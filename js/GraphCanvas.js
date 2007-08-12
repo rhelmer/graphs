@@ -257,9 +257,6 @@ Graph.prototype = {
     },
     
     resize: function () {
-        if(this.frontBuffer.width > 900) {
-                getElement('graph-container').style.width = (this.frontBuffer.width + 200) + "px";
-        }
         this.backBuffer.width = this.frontBuffer.width;
         this.backBuffer.height = this.frontBuffer.height;
         /* Always have at least 6 labels on the graph */
@@ -564,6 +561,10 @@ Graph.prototype = {
             globalCompositeOperation = "copy";
             drawImage(this.backBuffer, 0, 0);
         }
+
+        // if we don't have anything to graph, just give up
+        if (this.startTime == this.endTime)
+            return;
 
         var doDrawOverlay = false;
 

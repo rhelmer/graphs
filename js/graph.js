@@ -65,6 +65,11 @@ var SmallPerfGraph;
 var Bonsai;
 var graphType;
 
+var ResizableBigGraph;
+
+var SmallGraphSizeRuleIndex;
+var BigGraphSizeRuleIndex;
+
 function loadingDone(graphTypePref) {
     //createLoggingPane(true);
     graphType = graphTypePref;
@@ -86,6 +91,35 @@ function loadingDone(graphTypePref) {
         BigPerfGraph = new DiscreteGraph("graph");
         onDiscreteDataLoadChanged();
     }
+
+    // create CSS "smallgraph-size" and "graph-size" rules that the
+    // layout depends on
+    {
+        var sg = document.getElementById("smallgraph");
+        var g = document.getElementById("graph");
+
+        SmallGraphSizeRuleIndex = document.styleSheets[0].insertRule (
+            ".smallgraph-size { width: " + sg.width + "px; height: " + sg.height + "px; }",
+            document.styleSheets[0].cssRules.length);
+
+        BigGraphSizeRuleIndex = document.styleSheets[0].insertRule (
+            ".graph-size { width: " + g.width + "px; height: " + g.height + "px; }",
+            document.styleSheets[0].cssRules.length);
+    }
+
+    // make the big graph resizable
+    ResizableBigGraph = new ResizeGraph();
+    ResizableBigGraph.init('graph', function (nw, nh) {
+                               document.styleSheets[0].cssRules[BigGraphSizeRuleIndex].style.width = nw + "px";
+                               document.styleSheets[0].cssRules[BigGraphSizeRuleIndex].style.height = nh + "px";
+                               BigPerfGraph.resize();
+
+                               if (nw != document.getElementById("smallgraph").width) {
+                                   document.getElementById("smallgraph").width = nw;
+                                   document.styleSheets[0].cssRules[SmallGraphSizeRuleIndex].style.width = nw + "px";
+                                   SmallPerfGraph.resize();
+                               }
+                           } );
 
     Tinderbox.init();
 
@@ -218,7 +252,6 @@ function loadingDone(graphTypePref) {
         }
     }
 }
-
 
 function addExtraDataGraphForm(config, name) {
     showLoadingAnimation("populating lists");
