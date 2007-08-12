@@ -633,7 +633,10 @@ function showGraphList(s) {
        appendChildNodes(tbl_tr, new TD(ds.title));
     } 
     appendChildNodes("graph-label-list", tbl);
-    if (s.length == GraphFormModules[0].testIds.length) {
+    if (GraphFormModules.length > 0 &&
+        GraphFormModules[0].testIds &&
+        s.length == GraphFormModules[0].testIds.length)
+    {
       clearLoadingAnimation();
     }
     //replaceChildNodes("graph-label-list",rstring);
