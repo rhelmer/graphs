@@ -149,3 +149,8 @@ select.other {
   font-size: small;
   font-family: Tahoma, Verdana, Vera Sans, "Bitstream Vera Sans", Arial, Helvetica, sans-serif;
 }
+
+.linkbutton, .linkbutton:visited, .linkbutton:hover {
+  color: blue;
+  padding: 0px 3px 0px 3px;
+}
