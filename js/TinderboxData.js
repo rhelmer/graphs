@@ -49,54 +49,56 @@ function checkErrorReturn(obj) {
     return true;
 }
 
-function TinderboxData() {
-    this.onTestListAvailable = new YAHOO.util.CustomEvent("testlistavailable");
-    this.onDataSetAvailable = new YAHOO.util.CustomEvent("datasetavailable");
-    this.testList = null;
-    
-    this.testData = {};
+var gTinderboxDataCount = 0;
 
+function TinderboxData() {
+    this.testList = null;
+    this.testData = {};
+    this._id = gTinderboxDataCount;
+    gTinderboxDataCount++;
 }
 
 TinderboxData.prototype = {
+    eventTarget: null,
+
     testList: null,
     testData: null,
-
-    onTestListAvailable: null,
-    onDataSetAvailable: null,
 
     defaultLoadRange: null,
     raw: 0,
 
     init: function () {
+        // create an element to use as the event target
+        $("body").append("<div style='display:none' id='__TinderboxData" + this._id + "'></div>");
+        this.eventTarget = $("#__TinderboxData" + this._id);
+
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
-        
+
         loadJSONDoc(getdatacgi + "type=continuous")
         .addCallbacks(
             function (obj) {
                 if (!checkErrorReturn(obj)) return;
                 self.testList = obj.results;
                 //log("default test list" + self.testList);
-                self.onTestListAvailable.fire(self.testList);
+                $(self.eventTarget).trigger("tinderboxTestListAvailable", [self.testList]);
             },
             function () {alert ("Error talking to " + getdatacgi + ""); });
     },
 
     requestTestList: function (callback) {
-        //log("requestTestList default");
         var self = this;
         
         if (this.testList != null) {
             callback.call (window, this.testList);
         } else {
             var cb = 
-            function (type, args, obj) {
-                self.onTestListAvailable.unsubscribe(cb, obj);
-                obj.call (window, args[0]);
+            function (event, testList) {
+                $(self.eventTarget).unbind("tinderboxTestListAvailable", cb);
+                (event.data).call (window, testList);
             };
             
-            this.onTestListAvailable.subscribe (cb, callback);
+            $(self.eventTarget).bind("tinderboxTestListAvailable", callback, cb);
         }
     },
 
@@ -142,20 +144,21 @@ TinderboxData.prototype = {
         }
 
         var cb = 
-        function (type, args, obj) {
-            if (args[0] != testId ||
-                args[2] > startTime ||
-                args[3] < endTime)
+        function (event, aTID, aDS, aStartTime, aEndTime) {
+            if (aTID != testId ||
+                aStartTime > startTime ||
+                aEndTime < endTime)
             {
                 // not useful for us; there's another
                 // outstanding request for our time range, so wait for that
                 return;
             }
 
-            self.onDataSetAvailable.unsubscribe(cb, obj);
-            obj.call (window, args[0], args[1]);
+            $(self.eventTarget).unbind("tinderboxDataSetAvailable", cb);
+            (event.data).call (window, aTID, aDS);
         };
-        this.onDataSetAvailable.subscribe (cb, callback);
+
+        $(self.eventTarget).bind("tinderboxDataSetAvailable", callback, cb);
 
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
 
@@ -192,7 +195,8 @@ TinderboxData.prototype = {
                     ds.rawdata = obj.rawdata;
                 if (obj.stats)
                     ds.stats = obj.stats;
-                self.onDataSetAvailable.fire(testId, ds, startTime, endTime);
+
+                $(self.eventTarget).trigger("tinderboxDataSetAvailable", [testId, ds, startTime, endTime]);
             },
             function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
     },
@@ -466,20 +470,20 @@ ExtraDataTinderboxData.prototype = {
         }
 
         var cb = 
-        function (type, args, obj) {
-            if (args[0] != testId ||
-                args[2] > startTime ||
-                args[3] < endTime)
+        function (event, aTID, aDS, aStartTime, aEndTime) {
+            if (aTID != testId ||
+                aStartTime > startTime ||
+                aEndTime < endTime)
             {
                 // not useful for us; there's another
                 // outstanding request for our time range, so wait for that
                 return;
             }
 
-            self.onDataSetAvailable.unsubscribe(cb, obj);
-            obj.call (window, args[0], args[1]);
+            $(self.eventTarget).unbind("tinderboxDataSetAvailable", cb);
+            (event.data).call (window, aTID, aDS);
         };
-        this.onDataSetAvailable.subscribe (cb, callback);
+        $(self.eventTarget).bind("tinderboxDataSetAvailable", callback, cb);
 
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
 
@@ -518,7 +522,7 @@ ExtraDataTinderboxData.prototype = {
                     ds.rawdata = obj.rawdata;
                 if (obj.stats)
                     ds.stats = obj.stats;
-                self.onDataSetAvailable.fire(testId, ds, startTime, endTime);
+                $(self.eventTarget).trigger("tinderboxDataSetAvailable", [testId, ds, startTime, endTime]);
             },
             function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
     },

@@ -72,6 +72,143 @@ var ResizableBigGraph;
 var SmallGraphSizeRuleIndex;
 var BigGraphSizeRuleIndex;
 
+// discrete graph config
+var DGC;
+
+function initDiscreteGraph() {
+    window.GraphFormModules = [];
+
+    DGC = { };
+
+    DGC.isLimit = $("#num-days-radio").get(0);
+    DGC.limitDays = $("#load-days-entry").get(0);
+    DGC.testSelect = $("#testselect").get(0);
+    DGC.branchSelect = $("#branchselect").get(0);
+    DGC.machineSelect = $("#machineselect").get(0);
+    DGC.testtypeSelect = $("#testtypeselect").get(0);
+
+    // just grab an element somewhere, doesn't matter which
+    DGC.eventTarget = $("#graphconfig").get(0);
+
+    DGC.onChangeTest = function (forceTestIds) {
+        DGC.tests = [];
+        for each (var opt in this.testSelect.options) {
+            if (opt.selected)
+                this.tests.push([opt.value, opt.text]);
+        }
+
+        $(DGC.eventTarget).trigger("DGCAddedInitialInfo");
+    };
+
+    DGC.getQueryString = function () {
+    };
+
+    DGC.getDumpString = function () {
+    };
+
+    DGC.update = function (limitD, branch, machine, testname) {
+        $(DGC.eventTarget).trigger("formLoading", ["updating test list"]);
+        Tinderbox.requestTestList(limitD, branch, machine, testname, function(tests) {
+                                      var branch_opts = [];
+                                      if (tests == '') {
+                                        log("empty test list"); 
+                                        $(DGC.eventTarget).trigger("formLoadingDone");
+                                        $(DGC.testSelect).empty();
+                                        $("#graphbutton").attr("disabled", "true");
+                                        return;
+                                      }
+                                      // let's sort by machine name
+                                      var sortedTests = Array.sort(tests, function (a, b) {
+                                                                       if (a.machine < b.machine) return -1;
+                                                                       if (a.machine > b.machine) return 1;
+                                                                       if (a.test < b.test) return -1;
+                                                                       if (a.test > b.test) return 1;
+                                                                       if (a.test_type < b.test_type) return -1;
+                                                                       if (a.test_type > b.test_type) return 1;
+                                                                       if (a.date < b.date) return -1;
+                                                                       if (a.date > b.date) return 1;
+                                                                       return 0;
+                                                                   });
+
+                                      $(DGC.testSelect).empty();
+
+                                      for each (var test in sortedTests) {
+                                          var d = new Date(test.date*1000);
+                                          var s1 = (d.getHours() < 10 ? "0" : "") + d.getHours() + (d.getMinutes() < 10 ? ":0" : ":") + d.getMinutes() +
+                                                                  //(d.getSeconds() < 10 ? ":0" : ":") + d.getSeconds() +
+                                                                  " " + (d.getDate() < 10 ? "0" : "") + d.getDate();
+                                          s1 +=  "/" + MONTH_ABBREV[d.getMonth()] + "/" + (d.getFullYear() -2000 < 10 ? "0" : "") + (d.getFullYear() - 2000);
+                                          var padstr = "--------------------";
+                                          var tstr = "" + //test.test + padstr.substr(0, 20-test.test.length) + 
+                                              test.branch.toString() + padstr.substr(0, 6-test.branch.toString().length) + 
+                                              "-" + test.machine + padstr.substr(0, 10-test.machine.length) + 
+                                              "-" + s1;
+                                          startSelected = false;
+
+                                          var opt = $("<option>" + tstr + "</option>");
+                                          opt.attr("value", test.id);
+                                          opt.appendTo(DGC.testSelect);
+                                          opt.get(0).selected = startSelected;
+                                      }
+
+                                      $("#listname").empty();
+                                      $("#listname").append("Select from " + testname + ":");
+
+                                      $("#graphbutton").removeAttr("disabled");
+
+                                      setTimeout(function () { DGC.onChangeTest(); }, 0);
+                                      $(DGC.eventTarget).trigger("formLoadingDone");
+                                  });
+
+    };
+
+    // do this after we finish loading
+    var userName = null;
+    var forceTestIds = null;
+
+    // grab the list of test types
+    Tinderbox.requestSearchList(null, null, 1, function (list) {
+                                    try {
+                                        $(DGC.testtypeSelect).empty();
+                                        for each (var listvalue in list)  {
+                                            var opt = $("<option>" + listvalue.value + "</option>");
+                                            opt.attr("value", listvalue.value);
+                                            if ((userName) && (userName == listvalue.value))
+                                                opt.attr("selected", "true");
+                                            $(DGC.testtypeSelect).append(opt);
+                                        }
+
+                                        if (forceTestIds == null) {
+                                            DGC.testtypeSelect.options[0].selected = true;
+                                            DGC.update(null, null, null, DGC.testtypeSelect.value, forceTestIds);
+                                        } else {
+                                            DGC.update(null, null, null, userName, forceTestIds);
+                                        }} catch (ex) { log(ex); }
+                                });
+
+    // grab the list of branch names
+    Tinderbox.requestSearchList(1, null, null, function (list) {
+                                    $(DGC.branchSelect).empty();
+                                    for each (var listvalue in list) {
+                                        var opt = $("<option>" + listvalue.value + "</option>");
+                                        opt.attr("value", listvalue.value);
+                                        opt.get(0).selected = true;
+                                        $(DGC.branchSelect).append(opt);
+                                    }
+                                });
+
+    // grab the list of machine name
+    Tinderbox.requestSearchList(1, null, null, function (list) {
+                                    $(DGC.machineSelect).empty();
+                                    for each (var listvalue in list) {
+                                        var opt = $("<option>" + listvalue.value + "</option>");
+                                        opt.attr("value", listvalue.value);
+                                        opt.get(0).selected = true;
+                                        $(DGC.machineSelect).append(opt);
+                                    }
+                                });
+}
+
 function loadingDone(graphTypePref) {
 
     loadOptions();
@@ -91,13 +228,18 @@ function loadingDone(graphTypePref) {
         Tinderbox = new ExtraDataTinderboxData();
         SmallPerfGraph = new CalendarTimeGraph("smallgraph");
         BigPerfGraph = new CalendarTimeGraph("graph");
-    } else {
+    } else if (graphType == DISCRETE_GRAPH) {
         Tinderbox = new DiscreteTinderboxData();
         Tinderbox.raw = 1;
         SmallPerfGraph = new DiscreteGraph("smallgraph");
         BigPerfGraph = new DiscreteGraph("graph");
 
+        initDiscreteGraph();
+
         onDiscreteDataLoadChanged();
+    } else {
+        alert("What?");
+        return;
     }
 
     // handle saved options
@@ -161,77 +303,28 @@ function loadingDone(graphTypePref) {
     BigPerfGraph.setSelectionType("cursor");
     BigPerfGraph.setCursorType("snap");
 
-
-    SmallPerfGraph.onSelectionChanged.
-        subscribe (function (type, args, obj) {
-                       log ("selchanged");
-
-                       if (args[0] == "range") {
-                           var t1 = SmallPerfGraph.startTime;
-                           var t2 = SmallPerfGraph.endTime;
-
-                           if (args[1] && args[2]) {
-                               t1 = args[1];
-                               t2 = args[2];
-
-                               var foundIndexes = [];
-
-                               // make sure that there are at least two points
-                               // on at least one graph for this
-                               var foundPoints = false;
-                               var dss = BigPerfGraph.dataSets;
-                               for (var i = 0; i < dss.length; i++) {
-                                   var idcs = dss[i].indicesForTimeRange(t1, t2);
-                                   if (idcs[1] - idcs[0] > 1) {
-                                       foundPoints = true;
-                                       break;
-                                   }
-                                   foundIndexes.push(idcs);
-                               }
-
-                               if (!foundPoints) {
-                                   // we didn't find at least two points in at least
-                                   // one graph; so munge the time numbers until we do.
-                                   log("Orig t1 " + t1 + " t2 " + t2);
-
-                                   for (var i = 0; i < dss.length; i++) {
-                                       if (foundIndexes[i][0] > 0) {
-                                           t1 = Math.min(dss[i].data[(foundIndexes[i][0] - 1) * 2], t1);
-                                       } else if (foundIndexes[i][1]+1 < (ds.data.length/2)) {
-                                           t2 = Math.max(dss[i].data[(foundIndexes[i][1] + 1) * 2], t2);
-                                       }
-                                   }
-
-                                   log("Fixed t1 " + t1 + " t2 " + t2);
-                               }
-                           }
-
-                           if (document.getElementById("bonsailink"))
-                               document.getElementById("bonsailink").href = makeBonsaiLink(t1, t2);
-
-                           BigPerfGraph.setTimeRange (t1, t2);
-                           BigPerfGraph.autoScale();
-                           BigPerfGraph.redraw();
-                       }
-                       
-                       updateLinkToThis();
-                       updateDumpToCsv();
-                   });
-
-    BigPerfGraph.onCursorMoved.subscribe (onCursorMoved);
+    $(SmallPerfGraph.eventTarget).bind ("graphSelectionChanged", onGraphSelectionChanged);
+    $(BigPerfGraph.eventTarget).bind("graphCursorMoved", onCursorMoved);
 
     if (graphType == CONTINUOUS_GRAPH) {
-         BigPerfGraph.onNewGraph.
-             subscribe (function(type, args, obj) {
-               if (args[0].length >= GraphFormModules.length) {
-                   clearLoadingAnimation();
-               }
-             });
+        $(BigPerfGraph.eventTarget).bind("graphNewGraph",
+                                         function (event, dss) {
+                                             if (dss.length >= GraphFormModules.length)
+                                                 clearLoadingAnimation();
+                                         });
     } else if (graphType == DATA_GRAPH || graphType == DISCRETE_GRAPH) {
-         BigPerfGraph.onNewGraph.
-             subscribe (function(type, args, obj) {
-                            showGraphList(args[0]);
-                        });
+        $(BigPerfGraph.eventTarget).bind("graphNewGraph",
+                                         function (event, dss) {
+                                             showGraphList(dss);
+                                         });
+
+        $(BigPerfGraph.eventTarget).bind("graphSelectionChanged",
+                                         function (event, selectionType, arg1, arg2) {
+                                             if (selectionType == "cursor") {
+                                                 var val = Math.floor(arg1);
+                                                 zoomToTimes(val - 15, val + 15);
+                                             }
+                                         });
     }
 
     if (document.location.hash) {
@@ -293,10 +386,16 @@ function saveGraphDimensions(w, h) {
 function addExtraDataGraphForm(config, name) {
     showLoadingAnimation("populating lists");
     var ed = new ExtraDataGraphFormModule(config, name);
-    ed.onLoading.subscribe (function(type,args,obj) { showLoadingAnimation(args[0]);});
-    ed.onLoadingDone.subscribe (function(type,args,obj) { clearLoadingAnimation();});
+    $(ed.eventTarget).bind ("formLoading", function(event, notice) {
+                                showLoadingAnimation(notice);
+                            });
+    $(ed.eventTarget).bind ("formLoadingDone", function(event) {
+                                clearLoadingAnimation();
+                            });
     if (config) {
-        ed.addedInitialInfo.subscribe(function(type,args,obj) { graphInitial();});
+        $(ed.eventTarget).bind ("formAddedInitialInfo", function(event) {
+                                    graphInitial();
+                                });
     }
     ed.render (getElement("graphforms"));
     return ed;
@@ -304,25 +403,25 @@ function addExtraDataGraphForm(config, name) {
 
 function addDiscreteGraphForm(config, name) {
     showLoadingAnimation("populating lists");
-    //log("name: " + name);
-    var m = new DiscreteGraphFormModule(config, name);
-    m.onLoading.subscribe (function(type,args,obj) { showLoadingAnimation(args[0]);});
-    m.onLoadingDone.subscribe (function(type,args,obj) { clearLoadingAnimation();});
-    if (config) {
-        m.addedInitialInfo.subscribe(function(type,args,obj) { graphInitial();});
-    }
-    m.render (getElement("graphforms"));
-    //m.setColor(randomColor());
-    return m;
+    $(DGC.eventTarget).bind("formLoading",
+                            function (event, notice) {
+                                showLoadingAnimation(notice);
+                            });
+    $(DGC.eventTarget).bind ("formLoadingDone", function(event) {
+                                 clearLoadingAnimation();
+                             });
+
+    // ???
+    // m.addedInitialInfo.subscribe(function(type,args,obj) { graphInitial();});
 }
 
 function addGraphForm(config) {
     showLoadingAnimation("populating list");
-    var m = new GraphFormModule(config);
-    m.render (getElement("graphforms"));
+    var m = new GraphFormModule();
+    m.init($("#graphforms"));
     m.setColor(randomColor());
-    m.onLoading.subscribe (function(type,args,obj) { showLoadingAnimation(args[0]);});
-    m.onLoadingDone.subscribe (function(type,args,obj) { clearLoadingAnimation();});
+    $(m.eventTarget).bind("formLoadingProgress", function(event, message) { showLoadingAnimation(message); });
+    $(m.eventTarget).bind("formLoadingDone", function(event) { clearLoadingAnimation(); });
     return m;
 }
 
@@ -368,7 +467,11 @@ function onGraph()  {
 
     // do the actual graph data request
     var baselineModule = null;
-    GraphFormModules.forEach (function (g) { if (g.baseline) baselineModule = g; });
+    if (GraphFormModules)
+        GraphFormModules.forEach (function (g) { if (g.baseline) baselineModule = g; });
+
+    // we have to request the baseline first, because we need to generate the other
+    // datasets relative to it.
     if (baselineModule) {
         Tinderbox.requestDataSetFor (baselineModule.testId,
                                      function (testid, ds) {
@@ -384,13 +487,30 @@ function onGraph()  {
 }
 
 function onGraphLoadRemainder(baselineDataSet) {
-    for each (var graphModule in GraphFormModules) {
-        //log ("onGraphLoadRemainder: ", graphModule.id, graphModule.testId, "color:", graphModule.color, "average:", graphModule.average);
+    var testIds = [];
+    var isAverage = [];
+    var dsTitle = [];
 
-        // this would have been loaded earlier
-        if (graphModule.baseline)
-            continue;
+    if (DGC) {
+        for each (var t in DGC.tests) {
+            testIds.push(t[0]);
+            isAverage.push(false);
+            dsTitle.push(t[1]);
+        }
+    } else {
+        for each (var gm in GraphFormModules) {
+            if (gm.baseline)
+                continue;
 
+            testIds.push(gm.testId);
+            isAverage.push(gm.average);
+            dsTitle.push(null);
+        }
+    }
+
+    log (testIds);
+
+    for (var i = 0; i < testIds.length; i++) {
         var autoExpand = true;
         if (SmallPerfGraph.selectionType == "range" &&
             SmallPerfGraph.selectionStartTime &&
@@ -407,39 +527,31 @@ function onGraphLoadRemainder(baselineDataSet) {
             autoExpand = false;
         }
 
-        // we need a new closure here so that we can get the right value
-        // of graphModule in our closure
-        var makeCallback = function (module, color, title) {
+        var makeCallback = function (average, color, title) {
             return function (testid, ds) {
                 try {
                     log("ds.firstTime " + ds.firstTime + " ds.lastTime " + ds.lastTime);
                     if (!("firstTime" in ds) || !("lastTime" in ds)) {
-                       // got a data set with no data in this time range, or damaged data
-                       // better to not graph
-                       for each (g in [BigPerfGraph, SmallPerfGraph]) {
-                           g.clearGraph();
+                        // got a data set with no data in this time range, or damaged data
+                        // better to not graph
+                        for each (g in [BigPerfGraph, SmallPerfGraph]) {
+                            g.clearGraph();
 
-                       }
-                       showStatus("No data in the given time range");
-                       clearLoadingAnimation();
-                       
-                    }
-                    else {
-                        ds.color = color;
-                        if (title) {
-                            ds.title = title;
                         }
+
+                        showStatus("No data in the given time range -- got an invalid data set (testid " + testid + "?");
+                        clearLoadingAnimation();
+                    } else {
+                        ds.color = color;
+                        ds.title = title ? title : ds.title;
 
                         if (baselineDataSet)
                             ds = ds.createRelativeTo(baselineDataSet);
 
                         //log ("got ds: (", module.id, ")", ds.firstTime, ds.lastTime, ds.data.length);
                         var avgds = null;
-                        if (baselineDataSet == null &&
-                            module.average)
-                        {
+                        if (baselineDataSet == null && average)
                             avgds = ds.createAverage(gAverageInterval);
-                        }
 
                         if (avgds)
                             log ("got avgds: (", module.id, ")", avgds.firstTime, avgds.lastTime, avgds.data.length);
@@ -459,34 +571,15 @@ function onGraphLoadRemainder(baselineDataSet) {
                             gReadyForRedraw = true;
                         }
 
-                        //if (graphType == CONTINUOUS_GRAPH) {
-                            updateLinkToThis();
-                            updateDumpToCsv();
-                        //}
+                        updateLinkToThis();
+                        updateDumpToCsv();
                     }
-
                 } catch(e) { log(e); }
             };
         };
 
-        if (graphModule.testIds) {  
-          if ( graphType == DISCRETE_GRAPH ) {
-            var testIds = new Array();
-            for each ( var testId in graphModule.testIds ) {
-                testIds[testId[0]] = makeCallback(graphModule, randomColor(), testId[1]);
-            }
-            Tinderbox.requestDataSetFor(testIds);
-          } else { 
-              for each (var testId in graphModule.testIds) { 
-               // log ("working with testId: " + testId);
-                Tinderbox.requestDataSetFor (testId[0], makeCallback(graphModule, randomColor(), testId[1]));
-              }
-          }
-        }
-        else {
-           // log ("working with standard, single testId");
-            Tinderbox.requestDataSetFor (graphModule.testId, makeCallback(graphModule, graphModule.color));
-        }
+
+        Tinderbox.requestDataSetFor (testIds[i], makeCallback(isAverage[i], randomColor(), dsTitle[i]));
     }
 }
 
@@ -540,23 +633,20 @@ function onDiscreteDataLoadChanged() {
     randomColorBias = 0;
 }
 
-function findGraphModule(testId) {
-    for each (var gm in GraphFormModules) {
-        if (gm.testId == testId)
-            return gm;
-    }
-    return null;
-}
-
 function updateDumpToCsv() {
-  var ds = "?"
-  prefix = ""
-  for each (var gm in GraphFormModules) {
-    ds += prefix + gm.getDumpString();
-    prefix = "&"
-  }
-  log ("ds");
-  getElement("dumptocsv").href = "http://" + document.location.host + "/dumpdata.cgi" + ds;
+    var ds = "?";
+    var prefix = "";
+
+    if (DGC) {
+        ds += DGC.getDumpString();
+    } else {
+        for each (var gm in GraphFormModules) {
+            ds += prefix + gm.getDumpString();
+            prefix = "&";
+        }
+    }
+
+    getElement("dumptocsv").href = "http://" + document.location.host + "/dumpdata.cgi" + ds;
 }
 
 function updateLinkToThis() {
@@ -566,18 +656,13 @@ function updateLinkToThis() {
     qs += "&";
     qs += BigPerfGraph.getQueryString("bp");
 
-    if (graphType == CONTINUOUS_GRAPH) {
+    if (DGC) {
+        qs += "&gt=d&name=" + DGC.name + "&" + DGC.getQueryString("m0");
+    } else {
         var ctr = 1;
         for each (var gm in GraphFormModules) {
             qs += "&" + gm.getQueryString("m" + ctr);
             ctr++;
-        }
-    }
-    else {
-        qs += "&";
-        qs += "name=" + GraphFormModules[0].name;
-        for each (var gm in GraphFormModules) {
-            qs += gm.getQueryString("m");
         }
     }
 
@@ -630,7 +715,7 @@ function handleHash(hash) {
 function graphInitial() {
     GraphFormModules[0].addedInitialInfo.unsubscribeAll();
     Tinderbox.requestTestList(null, null, null, null, function (tests) { 
-        setTimeout(onGraph, 0); 
+        setTimeout(onGraph, 0);
     });
 }
 
@@ -654,7 +739,6 @@ function clearLoadingAnimation() {
 
 function showGraphList(s) {
     replaceChildNodes("graph-label-list",null);
-   // log("s: " +s);
     var tbl = new TABLE({});
     var tbl_tr = new TR();
     appendChildNodes(tbl_tr, new TD(""));
@@ -799,11 +883,26 @@ function saveOptions() {
     }
 }
 
-function onCursorMoved(type, args, obj) {
-    var time = args[0];
-    var val = args[1];
-    var extra_data = args[2];
+function onGraphSelectionChanged(event, selectionType, arg1, arg2) {
+    log ("selchanged");
 
+    if (selectionType == "range") {
+        var t1 = SmallPerfGraph.startTime;
+        var t2 = SmallPerfGraph.endTime;
+
+        if (arg1 && arg2) {
+            t1 = arg1;
+            t2 = arg2;
+        }
+
+        zoomToTimes(t1, t2);
+    }
+
+    updateLinkToThis();
+    updateDumpToCsv();
+}
+
+function onCursorMoved(event, time, val, extra_data) {
     var extra = "";
     var label = "Date: ";
     if (graphType == DISCRETE_GRAPH) {

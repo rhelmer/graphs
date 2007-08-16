@@ -38,89 +38,52 @@
 var GraphFormModules = [];
 var GraphFormModuleCount = 0;
 
-function GraphFormModule(userConfig) {
+function GraphFormModule() {
     GraphFormModuleCount++;
-    this.__proto__.__proto__.constructor.call(this, "graphForm" + GraphFormModuleCount, userConfig);
+
+    this._id = GraphFormModuleCount;
 }
 
-GraphFormModule.prototype = {
-    __proto__: new YAHOO.widget.Module(),
 
+GraphFormModule.prototype = {
     imageRoot: "",
 
     testId: null,
     baseline: false,
     average: false,
     color: "#000000",
-    onLoadingDone : new YAHOO.util.CustomEvent("onloadingdone"),
-    onLoading : new YAHOO.util.CustomEvent("onloading"),
 
-    init: function (el, userConfig) {
+    makeID: function (str) {
+        return "__FormModule" + this._id + str;
+    },
+
+    init: function (parent) {
         var self = this;
 
-        this.__proto__.__proto__.init.call(this, el/*, userConfig*/);
-        
-        this.cfg = new YAHOO.util.Config(this);
-        this.cfg.addProperty("testid", { suppressEvent: true });
-        this.cfg.addProperty("average", { suppressEvent: true });
-        this.cfg.addProperty("baseline", { suppressEvent: true });
+        // plusminus onclick="$("#' + this.makeID() + '").remove();"
+        // testname 
+        // average onchange: function(event) { self.average = event.target.checked; } }
+        $(parent).append(
+'<div class="graphform-line">' +
+' <img id="' + this.makeID("plusminus") + '" src="js/img/minus.png" class="plusminus">' +
+' <div id="' + this.makeID("colordiv") + '" style="display: inline; display: inline-block; border: 1px solid black; height: 15px; padding-right: 15px; vertical-align: middle; margin: 3px;"></div>' +
+' <select id="' + this.makeID("testname") + '" class="testname"></select>' +
+' <label>Average:</label> <input id="' + this.makeID("average") + '" type="checkbox"></input>' +
+'</div>'
+);
 
-        if (userConfig)
-            this.cfg.applyConfig(userConfig, true);
+        $("#" + this.makeID("plusminus")).click(function () { self.remove(); });
+        $("#" + this.makeID("testname")).bind("change", function () { self.onChangeTest(); });
+        $("#" + this.makeID("average")).bind("change", function (event) { self.average = event.target.checked; });
 
-        var form, td, el;
+        this.eventTarget = $("#" + this.makeID()).get(0);
+        this.colorDiv = $("#" + this.makeID("colordiv")).get(0);
+        this.testSelect = $("#" + this.makeID("testname")).get(0);
+        this.averageCheckbox = $("#" + this.makeID("average")).get(0);
 
-        form = new DIV({ class: "graphform-line" });
-
-        td = new SPAN();
-/*
-        el = new IMG({ src: "js/img/plus.png", class: "plusminus",
-                       onclick: function(event) { addGraphForm(); } });
-        td.appendChild(el);
-*/
-        el = new IMG({ src: "js/img/minus.png", class: "plusminus",
-                       onclick: function(event) { self.remove(); } });
-        td.appendChild(el);
-        form.appendChild(td);
-
-        td = new SPAN();
-        el = new DIV({ id: "whee", style: "display: inline; border: 1px solid black; height: 15; " +
-                              "padding-right: 15; vertical-align: middle; margin: 3px;" });
-        this.colorDiv = el;
-        td.appendChild(el);
-        form.appendChild(td);
-
-        td = new SPAN();
-        el = new SELECT({ name: "testname",
-                          class: "testname",
-                          onchange: function(event) { self.onChangeTest(); } });
-        this.testSelect = el;
-        td.appendChild(el);
-        form.appendChild(td);
-
-        td = new SPAN({ style: "padding-left: 10px;"});
-        appendChildNodes(td, "Average:");
-        el = new INPUT({ name: "average",
-                         type: "checkbox",
-                         onchange: function(event) { self.average = event.target.checked; } });
-        this.averageCheckbox = el;
-        td.appendChild(el);
-        form.appendChild(td);
-
-        this.setBody (form);
-
-        var forceTestId = null;
-        this.average = false;
-        if (userConfig) {
-            forceTestId = this.cfg.getProperty("testid");
-            avg = this.cfg.getProperty("average");
-            baseline = this.cfg.getProperty("baseline");
-            if (avg == 1) {
-                this.averageCheckbox.checked = true;
-                this.average = true;
-            }
-            if (baseline == 1)
-                this.onBaseLineRadioClick();
+        if (this.average == 1) {
+            this.averageCheckbox.checked = true;
+            this.average = true;
         }
 
         Tinderbox.requestTestList(function (tests) {
@@ -136,19 +99,23 @@ GraphFormModule.prototype = {
                                                                        return 0;
                                                                    });
 
+                                      $(self.testSelect).empty();
+
                                       for each (var test in sortedTests) {
                                           var tstr = test.machine + " - " + test.test + " - " + test.branch;
-                                          opts.push(new OPTION({ value: test.id }, tstr));
+                                          var opt = $("<option value='" + test.id + "'>" + tstr +"</option>");
+                                          opt.appendTo(self.testSelect);
+                                          opts.push(opt.get(0));
                                       }
-                                      replaceChildNodes(self.testSelect, opts);
 
-                                      if (forceTestId != null) {
-                                          self.testSelect.value = forceTestId;
+                                      if (self.testId != null) {
+                                          self.testSelect.value = self.testId;
                                       } else {
                                           self.testSelect.value = sortedTests[0].id;
                                       }
-                                      setTimeout(function () { self.onChangeTest(forceTestId); }, 0);
-                                      self.onLoadingDone.fire();
+                                      self.testId = self.testSelect.value;
+
+                                      $(self.eventTarget).trigger("formLoadingDone");
                                   });
 
         GraphFormModules.push(this);
@@ -161,7 +128,7 @@ GraphFormModule.prototype = {
 
     getDumpString: function () {
        return "setid=" + this.testId;
-     },
+    },
 
     onChangeTest: function (forceTestId) {
         this.testId = this.testSelect.value;
@@ -187,6 +154,7 @@ GraphFormModule.prototype = {
                 nf.push(f);
         }
         GraphFormModules = nf;
-        this.destroy();
+
+        $(document).remove("#" + this.makeID(""));
     },
 };

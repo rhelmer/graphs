@@ -75,20 +75,6 @@
   margin-bottom: 5px;
 }
 
-.graphform-first-span {
-/*  font-weight: bold; */
-}
-
-/*
-#graphforms div .bd .graphform-line .graphform-first-span:after {
-  content: "For ";
-}
-
-.module + .module .bd .graphform-line .graphform-first-span:after {
-  content: "and " ! important;
-}
-*/
-
 select.tinderbox, select.testname {
   font-family: monospace;
   width: 350px;
@@ -163,4 +149,16 @@ select.other {
 .linkbutton, .linkbutton:visited, .linkbutton:hover {
   color: blue;
   padding: 0px 3px 0px 3px;
+}
+
+/* new */
+.leftbar {
+  width: 200px;
+   height: 200px;
+  float: left;
+}
+
+.content {
+  position: relative;
+  clear: left;
 }

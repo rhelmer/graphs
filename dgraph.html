@@ -8,19 +8,15 @@
     <!-- MochiKit -->
     <script type="text/javascript" src="js/mochikit/MochiKit.js"></script>
 
-    <!-- YUI -->
-    <script type="text/javascript" src="js/yui/yahoo.js"></script>
-    <script type="text/javascript" src="js/yui/dom.js"></script>
-    <script type="text/javascript" src="js/yui/event.js"></script>
-    <script type="text/javascript" src="js/yui/animation.js"></script>
-    <script type="text/javascript" src="js/yui/container.js"></script>
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery.pack.js"></script>
+    <script type="text/javascript" src="js/jquery.dimensions.pack.js"></script>
 
     <!-- Core -->
     <script type="text/javascript" src="js/TinderboxData.js"></script>
     <script type="text/javascript" src="js/DataSet.js"></script>
     <script type="text/javascript" src="js/GraphCanvas.js"></script>
 
-    <script type="text/javascript" src="js/dGraphFormModule.js"></script>
     <script type="text/javascript" src="js/graph.js"></script>
     <script type="text/javascript" src="js/ResizeGraph.js"></script>
 
@@ -40,12 +36,44 @@
       <table class="graphconfig-no" width="100%">
 
         <tr style="vertical-align: top">
-          <td class="graphconfig-list">
-            <div id="graphforms"></div>
+          <td id="graphconfig" class="graphconfig-list">
+	    <table>
+	      <tr><td colspan="2">Limit selection list by:</td><td>Choose test(s) to graph:</td></tr>
+	      <tr>
+		<td>
+		  <input name="dataload" id="all-days-radio" type="radio" checked="1"
+		    onchange="DGC.update(null, DGC.branchSelect.value, DGC.machineSelect.value, DGC.testtypeSelect.value);">all data
+		  <br>
+		  <input name="dataload" id="num-days-radio" type="radio" checked="1"
+		      onchange="DGC.update(DGC.limitDays.value, DGC.branchSelect.value, DGC.machineSelect.value, DGC.testtypeSelect.value);">last <input name="load-days-entry" id="load-days-entry" size="3" value="5"
+		    onchange="DGC.update(DGC.limitDays.value, DGC.branchSelect.value, DGC.machineSelect.value, DGC.testtypeSelect.value);"> days
+		</td>
+		<td>
+		  Branch:<br>
+		  <select name="branchname" id="branchselect" class="other" size="5"
+		    onchange="DGC.update(DGC.isLimit.checked ? DGC.limitDays.value : null, DGC.branchSelect.value, DGC.machineSelect.value, DGC.testtypeSelect.value);"></select>
+		</td>
 
-          </td>
-          <td class="graphconfig-test-list">
-            <div id="graphforms-test-list"></div>
+		<td colspan="2" rowspan="2">
+		  <span id="listname"></span><br>
+		  <select name="testname" id="testselect" class="testname" multiple="1" center="1" size="20"
+		    onchange="DGC.onChangeTest();"></select>
+		</td>
+	      </tr>
+
+	      <tr>
+		<td>
+		  Machine:<br>
+		  <select id="machineselect" name="machinename" class="other" size="5"
+		    onchange="DGC.update(DGC.isLimit.checked ? DGC.limitDays.value : null, DGC.branchSelect.value, DGC.machineSelect.value, DGC.testtypeSelect.value);"></select>
+		</td>
+		<td>
+		  Test name:<br>
+		  <select id="testtypeselect" name="testtypename" class="other" size="5"
+		    onchange="DGC.update(DGC.isLimit.checked ? DGC.limitDays.value : null, DGC.branchSelect.value, DGC.machineSelect.value, DGC.testtypeSelect.value);"></select>
+		</td>
+	      </tr>
+	    </table>
           </td>
 
           <td class="dgraphconfig">

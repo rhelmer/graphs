@@ -41,6 +41,8 @@ function Graph() {
 }
 
 Graph.prototype = {
+    eventTarget: null,
+
     startTime: null,
     endTime: null,
     offsetTime: 0,
@@ -101,11 +103,6 @@ Graph.prototype = {
     cursorTime: null,
     cursorValue: null,
 
-    // events to fire
-    onSelectionChanged: null,
-    onCursorMoved: null,
-    onNewGraph: null,
-
     // whether points should be drawn on the graph
     drawPoints: false,
     // radius (in pixels) of the points
@@ -137,9 +134,8 @@ Graph.prototype = {
 
         this.markers = new Array();
 
-        this.onSelectionChanged = new YAHOO.util.CustomEvent("graphselectionchanged");
-        this.onCursorMoved = new YAHOO.util.CustomEvent("graphcursormoved");
-        this.onNewGraph = new YAHOO.util.CustomEvent("onnewgraph");
+        this.eventTarget = this.frontBuffer;
+
         //log(this.offsetTime + " offsetTime");
     },
 
@@ -246,29 +242,30 @@ Graph.prototype = {
         if (this.selectionType == stype)
             return;
 
-        // clear out old listeners
-        if (this.selectionType == "range") {
-            YAHOO.util.Event.removeListener (this.frontBuffer, "mousedown", this.selectionMouseDown);
-            YAHOO.util.Event.removeListener (this.frontBuffer, "mousemove", this.selectionMouseMove);
-            YAHOO.util.Event.removeListener (this.frontBuffer, "mouseup", this.selectionMouseUp);
-            YAHOO.util.Event.removeListener (this.frontBuffer, "mouseout", this.selectionMouseOut);
-        } else if (this.selectionType == "cursor") {
-            YAHOO.util.Event.removeListener (this.frontBuffer, "mousedown", this.selectionMouseDown);
-        }
+        var self = this;
+
+        // we have to bind these as capturing events, otherwise I don't get the events;
+        // not sure why.  jQuery doesn't support capture phase events (due to cross-browser
+        // compat), so we use the DOM here.
+
+        this.removeEventList (this.frontBuffer, "selection");
 
         this.selectionStartTime = null;
         this.selectionEndTime = null;
         this.selectionCursorTime = null;
 
         if (stype == "range") {
-            YAHOO.util.Event.addListener (this.frontBuffer, "mousedown", this.selectionMouseDown, this, true);
-            YAHOO.util.Event.addListener (this.frontBuffer, "mousemove", this.selectionMouseMove, this, true);
-            YAHOO.util.Event.addListener (this.frontBuffer, "mouseup", this.selectionMouseUp, this, true);
-            YAHOO.util.Event.addListener (this.frontBuffer, "mouseout", this.selectionMouseOut, this, true);
+            this.addEventList (this.frontBuffer, "selection",
+                               [ "mousedown", function (event) { return self.selectionMouseDown(event); },
+                                 "mousemove", function (event) { return self.selectionMouseMove(event); },
+                                 "mouseup", function (event) { return self.selectionMouseUp(event); },
+                                 "mouseout", function (event) { return self.selectionMouseOut(event); } ] );
 
             this.selectionType = "range";
         } else if (stype == "cursor") {
-            YAHOO.util.Event.addListener (this.frontBuffer, "mousedown", this.selectionMouseDown, this, true);
+            this.addEventList (this.frontBuffer, "selection",
+                               [ "mousedown", function (event) { return self.selectionMouseDown(event); } ] );
+
             this.selectionType = "cursor";
         }
 
@@ -301,14 +298,18 @@ Graph.prototype = {
         if (this.cursorType == type)
             return;
 
-        if (this.cursorType == "free" || this.cursorType == "snap") {
-            YAHOO.util.Event.removeListener (this.frontBuffer, "mousemove", this.cursorMouseMove);
-            YAHOO.util.Event.removeListener (this.frontBuffer, "mouseout", this.cursorMouseOut);
-        }
+        var self = this;
+
+        // we have to bind these as capturing events, otherwise I don't get the events;
+        // not sure why.  jQuery doesn't support capture phase events (due to cross-browser
+        // compat), so we use the DOM here.
+
+        this.removeEventList (this.frontBuffer, "cursor");
 
         if (type == "free" || type == "snap") {
-            YAHOO.util.Event.addListener (this.frontBuffer, "mousemove", this.cursorMouseMove, this, true);
-            YAHOO.util.Event.addListener (this.frontBuffer, "mouseout", this.cursorMouseOut, this, true);
+            this.addEventList (this.frontBuffer, "cursor",
+                               [ "mousemove", function (event) { self.cursorMouseMove(event); },
+                                 "mouseout", function (event) { self.cursorMouseOut(event); } ]);
             this.cursorType = type;
         } else {
             this.cursorType = "none";
@@ -677,14 +678,10 @@ Graph.prototype = {
         }
 
         this.redrawOverlayOnly();
-        this.onNewGraph.fire(this.dataSets);
 
-        try {
-            this.makeLabels();
-        } catch (e) {
-            log(e);
-        }
+        $(this.eventTarget).trigger("graphNewGraph", [ this.dataSets ]);
 
+        this.makeLabels();
         this.valid = true;
     },
 
@@ -896,22 +893,18 @@ Graph.prototype = {
     },
 
     makeLabels: function () {
-        //log ("makeLabels");
         if (this.xLabelContainer) {
             var labels = [];
-            var xboxPos = YAHOO.util.Dom.getXY(this.xLabelContainer);
-            xboxPos[0] = xboxPos[0] + this.borderLeft;
-            xboxPos[1] = xboxPos[1] + this.borderTop;
             var labelValues = this.getTimeAxisLabels();
 
             for each (var lval in labelValues) {
-                var xpos = /*xboxPos[0] +*/ lval[0];
+                var xpos = lval[0];
                 var div = new DIV({ class: "x-axis-label" });
                 div.style.position = "absolute";
                 div.style.width = this.xLabelWidth + "px";
                 div.style.height = this.xLabelHeight + "px";
                 div.style.left = xpos + "px";
-                div.style.top = "0px"; //xboxPos[1] + this.frontBuffer.height;
+                div.style.top = "0px";
 
                 // XXX don't hardcode [2][0] etc.
                 appendChildNodes(div, lval[2][0], new BR(), lval[2][1]);
@@ -924,21 +917,18 @@ Graph.prototype = {
 
         if (this.yLabelContainer) {
             var labels = [];
-            var yboxPos = YAHOO.util.Dom.getXY(this.yLabelContainer);
-            yboxPos[0] = yboxPos[0] + this.borderLeft;
-            yboxPos[1] = yboxPos[1] + this.borderTop;
             var labelValues = this.getValueAxisLabels();
             var firstLabelShift = labelValues[labelValues.length-1][0]
 
             for each (var lval in labelValues) {
                 var ypos = this.frontBuffer.height - Math.round((lval[1] - this.yOffset) * this.yScale);
 
-                //var ypos = /*xboxPos[0] +*/ lval[0];
+                //var ypos = lval[0];
                 var div = new DIV({ class: "y-axis-label" });
                 div.style.position = "absolute";
                 div.style.width = this.yLabelWidth + "px";
                 div.style.height = this.yLabelHeight + "px";
-                div.style.left = "0px"; //xboxPos[0]
+                div.style.left = "0px";
                 // XXX remove the -8 once we figure out how to vertically center text in this box
                 div.style.top = (ypos-8) + "px";
 
@@ -982,7 +972,7 @@ Graph.prototype = {
             return;
 
         if (this.selectionType == "range") {
-            var pos = YAHOO.util.Dom.getX(this.frontBuffer) + this.borderLeft;
+            var pos = $(this.frontBuffer).offset().left + this.borderLeft;
             this.dragState = { startX: event.pageX - pos };
             var ds = this.dragState;
 
@@ -996,14 +986,14 @@ Graph.prototype = {
             
             this.selectionSweeping = true;
         } else if (this.selectionType == "cursor") {
-            var pos = YAHOO.util.Dom.getX(this.frontBuffer) + this.borderLeft;
+            var pos = $(this.frontBuffer).offset().left + this.borderLeft;
             var secondsPerPixel = (this.endTime - this.startTime + this.offsetTime) / this.frontBuffer.width;
 
             this.selectionCursorTime = (event.pageX - pos) * secondsPerPixel + this.startTime;
 
             this.redrawOverlayOnly();
 
-            this.onSelectionChanged.fire("cursor", this.selectionCursorTime);
+            $(this.eventTarget).trigger("graphSelectionChanged", ["cursor", this.selectionCursorTime]);
         }
     },
 
@@ -1024,7 +1014,7 @@ Graph.prototype = {
     },
 
     selectionUpdateFromEventPageCoordinate: function(pagex) {
-        var pos = YAHOO.util.Dom.getX(this.frontBuffer) + this.borderLeft;
+        var pos = $(this.frontBuffer).offset().left + this.borderLeft;
         var ds = this.dragState;
         ds.curX = pagex - pos;
         if (ds.curX > this.frontBuffer.width)
@@ -1058,7 +1048,7 @@ Graph.prototype = {
 
         this.selectionSweeping = false;
 
-        var pos = YAHOO.util.Dom.getX(this.frontBuffer) + this.borderLeft;
+        var pos = $(this.frontBuffer).offset().left + this.borderLeft;
         if (this.dragState.startX == event.pageX - pos) {
             // mouse didn't move
             this.selectionStartTime = null;
@@ -1067,7 +1057,7 @@ Graph.prototype = {
             this.redrawOverlayOnly();
         }
 
-        this.onSelectionChanged.fire("range", this.selectionStartTime, this.selectionEndTime);
+        $(this.eventTarget).trigger("graphSelectionChanged", ["range", this.selectionStartTime, this.selectionEndTime]);
     },
 
     selectionMouseOut: function(event) {
@@ -1078,7 +1068,8 @@ Graph.prototype = {
         this.redrawOverlayOnly();
 
         this.selectionSweeping = false;
-        this.onSelectionChanged.fire("range", this.selectionStartTime, this.selectionEndTime);
+
+        $(this.eventTarget).trigger("graphSelectionChanged", ["range", this.selectionStartTime, this.selectionEndTime]);
     },
 
     /*
@@ -1091,14 +1082,14 @@ Graph.prototype = {
         if (this.cursorType != "free" && this.cursorType != "snap")
             return;
 
-        var pos = YAHOO.util.Dom.getXY(this.frontBuffer);
-        pos[0] = pos[0] + this.borderLeft;
-        pos[1] = pos[1] + this.borderTop;
+        var pos = $(this.frontBuffer).offset();
+        pos.left = pos.left + this.borderLeft;
+        pos.top = pos.top + this.borderTop;
         var secondsPerPixel = (this.endTime - this.startTime + this.offsetTime) / this.frontBuffer.width;
         var valuesPerPixel = 1.0 / this.yScale;
 
-        var pointTime = (event.pageX - pos[0]) * secondsPerPixel + this.startTime;
-        var pointValue = (this.frontBuffer.height - (event.pageY - pos[1])) * valuesPerPixel + this.yOffset;
+        var pointTime = (event.pageX - pos.left) * secondsPerPixel + this.startTime;
+        var pointValue = (this.frontBuffer.height - (event.pageY - pos.top)) * valuesPerPixel + this.yOffset;
 
         var snapToPoints = (this.cursorType == "snap");
 
@@ -1148,7 +1139,7 @@ Graph.prototype = {
           }
         }
 
-        this.onCursorMoved.fire(this.cursorTime, this.cursorValue, extra_data);
+        $(this.eventTarget).trigger("graphCursorMoved", [this.cursorTime, this.cursorValue, extra_data]);
 
         this.redrawOverlayOnly();
     },
@@ -1163,7 +1154,7 @@ Graph.prototype = {
         this.cursorTime = null;
         this.cursorValue = null;
 
-        this.onCursorMoved.fire(this.cursorTime, this.cursorValue);
+        $(this.eventTarget).trigger("graphCursorMoved", [this.cursorTime, this.cursorValue, null]);
 
         this.redrawOverlayOnly();
     },
@@ -1189,7 +1180,31 @@ Graph.prototype = {
         var y = (value - this.yOffset) * this.yScale;
 
         return {x: x, y: y};
+    },
+
+    addEventList: function (element, group, handlers) {
+        var h = "_" + group + "Handlers";
+
+        if (!(h in this))
+            this[h] =  [ ];
+
+        for (var i = 0; i < handlers.length / 2; i++) {
+            element.addEventListener(handlers[i*2], handlers[i*2 + 1], true);
+            this[h].push(handlers[i*2]);
+            this[h].push(handlers[i*2+1]);
+        }
+    },
+
+    removeEventList: function (element, group) {
+        var h = "_" + group + "Handlers";
+        if (!(h in this))
+            return;
+
+        for (var i = 0; i < this[h].length / 2; i++)
+            element.removeEventListener(this[h][i*2], this[h][i*2 + 1], true);
+        this[h] = [ ];
     }
+
 };
 
 function DiscreteGraph(canvasId) {
