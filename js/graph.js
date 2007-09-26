@@ -340,6 +340,51 @@ function loadingDone(graphTypePref) {
     }
 }
 
+function zoomToTimes(t1, t2) {
+    var foundIndexes = [];
+
+    // make sure that there are at least two points
+    // on at least one graph for this
+    var foundPoints = false;
+    var dss = BigPerfGraph.dataSets;
+    for (var i = 0; i < dss.length; i++) {
+        var idcs = dss[i].indicesForTimeRange(t1, t2);
+        if (idcs[1] - idcs[0] > 1) {
+            foundPoints = true;
+            break;
+        }
+        foundIndexes.push(idcs);
+    }
+
+    if (!foundPoints) {
+        // we didn't find at least two points in at least
+        // one graph; so munge the time numbers until we do.
+        log("Orig t1 " + t1 + " t2 " + t2);
+
+        for (var i = 0; i < dss.length; i++) {
+            if (foundIndexes[i][0] > 0) {
+                t1 = Math.min(dss[i].data[(foundIndexes[i][0] - 1) * 2], t1);
+            } else if (foundIndexes[i][1]+1 < (ds.data.length/2)) {
+                t2 = Math.max(dss[i].data[(foundIndexes[i][1] + 1) * 2], t2);
+            }
+        }
+        
+        log("Fixed t1 " + t1 + " t2 " + t2);
+    }
+
+
+    if (document.getElementById("bonsailink"))
+        document.getElementById("bonsailink").href = makeBonsaiLink(t1, t2);
+
+    SmallPerfGraph.selectionStartTime = t1;
+    SmallPerfGraph.selectionEndTime = t2;
+    SmallPerfGraph.redrawOverlayOnly();
+
+    BigPerfGraph.setTimeRange (t1, t2);
+    BigPerfGraph.autoScale();
+    BigPerfGraph.redraw();
+}
+
 function loadGraphDimensions(data) {
     if (!globalStorage || document.domain == "")
         return false;
@@ -527,7 +572,7 @@ function onGraphLoadRemainder(baselineDataSet) {
             autoExpand = false;
         }
 
-        var makeCallback = function (average, color, title) {
+        var makeCallback = function (average, title) {
             return function (testid, ds) {
                 try {
                     log("ds.firstTime " + ds.firstTime + " ds.lastTime " + ds.lastTime);
@@ -542,7 +587,6 @@ function onGraphLoadRemainder(baselineDataSet) {
                         showStatus("No data in the given time range -- got an invalid data set (testid " + testid + "?");
                         clearLoadingAnimation();
                     } else {
-                        ds.color = color;
                         ds.title = title ? title : ds.title;
 
                         if (baselineDataSet)
@@ -579,7 +623,7 @@ function onGraphLoadRemainder(baselineDataSet) {
         };
 
 
-        Tinderbox.requestDataSetFor (testIds[i], makeCallback(isAverage[i], randomColor(), dsTitle[i]));
+        Tinderbox.requestDataSetFor (testIds[i], makeCallback(isAverage[i], dsTitle[i]));
     }
 }
 
@@ -775,10 +819,11 @@ function showGraphList(s) {
 var presetColorIndex = 0;
 var presetColors = [
     [0.0, 0.0, 0.7, 1.0],
-    [0.0, 0.5, 0.0, 1.0],
     [0.7, 0.0, 0.0, 1.0],
+    [0.0, 0.5, 0.0, 1.0],
+    [1.0, 0.3, 0.0, 1.0],
     [0.7, 0.0, 0.7, 1.0],
-    [0.0, 0.7, 0.7, 1.0]
+    [0.0, 0.7, 0.7, 1.0],
 ];
 
 var randomColorBias = 0;
@@ -809,14 +854,14 @@ function lighterColor(col) {
     ];
 }
 
-function colorToRgbString(col) {
+function colorToRgbString(col, forcealpha) {
    // log ("in colorToRgbString");
-    if (col[3] < 1) {
+    if (forcealpha != null || col[3] < 1) {
         return "rgba("
             + Math.floor(col[0]*255) + ","
             + Math.floor(col[1]*255) + ","
             + Math.floor(col[2]*255) + ","
-            + col[3]
+            + (forcealpha ? forcealpha : col[3])
             + ")";
     }
     return "rgb("
@@ -984,3 +1029,14 @@ function showFloater(time, value) {
     fdiv.innerHTML = s;
 }
 
+// DataSet.js checks for this function and will call it
+function getNewColorForDataset() {
+    return randomColor();
+}
+
+if (!("log" in window)) {
+    window.log = function(s) {
+        var l = document.getElementById("log");
+        l.innerHTML += "<br>" + s;
+    }
+}

@@ -515,58 +515,57 @@ Graph.prototype = {
 
         // draw actual graph lines
 
-        for (var i = 0; i < this.dataSets.length; i++) {
-            if (this.dataSetIndices[i] == null) {
-                // there isn't anything in the data set in the given time range
-                continue;
-            }
+        // if offsetTime is 0, draw a normal graph
+        if (this.offsetTime == 0) {
+            for (var i = 0; i < this.dataSets.length; i++) {
+                if (this.dataSetIndices[i] == null) {
+                    // there isn't anything in the data set in the given time range
+                    continue;
+                }
 
-            var dsHasAverage = false;
-            if (hasAverageDSs) {
-                // figure out if there is an average for this ds being drawn
-                for each (var ds in this.dataSets) {
-                    if ("averageOf" in ds &&
-                        ds.averageOf == this.dataSets[i])
-                    {
-                        dsHasAverage = true;
-                        break;
+                var dsHasAverage = false;
+                if (hasAverageDSs) {
+                    // figure out if there is an average for this ds being drawn
+                    for each (var ds in this.dataSets) {
+                        if ("averageOf" in ds &&
+                            ds.averageOf == this.dataSets[i])
+                        {
+                            dsHasAverage = true;
+                            break;
+                        }
                     }
                 }
-            }
 
-            with (ctx) {
+                with (ctx) {
+                    // draw any baselines.  needs to be rethought
+                    for (baseline in this.dataSets[i].baselines) {
+                        save();
+                        var v = ch - Math.round((this.dataSets[i].baselines[baseline] - yoffs) * this.yScale);
+                        var x0 = Math.round((this.startTime - xoffs) * xscale);
+                        var x1 = Math.round((this.endTime - xoffs) * xscale);
+                        beginPath();
+                        moveTo(x0-0.5, v+0.5);
+                        lineTo(x1+0.5, v+0.5);
+                        strokeStyle = colorToRgbString(this.dataSets[i].color);
+                        globalAlpha = 0.2;
+                        lineWidth = 5.0;
+                        stroke();
+                        restore();
+                        strokeStyle = colorToRgbString(this.dataSets[i].color);
+                        lineWidth = 1.0;
+                        stroke();
+                    }
 
-                // draw any baselines.  needs to be rethought
-                for (baseline in this.dataSets[i].baselines) {
-                    save();
-                    var v = ch - Math.round((this.dataSets[i].baselines[baseline] - yoffs) * this.yScale);
-                    var x0 = Math.round((this.startTime - xoffs) * xscale);
-                    var x1 = Math.round((this.endTime - xoffs) * xscale);
-                    beginPath();
-                    moveTo(x0-0.5, v+0.5);
-                    lineTo(x1+0.5, v+0.5);
-                    strokeStyle = colorToRgbString(this.dataSets[i].color);
-                    globalAlpha = 0.2;
-                    lineWidth = 5.0;
-                    stroke();
-                    restore();
-                    strokeStyle = colorToRgbString(this.dataSets[i].color);
-                    lineWidth = 1.0;
-                    stroke();
-                }
+                    //log ("ds start end", this.startTime, this.endTime, "timediff:", (this.endTime - this.startTime + this.offsetTime));
+                    var startIdx = this.dataSetIndices[i][0];
+                    var endIdx = this.dataSetIndices[i][1];
 
-                //log ("ds start end", this.startTime, this.endTime, "timediff:", (this.endTime - this.startTime + this.offsetTime));
-                var startIdx = this.dataSetIndices[i][0];
-                var endIdx = this.dataSetIndices[i][1];
+                    // start one before and go one after if we can,
+                    // so that the plot doesn't have a hole at the start
+                    // and end
+                    if (startIdx > 0) startIdx--;
+                    if (endIdx < ((this.dataSets[i].data.length)/2)) endIdx++;
 
-                // start one before and go one after if we can,
-                // so that the plot doesn't have a hole at the start
-                // and end
-                if (startIdx > 0) startIdx--;
-                if (endIdx < ((this.dataSets[i].data.length)/2)) endIdx++;
-
-                // if offsetTime is 0, then draw a normal graph
-                if (this.offsetTime == 0) {
                     save();
                     scale(xscale, -this.yScale);
                     translate(0, -ch/this.yScale);
@@ -626,54 +625,93 @@ Graph.prototype = {
                         globalAlpha = 1.0;
                         restore();
                     }
-                } else {
-                    // we're doing a bar graph, and we don't have to
-                    // worry about any average stuff.
+                }
+            }
+        } else {
+            // we're doing a bar graph, and we don't have to
+            // worry about any average stuff.
 
-                    // we assume that each "time" index is offset by offsetTime.
-                    // XXX we really should just specify "graph has a constant spacing"
-                    // as opposed to an explicit "offsetTime", and let the graph
-                    // figure out how best to draw that in the available space
+            // we assume that each "time" index is offset by offsetTime.
+            // XXX we really should just specify "graph has a constant spacing"
+            // as opposed to an explicit "offsetTime", and let the graph
+            // figure out how best to draw that in the available space
 
-                    // Note that we can't round this, but we do round when
-                    // we draw the line coordinates, to get solid vertical lines.
-                    // However, that means that as the graph goes along, the width
-                    // of each "bar" will vary by as much as 1 pixel -- I think that's
-                    // ok, ebcause in practice it's not noticable, and it's much less
-                    // distracting than blurry edges.
-                    var scaledOffset = this.offsetTime * xscale;
+            // Note that we can't round this, but we do round when
+            // we draw the line coordinates, to get solid vertical lines.
+            // However, that means that as the graph goes along, the width
+            // of each "bar" will vary by as much as 1 pixel -- I think that's
+            // ok, ebcause in practice it's not noticable, and it's much less
+            // distracting than blurry edges.
+            var scaledOffset = this.offsetTime * xscale;
 
-                    save();
-                    // we do the scaling/etc. manually, so that we can control pixel position
-                    // of the lines
-                    beginPath();
+            // these better be the same for each dataset, but we'll clamp
+            // them
+            var startIdx = this.dataSetIndices[0][0];
+            var endIdx = this.dataSetIndices[0][1];
 
-                    // always start at 0
-                    var zeroY = (- yoffs) * (- this.yScale) + ch;
-                    var lastT = (this.dataSets[i].data[startIdx*2] - xoffs) * xscale;
-                    moveTo(Math.round(lastT) + 0.5, zeroY);
+            // the fill styles we'll use for each graph
+            var fillStyles = [];
 
-                    for (var j = startIdx; j < endIdx; j++)
-                    {
+            for (var i = 0; i < this.dataSets.length; i++) {
+                fillStyles.push(colorToRgbString(this.dataSets[i].color));
+
+                if (this.dataSetIndices[i][0] > startIdx)
+                    startIdx = this.dataSetIndices[i][0];
+                if (this.dataSetIndices[i][1] < endIdx)
+                    endIdx = this.dataSetIndices[i][1];
+            }
+
+            with (ctx) {
+                save();
+
+                // we do the scaling/etc. manually, so that we can control pixel position
+                // of the lines
+
+                // always start at 0
+                var zeroY = (- yoffs) * (- this.yScale) + ch;
+                var lastT = (this.dataSets[0].data[startIdx*2] - xoffs) * xscale;
+
+                if (0) {
+                    var grad = createLinearGradient(0.0, zeroY / 2.0, 0.0, zeroY);
+                    grad.addColorStop(0.0, colorToRgbString(this.dataSets[i].color/*, 1.0 / this.dataSets.length*/));
+                    grad.addColorStop(1.0, "rgba(255,255,255,0.0)");
+                }
+
+                for (var j = startIdx; j < endIdx; j++)
+                {
+                    var values = [];
+
+                    for (var i = 0; i < this.dataSets.length; i++) {
                         // don't care about t -- we're always going to draw steps
                         // exactly scaledOffset apart
                         var v = this.dataSets[i].data[j*2+1] - yoffs;
                         v = v * (- this.yScale) + ch;
-                        lineTo(Math.round(lastT) + 0.5, v);
-                        lastT += scaledOffset;
-                        lineTo(Math.round(lastT) + 0.5, v);
+                        values.push([i, v]);
                     }
 
-                    // ... and end at 0, to make a nice square
-                    lineTo(lastT, zeroY)
+                    values.sort(function(a,b) {
+                                    if (a[1] < b[1]) return -1;
+                                    if (a[1] > b[1]) return 1;
+                                    return 0;
+                                });
 
-                    // restore before calling stroke() so that we can
-                    // do a line width in absolute pixel size
-                    restore();
+                    for (var i = 0; i < values.length; i++) {
+                        var v = values[i][1];
+                        beginPath();
+                        moveTo(Math.round(lastT) + 0.25, zeroY);
+                        lineTo(Math.round(lastT) + 0.25, v);
+                        lineTo(Math.round(lastT + scaledOffset) - 0.25, v);
+                        lineTo(Math.round(lastT + scaledOffset) - 0.25, zeroY);
+                        closePath();
 
-                    strokeStyle = colorToRgbString(this.dataSets[i].color);
-                    stroke();
+                        fillStyle = fillStyles[values[i][0]];
+                        fill();
+                    }
+
+                    lastT += scaledOffset;
                 }
+
+                restore();
             }
         }
 

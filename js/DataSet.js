@@ -121,6 +121,8 @@ function TimeValueDataSet(data, color) {
 
     if (color) {
         this.color = color;
+    } else if ("getNewColorForDataset" in window) {
+        this.color = getNewColorForDataset();
     } else {
         this.color = "#000000";
     }
