@@ -814,20 +814,18 @@ function onCursorMoved(type, args, obj) {
     var val = args[1];
     var extra_data = args[2];
 
-    var extra = "";
-    var label = "Date: ";
-    if (graphType == DISCRETE_GRAPH) {
-        label = "Index: ";
-        extra = extra_data;
-    }
-
-    if (time != null && val != null) {
-        // cheat
-        showStatus(label + formatTime(time) + " Value: " + val.toFixed(2) + " " + extra);
-        showFloater(time, val);
-    } else {
+    if (time == null || val == null) {
         showStatus(null);
         showFloater(null);
+        return;
+    }
+
+    if (graphType == DISCRETE_GRAPH) {
+        showStatus("Index: " + time + " Value: " + val.toFixed(2) + " " + extra_data);
+        showFloater(time, val);
+    } else {
+        showStatus("Date: " + time + " Value: " + val.toFixed(2));
+        showFloater(time, val);
     }
 }
 
