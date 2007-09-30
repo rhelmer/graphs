@@ -948,20 +948,19 @@ function onGraphSelectionChanged(event, selectionType, arg1, arg2) {
 }
 
 function onCursorMoved(event, time, val, extra_data) {
-    var extra = "";
-    var label = "Date: ";
-    if (graphType == DISCRETE_GRAPH) {
-        label = "Index: ";
-        extra = extra_data;
-    }
 
-    if (time != null && val != null) {
-        // cheat
-        showStatus(label + formatTime(time) + " Value: " + val.toFixed(2) + " " + extra);
-        showFloater(time, val);
-    } else {
+    if (time == null || val == null) {
         showStatus(null);
         showFloater(null);
+        return;
+    }
+
+    if (graphType == DISCRETE_GRAPH) {
+        showStatus("Index: " + time + " Value: " + val.toFixed(2) + " " + extra_data);
+        showFloater(time, val);
+    } else {
+        showStatus("Date: " + formatTime(time) + " Value: " + val.toFixed(2));
+        showFloater(time, val);
     }
 }
 
