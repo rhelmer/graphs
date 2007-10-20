@@ -59,7 +59,10 @@ var gAverageInterval = 3*ONE_HOUR_SECONDS;
 var gCurrentLoadRange = null;
 var gForceBonsai = false;
 
-var gOptions = { autoScaleYAxis: true };
+var gOptions = {
+    autoScaleYAxis: true,
+    doDeltaSort: false,
+};
 
 var Tinderbox;
 var BigPerfGraph;
@@ -244,13 +247,15 @@ function loadingDone(graphTypePref) {
 
     // handle saved options
     if ("autoScaleYAxis" in gOptions) {
-        if (gOptions.autoScaleYAxis) {
-            getElement("autoscale").checked = true;
-            onAutoScaleClick(true);
-        } else {
-            getElement("autoscale").checked = false;
-            onAutoScaleClick(false);
-        }
+        var box = getElement("autoscale");
+        box.checked = gOptions.autoScaleYAxis ? true : false;
+        onAutoScaleClick(box.checked);
+    }
+
+    if (graphType == DISCRETE_GRAPH && "doDeltaSort" in gOptions) {
+        var box = getElement("deltasort");
+        box.checked = gOptions.doDeltaSort ? true : false;
+        onDeltaSortClick(box.checked);
     }
 
     // create CSS "smallgraph-size" and "graph-size" rules that the
@@ -894,6 +899,17 @@ function onAutoScaleClick(override) {
 
     gOptions.autoScaleYAxis = checked;
     saveOptions();
+}
+
+function onDeltaSortClick(override) {
+    var checked;
+    if (override != null) {
+        checked = override;
+    } else {
+        checked = getElement("deltasort").checked;
+    }
+
+    
 }
 
 function loadOptions() {
