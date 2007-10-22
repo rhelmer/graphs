@@ -348,41 +348,48 @@ function loadingDone(graphTypePref) {
 function zoomToTimes(t1, t2) {
     var foundIndexes = [];
 
-    // make sure that there are at least two points
-    // on at least one graph for this
-    var foundPoints = false;
-    var dss = BigPerfGraph.dataSets;
-    for (var i = 0; i < dss.length; i++) {
-        var idcs = dss[i].indicesForTimeRange(t1, t2);
-        if (idcs[1] - idcs[0] > 1) {
-            foundPoints = true;
-            break;
-        }
-        foundIndexes.push(idcs);
-    }
-
-    if (!foundPoints) {
-        // we didn't find at least two points in at least
-        // one graph; so munge the time numbers until we do.
-        log("Orig t1 " + t1 + " t2 " + t2);
-
+    if (t1 == SmallPerfGraph.startTime &&
+        t2 == SmallPerfGraph.endTime)
+    {
+        SmallPerfGraph.selectionStartTime = null;
+        SmallPerfGraph.selectionEndTime = null;
+    } else {
+        // make sure that there are at least two points
+        // on at least one graph for this
+        var foundPoints = false;
+        var dss = BigPerfGraph.dataSets;
         for (var i = 0; i < dss.length; i++) {
-            if (foundIndexes[i][0] > 0) {
-                t1 = Math.min(dss[i].data[(foundIndexes[i][0] - 1) * 2], t1);
-            } else if (foundIndexes[i][1]+1 < (ds.data.length/2)) {
-                t2 = Math.max(dss[i].data[(foundIndexes[i][1] + 1) * 2], t2);
+            var idcs = dss[i].indicesForTimeRange(t1, t2);
+            if (idcs[1] - idcs[0] > 1) {
+                foundPoints = true;
+                break;
             }
+            foundIndexes.push(idcs);
         }
-        
-        log("Fixed t1 " + t1 + " t2 " + t2);
-    }
 
+        if (!foundPoints) {
+            // we didn't find at least two points in at least
+            // one graph; so munge the time numbers until we do.
+            log("Orig t1 " + t1 + " t2 " + t2);
+
+            for (var i = 0; i < dss.length; i++) {
+                if (foundIndexes[i][0] > 0) {
+                    t1 = Math.min(dss[i].data[(foundIndexes[i][0] - 1) * 2], t1);
+                } else if (foundIndexes[i][1]+1 < (ds.data.length/2)) {
+                    t2 = Math.max(dss[i].data[(foundIndexes[i][1] + 1) * 2], t2);
+                }
+            }
+        
+            log("Fixed t1 " + t1 + " t2 " + t2);
+        }
+
+        SmallPerfGraph.selectionStartTime = t1;
+        SmallPerfGraph.selectionEndTime = t2;
+    }
 
     if (document.getElementById("bonsailink"))
         document.getElementById("bonsailink").href = makeBonsaiLink(t1, t2);
 
-    SmallPerfGraph.selectionStartTime = t1;
-    SmallPerfGraph.selectionEndTime = t2;
     SmallPerfGraph.redrawOverlayOnly();
 
     BigPerfGraph.setTimeRange (t1, t2);
