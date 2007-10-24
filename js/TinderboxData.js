@@ -77,15 +77,13 @@ TinderboxData.prototype = {
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
 
-        loadJSONDoc(getdatacgi + "type=continuous")
-        .addCallbacks(
+        $.getJSON(getdatacgi + "type=continuous",
             function (obj) {
                 if (!checkErrorReturn(obj)) return;
                 self.testList = obj.results;
                 //log("default test list" + self.testList);
                 $(self.eventTarget).trigger("tinderboxTestListAvailable", [self.testList]);
-            },
-            function () {alert ("Error talking to " + getdatacgi + ""); });
+                  });
     },
 
     requestTestList: function (callback) {
@@ -102,6 +100,13 @@ TinderboxData.prototype = {
             
             $(self.eventTarget).bind("tinderboxTestListAvailable", callback, cb);
         }
+    },
+
+    // get a dataset for testId if it exists; otherwise,
+    // return null, and let the callee use requestDataSetFor
+    getDataSetFor: function (testId) {
+        if (testId in this.testData)
+            return this.testData[testId];
     },
 
     // arg1 = startTime, arg2 = endTime, arg3 = callback
@@ -173,9 +178,8 @@ TinderboxData.prototype = {
         if (this.raw)
             reqstr += "&raw=1";
         //log (reqstr);
-        loadJSONDoc(reqstr)
-        .addCallbacks(
-            function (obj) {
+        $.getJSON(reqstr,
+              function (obj) {
                 if (!checkErrorReturn(obj)) return;
 
                 var ds = new TimeValueDataSet(obj.results);
@@ -199,8 +203,9 @@ TinderboxData.prototype = {
                     ds.stats = obj.stats;
 
                 $(self.eventTarget).trigger("tinderboxDataSetAvailable", [testId, ds, startTime, endTime]);
-            },
-            function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
+                  });;
+
+// function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
     },
 
     clearValueDataSets: function () {
@@ -237,15 +242,13 @@ DiscreteTinderboxData.prototype = {
         if (machine != null) limiters += "&machine=" + machine;
         if (testname != null) limiters += "&test=" + testname;
         //log("drequestTestList: " + getdatacgi + "type=discrete&datelimit=" + tDate + limiters);
-        loadJSONDoc(getdatacgi + "type=discrete&datelimit=" + tDate + limiters)
-        .addCallbacks(
+        $.getJSON(getdatacgi + "type=discrete&datelimit=" + tDate + limiters,
             function (obj) {
                 if (!checkErrorReturn(obj)) return;
                 self.testList = obj.results;
                 //log ("testlist: " + self.testList);
                 callback.call(window, self.testList);
-            },
-            function () {alert ("requestTestList: Error talking to " + getdatacgi + ""); });
+                  });
     },
 
     requestSearchList: function (branch, machine, testname, callback) {
@@ -255,13 +258,11 @@ DiscreteTinderboxData.prototype = {
         if (machine != null) limiters += "&machine=" + machine;
         if (testname != null) limiters += "&test=" + testname;
         //log(getdatacgi + "getlist=1&type=discrete" + limiters);
-        loadJSONDoc(getdatacgi + "getlist=1&type=discrete" + limiters)
-        .addCallbacks(
+        $.getJSON(getdatacgi + "getlist=1&type=discrete" + limiters,
             function (obj) {
                 if (!checkErrorReturn(obj)) return;
                 callback.call(window, obj.results);
-            },
-            function () {alert ("requestSearchList: Error talking to " + getdatacgi); });
+                  });
     },
 };
 function ExtraDataTinderboxData() {

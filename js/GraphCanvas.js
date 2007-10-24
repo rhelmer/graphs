@@ -116,15 +116,15 @@ Graph.prototype = {
     valid: false,
 
     init: function (canvasElement) {
-        this.frontBuffer = getElement(canvasElement);
-        this.xLabelContainer = getElement(canvasElement + "-labels-x");
-        this.yLabelContainer = getElement(canvasElement + "-labels-y");
+        this.frontBuffer = $("#" + canvasElement)[0];
+        this.xLabelContainer = $("#" + canvasElement + "-labels-x")[0];
+        this.yLabelContainer = $("#" + canvasElement + "-labels-y")[0];
 
-        this.backBuffer = new CANVAS();
+        this.backBuffer = document.createElement("canvas");
         this.backBuffer.width = this.frontBuffer.width;
         this.backBuffer.height = this.frontBuffer.height;
 
-        this.overlayBuffer = new CANVAS();
+        this.overlayBuffer = document.createElement("canvas");
         this.overlayBuffer.width = this.frontBuffer.width;
         this.overlayBuffer.height = this.frontBuffer.height;
 
@@ -206,9 +206,9 @@ Graph.prototype = {
     removeDataSet: function (ds) {
         for (var i = 0; i < this.dataSets.length; i++) {
             if (this.dataSets[i] == ds) {
-                this.dataSets = Array.splice(this.dataSets, i, 1);
-                this.dataSetIndices = Array.splice(this.dataSetIndices, i, 1);
-                this.dataSetMinMaxes = Array.splice(this.dataSetMinMaxes, i, 1);
+                Array.splice(this.dataSets, i, 1);
+                Array.splice(this.dataSetIndices, i, 1);
+                Array.splice(this.dataSetMinMaxes, i, 1);
                 return;
             }
         }
@@ -937,20 +937,20 @@ Graph.prototype = {
 
             for each (var lval in labelValues) {
                 var xpos = lval[0];
-                var div = new DIV({ class: "x-axis-label" });
+                var div = $("<div class='x-axis-label'></div>")[0];
                 div.style.position = "absolute";
                 div.style.width = this.xLabelWidth + "px";
                 div.style.height = this.xLabelHeight + "px";
                 div.style.left = xpos + "px";
                 div.style.top = "0px";
 
-                // XXX don't hardcode [2][0] etc.
-                appendChildNodes(div, lval[2][0], new BR(), lval[2][1]);
+                $(div).append($("<div>" + lval[2].join("<br>") + "</div>"));
 
                 labels.push(div);
             }
 
-            replaceChildNodes(this.xLabelContainer, labels);
+            $(this.xLabelContainer).empty();
+            $(this.xLabelContainer).append(labels);
         }
 
         if (this.yLabelContainer) {
@@ -962,7 +962,7 @@ Graph.prototype = {
                 var ypos = this.frontBuffer.height - Math.round((lval[1] - this.yOffset) * this.yScale);
 
                 //var ypos = lval[0];
-                var div = new DIV({ class: "y-axis-label" });
+                var div = $("<div class='y-axis-label'></div>")[0];
                 div.style.position = "absolute";
                 div.style.width = this.yLabelWidth + "px";
                 div.style.height = this.yLabelHeight + "px";
@@ -972,11 +972,12 @@ Graph.prototype = {
 
                 //log ("ypos: ", ypos, " lval: ", lval);
                 // XXX don't hardcode [2] etc.
-                appendChildNodes(div, lval[2]);
+                $(div).append($("<div>" + lval[2] + "</div>"));
                 labels.push(div);
             }
 
-            replaceChildNodes(this.yLabelContainer, labels);
+            $(this.yLabelContainer).empty();
+            $(this.yLabelContainer).append(labels);
         }
 
         if (0) {
@@ -992,13 +993,14 @@ Graph.prototype = {
 
             for (var i = 0; i < nlabels; i++) {
                 var pos = label_sz * i;
-                var div = new DIV({class: "y-axis-label", style: "width: 50px; height: " + label_sz + "px" });
+                var div = $("<div class='y-axis-label' style='width: 50px; height: " + label_sz + "px'></div>");
                 appendChildNodes(div, "Label " + i);
 
                 labels.push(div);
             }
 
-            replaceChildNodes(this.yLabelContainer, labels);
+            $(this.yLabelContainer).empty();
+            $(this.yLabelContainer).append(labels);
         }
     },
 

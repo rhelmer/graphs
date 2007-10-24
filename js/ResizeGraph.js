@@ -56,41 +56,45 @@ ResizeGraph.prototype = {
     notifyFunc: null,
 
     init: function(elem, notify) {
-        this.handle = elem;
-        this.element = getElement(elem);
-        connect(this.handle,'onmousedown',this, 'mouseDownFunc');
-        connect(document,'onmouseup',this, 'mouseUpFunc');
-        connect(this.handle,'onmousemove',this, 'mouseMoveFunc');
-        connect(document,'onmousemove',this, 'updateElement');
+        // XXX fixme!
+        return;
+
+        this.handle = "#" + elem;
+        this.element = $(this.handle)[0];
+        var self = this;
+        $(this.handle).mousedown(function(ev) { return self.mouseDownFunc(ev); });
+        $(this.handle).mousemove(function(ev) { return self.mouseMoveFunc(ev); });
+        $(document).mouseup(function(ev) { return self.mouseUpFunc(ev); });
+        $(document).mousemove(function(ev) { return self.mouseMoveFunc(ev); });
 
         this.notifyFunc = notify;
     },
     
     directions: function(e) {
-        var pointer = e.mouse();
-        var graphPosition = elementPosition(this.handle);
-        var dimensions = elementDimensions(this.handle);
+        var pointer = { x: e.pageX, y: e.pageY };
+        var graphPosition = $(this.handle).position();
+        var dimensions = { width: $(this.handle).width(), height: $(this.handle).height() };
         var dir = '';
         // s must come first, since the cursor is called "se"
-        if ( pointer.page.y > (graphPosition.y + dimensions.h) - this.margin_bottom )
+        if ( pointer.y > (graphPosition.top + dimensions.height) - this.margin_bottom )
             dir += "s";
-        if ( pointer.page.x > (graphPosition.x + dimensions.w) - this.margin_right )
+        if ( pointer.x > (graphPosition.left + dimensions.width) - this.margin_right )
             dir += "e";
         return dir;
     },
     
     draw: function(e) {
-        var pointer = [e.mouse().page.x, e.mouse().page.y];
+        var pointer = { x: e.pageX, y: e.pageY };
         var style = this.element.style;
         if (this.currentDirection.indexOf('s') != -1) {
-            var newHeight = this.startHeight + pointer[1] - this.startY;
+            var newHeight = this.startHeight + pointer.y - this.startY;
             if (newHeight > this.margin_bottom) {
                 style.height = newHeight + "px";
                 this.element.height = newHeight;
             }
         }
         if (this.currentDirection.indexOf('e') != -1) {
-            var newWidth = this.startWidth + pointer[0] - this.startX;
+            var newWidth = this.startWidth + pointer.x - this.startX;
             if (newWidth > this.margin_right) {
                 style.width = newWidth + "px";
                 this.element.width = newWidth;
@@ -99,42 +103,36 @@ ResizeGraph.prototype = {
     },
     mouseDownFunc: function(e)
     {
+        var pointer = { x: e.pageX, y: e.pageY };
         var dir = this.directions(e);
-        pointer = e.mouse();
         if (dir.length > 0 ) {
             this.active = true;
-            var dimensions = elementDimensions(this.handle);
-            var graphPosition = elementPosition(this.handle);
-            this.startTop = graphPosition.y;
-            this.startLeft = graphPosition.x;
-            this.startHeight =  dimensions.h;
-            this.startWidth =  dimensions.w;
-            this.startX = pointer.page.x + document.body.scrollLeft + document.documentElement.scrollLeft;
-            this.startY = pointer.page.y + document.body.scrollLeft + document.documentElement.scrollLeft;
+            var graphPosition = $(this.handle).position();
+            var dimensions = { width: $(this.handle).width(), height: $(this.handle).height() };
+            this.startTop = graphPosition.top;
+            this.startLeft = graphPosition.left;
+            this.startHeight =  dimensions.height;
+            this.startWidth =  dimensions.width;
+            this.startX = pointer.x + document.body.scrollLeft + document.documentElement.scrollLeft;
+            this.startY = pointer.y + document.body.scrollLeft + document.documentElement.scrollLeft;
             this.currentDirection = dir;
             e.stop();
         }
     },
     mouseMoveFunc: function(e)
     {
-        pointer = e.mouse();
-        graphPosition = elementPosition(this.handle);
-        dimensions = elementDimensions(this.handle);
-        dir = this.directions(e);
+        var dir = this.directions(e);
         if(dir.length > 0) {
-            getElement(this.handle).style.cursor = dir + "-resize";
-        }
-        else {
-            getElement(this.handle).style.cursor = '';
+            $(this.handle)[0].style.cursor = dir + "-resize";
+        } else {
+            $(this.handle)[0].style.cursor = '';
         }
     },
     updateElement: function(e)
     {
         if( this.active ) {
-            if ( ! this.resizing ) {
-                var style = getElement(this.handle).style;
+            if (! this.resizing)
                 this.resizing = true;
-            } 
             this.draw(e);
             e.stop()
             return false;
