@@ -61,6 +61,14 @@ select {
   padding-left: 2px;
 }
 
+.testline .throbber {
+  display: none;
+}
+
+.testline .throbber[loading] {
+  display: inline ! important;
+}
+
 .testline tr > td:first-child {
   -moz-border-radius-topleft: 2px;
   -moz-border-radius-bottomleft: 2px;
@@ -98,6 +106,7 @@ select {
 }
 
 .iconcell {
+  display: inline-block;
   width: 15px ! important;
   height: 15px ! important;
 }
@@ -126,7 +135,7 @@ select {
   padding: 2px;
   font-weight: bold;
   background: darkgray;
-  color: yellow;
+  color: #222266;
   width: 20em;
 }
 
@@ -169,7 +178,7 @@ select {
   <body>
     <table><tr>
     <td class="leftcolumncell">
-    <div class="sectionheader"><span style="margin: auto" class="rightside smalllink"><img onclick="$('#testsel').slideToggle('fast')" src="images/wand.png"></span><span>Available graphs</span></div>
+    <div class="sectionheader"><span style="margin: auto" class="rightside smalllink"><img onclick="$('#testsel').slideToggle('fast')" src="images/wand.png"></span><span>Available Graphs</span></div>
 
     <div id="testsel">
       <div id="testfilterform">
@@ -207,7 +216,7 @@ select {
     </div>
 
     <div>
-    <div class="sectionheader">Graphs to Display</div>
+    <div class="sectionheader">Displayed Graphs</div>
     <div class="testlist" id="activetests"></div>
     <input type="button" value="Remove All" onclick="doRemoveAll()"></input>
 

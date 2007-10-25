@@ -4,14 +4,15 @@ import os
 import minjson as json
 import random
 import datetime
+import time
 
-print "Content-type: text/plain\n\n";
+print "Content-type: text/plain\n\n"
 
 def getQuery():
     query = {}
     try:
         QS = os.environ["QUERY_STRING"]
-        querybits = QS.split("&");
+        querybits = QS.split("&")
         for q in querybits:
             qq = q.split("=")
             if len(qq) == 2:
@@ -70,23 +71,25 @@ def main():
         setid = int(query["setid"])
 
         # if less than 100, then it's a continuous set
-        if setid < 100:
+        if setid < 100 or setid > 500:
             random.seed()
 
-            starttime = 1148589000
-    
+            starttime = int(time.time()) - max(0, int(random.random() * 25) - 15) * 60 * 60 * 12
+
             data = []
             val = int(random.random() * 100 + 200)
-            r = 500
+            r = int(random.random() * 2500)
             if setid == 50:
                 r = 1
             for z in range(r):
-                timeval = starttime + (z*60*20) + int(random.random() * 240 - 120);
-                data.append(timeval)
+                timeval = starttime - (z*60*20) + int(random.random() * 240 - 120)
                 data.append(val)
+                data.append(timeval)
                 val = val + int(random.random() * 10 - 5)
 
+            data.reverse()
             result = { 'resultcode': 0, 'results': data }
+            time.sleep(4)
             print json.write(result)
             return
 

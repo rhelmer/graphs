@@ -32,7 +32,7 @@ var gOptions = {
     doDeltaSort: false,
 };
 
-function initGraphLayout()
+function initGraphCore()
 {
     loadOptions();
 
@@ -318,6 +318,9 @@ function zoomToTimes(t1, t2) {
         var dss = BigPerfGraph.dataSets;
         for (var i = 0; i < dss.length; i++) {
             var idcs = dss[i].indicesForTimeRange(t1, t2);
+            if (idcs == null)
+                continue;
+
             if (idcs[1] - idcs[0] > 1) {
                 foundPoints = true;
                 break;
@@ -331,6 +334,8 @@ function zoomToTimes(t1, t2) {
             log("Orig t1 " + t1 + " t2 " + t2);
 
             for (var i = 0; i < dss.length; i++) {
+                if (foundIndexes[i] == null)
+                    continue;
                 if (foundIndexes[i][0] > 0) {
                     t1 = Math.min(dss[i].data[(foundIndexes[i][0] - 1) * 2], t1);
                 } else if (foundIndexes[i][1]+1 < (ds.data.length/2)) {
@@ -475,6 +480,18 @@ function lighterColor(col) {
         Math.min(0.85, col[2] * 1.2),
         col[3]
     ];
+}
+
+function dataSetsRange(dss) {
+    var t1 = dss[0].firstTime;
+    var t2 = dss[0].lastTime;
+
+    for (var i = 0; i < dss.length; i++) {
+        t1 = Math.min(t1, dss[i].firstTime);
+        t2 = Math.max(t2, dss[i].lastTime);
+    }
+
+    return [t1, t2];
 }
 
 function colorToRgbString(col, forcealpha) {

@@ -162,6 +162,7 @@ function doAddTest(id, optSkipAnimation)
         $("#activetests #testid" + id).fadeIn(300);
     }
 
+    $("#activetests #testid" + id + " .throbber")[0].setAttribute("loading", "true");
     $("#activetests #testid" + id + " .removecell").click(
         function(evt) {
             var tid = testIdFromElement(this);
@@ -174,6 +175,7 @@ function doAddTest(id, optSkipAnimation)
     var color = randomColor();
     $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
     addTestToGraph(id, function(ds) {
+                       $("#activetests #testid" + id + " .throbber")[0].removeAttribute("loading");
                        ds.color = color;
                   });
 }
@@ -197,26 +199,6 @@ function makeTestDiv(test, forActive)
 {
     var html = "";
     html += "<div class='testline' id='testid" + test.tid + "'>";
-    html += "<table style='border-collapse: collapse;'><tr><td width='2em'>";
-    if (forActive)
-        html += "<div class='iconcell colorcell'></div>";
-    html += "</td>";
-    html += "<td class='testmain' width='100%'><b>" + makeTestNameHtml(test.test) + "</b> on <b>" + test.platform + "</b><br>";
-    html += "<span style='font-size: small'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span>";
-    html += "</td><td width='2em'>";
-    if (forActive)
-        html += "<div class='iconcell removecell'></div>";
-    else
-        html += "<div class='iconcell addcell'></div>";
-    html += "</td></tr></table></div>";
-
-    return html;
-}
-
-function makeTestDiv(test, forActive)
-{
-    var html = "";
-    html += "<div class='testline' id='testid" + test.tid + "'>";
     html += "<table><tr>";
     if (forActive)
         html += "<td class='colorcell'><div style='width: 1em; height: 10px;'></div></td>";
@@ -224,10 +206,11 @@ function makeTestDiv(test, forActive)
     html += "<b>" + makeTestNameHtml(test.test) + "</b> on <b>" + test.platform + "</b><br>";
     html += "<span style='font-size: small'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span>";
     html += "</td><td>";
-    if (forActive)
-        html += "<div class='iconcell removecell'></div>";
-    else
+    if (forActive) {
+        html += "<div><img src='js/img/Throbber-small.gif' class='throbber'></div><div class='iconcell removecell'></div>";
+    } else {
         html += "<div class='iconcell addcell'></div>";
+    }
     html += "</td></tr></table></div>";
 
     return html;
@@ -288,7 +271,7 @@ function platformFromData(t)
             return "MacOS X";
     }
 
-    return m + " (?)";
+    return "Unknown";
 }
 
 function branchFromData(t)
@@ -336,12 +319,14 @@ function testFromData(t)
     return t.test;
 }
 
-function transformRawData()
+function transformRawData(testList)
 {
+    testList = testList ? testList : rawTestList;
+
     gTestList = [];
 
-    for (var i = 0; i < rawTestList.length; i++) {
-        var t = rawTestList[i];
+    for (var i = 0; i < testList.length; i++) {
+        var t = testList[i];
 
         t.newest = Date.now() - Math.random() * 25 *24*60*60*1000;
         if (/places/.test(t.machine))
@@ -395,20 +380,62 @@ function onNewRangeClick(ev)
     var which = this.textContent;
     var activeIds = [];
 
+    var dss = SmallPerfGraph.dataSets;
+    if (dss.length == 0)
+        return;
+
     $("#activetests .testline").each(function (k,v) { activeIds.push(testIdFromElement(v)); });
 
+    var range = dataSetsRange(dss);
+    var tnow = Date.now() / 1000;
+
+    log ('tnow: ' + tnow + " range " + range);
+    var t1, t2;
+
     if (which == "All") {
+        t1 = range[0];
+        t2 = range[1];
     } else if (which == "Custom...") {
     } else {
+        var m;
+        var tlength = null;
+
+        var mult = { d: ONE_DAY_SECONDS, m: 4*ONE_WEEK_SECONDS, y: ONE_YEAR_SECONDS };
+
+        m = which.match(/^(\d+)([dmy])$/);
+        if (!m)
+            return;
+
+        tlength = parseInt(m[1]) * mult[m[2]];
+
+        t2 = tnow;
+        t1 = t2 - tlength;
     }
 
+    SmallPerfGraph.setTimeRange(t1, t2);
+    SmallPerfGraph.autoScale();
+    SmallPerfGraph.redraw();
+
+    if (SmallPerfGraph.selectionStartTime &&
+        SmallPerfGraph.selectionEndTime)
+    {
+        t1 = Math.max(SmallPerfGraph.selectionStartTime, t1);
+        t2 = Math.min(SmallPerfGraph.selectionEndTime, t2);
+    }
+
+    // nothing was selected
+    zoomToTimes(t1, t2);
 }
 
 function handleLoad()
 {
-    transformRawData();
-    populateFilters();
-    doResetFilter();
+    initGraphCore();
+
+    Tinderbox.requestTestList(function (tests) {
+                                  transformRawData(tests);
+                                  populateFilters();
+                                  doResetFilter();
+                              });
 
     $("#activetests").droppable({
         accept: ".testline",
@@ -423,7 +450,6 @@ function handleLoad()
     // wrap the range-spans
     $(".clicky-ranges span").click(onNewRangeClick);
     updateAvailableTests();
-    initGraphLayout();
 }
 
 window.addEventListener("load", handleLoad, false);
