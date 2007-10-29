@@ -431,6 +431,8 @@ function handleLoad()
 {
     initGraphCore();
 
+    $("#availabletests").append("<div class='testline'><i>Loading...</i></div>");
+
     Tinderbox.requestTestList(function (tests) {
                                   transformRawData(tests);
                                   populateFilters();
@@ -449,7 +451,6 @@ function handleLoad()
 
     // wrap the range-spans
     $(".clicky-ranges span").click(onNewRangeClick);
-    updateAvailableTests();
 }
 
 window.addEventListener("load", handleLoad, false);
