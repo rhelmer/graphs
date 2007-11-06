@@ -92,11 +92,13 @@ select {
 }
 
 .testlist {
-  border: 2px solid gray;
+  border: 2px solid #999999;
   -moz-border-radius: 4px;
   width: 20em;
-
+  background: white;
   min-height: 12em;
+
+  background: #bbbbbb;
 }
 
 .scrollabletestlist {
@@ -130,12 +132,14 @@ select {
 }
 
 .sectionheader {
-  margin-top: 5px;
   margin-bottom: 2px;
   padding: 2px;
   font-weight: bold;
+/*
   background: darkgray;
   color: #222266;
+*/
+  color: #aaaaff;
   width: 20em;
 }
 
@@ -172,12 +176,21 @@ select {
   border-bottom: 1px dotted black;
   color: blue;
 }
+
+.gradbk {
+  /*background: url("images/grad.png");*/
+  background: #777777;
+  -moz-border-radius: 3px;
+  padding: 3px;
+}
+
 </style>
   </head>
 
   <body>
     <table><tr>
     <td class="leftcolumncell">
+	  <div class="gradbk">
     <div class="sectionheader"><span style="margin: auto" class="rightside smalllink"><img onclick="$('#testsel').slideToggle('fast')" src="images/wand.png"></span><span>Available Graphs</span></div>
 
     <div id="testsel">
@@ -214,8 +227,9 @@ select {
       <input type="button" value="Show All" onclick="doResetFilter()"></input>
       <input type="button" value="Add All" onclick="doAddAll()"></input>
     </div>
-
-    <div>
+	  </div>
+    <br>
+    <div class="gradbk">
     <div class="sectionheader">Displayed Graphs</div>
     <div class="testlist" id="activetests"></div>
     <input type="button" value="Remove All" onclick="doRemoveAll()"></input>
