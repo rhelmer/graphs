@@ -36,14 +36,17 @@ function initGraphCore(useDiscrete)
 {
     loadOptions();
 
-    if (useDiscrete)
+    if (useDiscrete) {
         Tinderbox = new DiscreteTinderboxData();
-    else
+        SmallPerfGraph = new DiscreteGraph("smallgraph");
+        BigPerfGraph = new DiscreteGraph("graph");
+    } else {
         Tinderbox = new TinderboxData();
-    SmallPerfGraph = new CalendarTimeGraph("smallgraph");
-    BigPerfGraph = new CalendarTimeGraph("graph");
+        SmallPerfGraph = new CalendarTimeGraph("smallgraph");
+        BigPerfGraph = new CalendarTimeGraph("graph");
 
-    BigPerfGraph.drawPoints = true;
+        BigPerfGraph.drawPoints = true;
+    }
 
     // handle saved options
     if ("autoScaleYAxis" in gOptions) {
