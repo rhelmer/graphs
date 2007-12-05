@@ -205,14 +205,15 @@ function makeTestNameHtml(tname)
 
 function makeTestDiv(test, forActive)
 {
+    var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\SA-Za-z0-9-]/g, "");
     var html = "";
     html += "<div class='testline' id='testid" + test.tid + "'>";
     html += "<table><tr>";
     if (forActive)
         html += "<td class='colorcell'><div style='width: 1em; height: 10px;'></div></td>";
     html += "<td class='testmain' width='100%'>";
-    html += "<b>" + makeTestNameHtml(test.test) + "</b> on <b>" + test.platform + "</b><br>";
-    html += "<span style='font-size: small'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span>";
+    html += "<b class='test-name'>" + makeTestNameHtml(test.test) + "</b> on <b class='" + platformclass + "'>" + test.platform + "</b><br>";
+    html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span>";
     html += "</td><td>";
     if (forActive) {
         html += "<div><img src='js/img/Throbber-small.gif' class='throbber'></div><div class='iconcell removecell'></div>";
@@ -273,9 +274,11 @@ function platformFromData(t)
             /.*bldxp.*/.test(m))
             return "Windows XP";
         if (/.*bldlnx.*/.test(m) ||
-            /.*linux.*/.test(m))
+            /.*linux.*/.test(m) ||
+            /.*ubuntu.*/.test(m))
             return "Linux";
-        if (/.*xserve.*/.test(m))
+        if (/.*xserve.*/.test(m) ||
+            /.*pmac.*/.test(m))
             return "MacOS X";
     }
 
@@ -381,8 +384,6 @@ function transformLegacySeriesData(testList)
             quickList[key] = ob;
         }
     }
-
-    log (gTestList.toSource());
 }
 
 function populateFilters()
