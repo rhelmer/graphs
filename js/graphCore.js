@@ -32,11 +32,14 @@ var gOptions = {
     doDeltaSort: false,
 };
 
-function initGraphCore()
+function initGraphCore(useDiscrete)
 {
     loadOptions();
 
-    Tinderbox = new TinderboxData();
+    if (useDiscrete)
+        Tinderbox = new DiscreteTinderboxData();
+    else
+        Tinderbox = new TinderboxData();
     SmallPerfGraph = new CalendarTimeGraph("smallgraph");
     BigPerfGraph = new CalendarTimeGraph("graph");
 

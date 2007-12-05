@@ -1,4 +1,12 @@
 
+// Just the single value for each result; reports value over time
+var GRAPH_TYPE_VALUE = 0;
+// Each result is a single series, reported over an index
+var GRAPH_TYPE_SERIES = 1;
+// A specific value from each series, reported over time
+var GRAPH_TYPE_SERIES_VALUE = 2;
+
+var gGraphType = GRAPH_TYPE_VALUE;
 
 var gTestList = [];
 var gActiveTests = [];
@@ -319,7 +327,7 @@ function testFromData(t)
     return t.test;
 }
 
-function transformRawData(testList)
+function transformLegacyData(testList)
 {
     testList = testList ? testList : rawTestList;
 
@@ -343,6 +351,38 @@ function transformRawData(testList)
 
         gTestList.push(ob);
     }
+}
+
+function transformLegacySeriesData(testList)
+{
+    gTestList = [];
+
+    var quickList = {};
+
+    for (var i = 0; i < testList.length; i++) {
+        var t = testList[i];
+
+        var key = t.machine + t.branch + t.test;
+
+        if (key in quickList) {
+            if (quickList[key].newest < t.date)
+                quickList[key].newest = t.date;
+        } else {
+            var ob = {
+                tid: t.id,
+                platform: platformFromData(t),
+                machine: t.machine,
+                branch: t.branch,
+                test: t.test,
+                newest: t.date * 1000
+            };
+
+            gTestList.push(ob);
+            quickList[key] = ob;
+        }
+    }
+
+    log (gTestList.toSource());
 }
 
 function populateFilters()
@@ -396,6 +436,7 @@ function onNewRangeClick(ev)
         t1 = range[0];
         t2 = range[1];
     } else if (which == "Custom...") {
+    } else if (which == "Older" || which == "Newer") {
     } else {
         var m;
         var tlength = null;
@@ -427,17 +468,54 @@ function onNewRangeClick(ev)
     zoomToTimes(t1, t2);
 }
 
+function initOptions()
+{
+    if (!document.location.hash)
+	return;
+
+    var qsdata = {};
+    var hasharray = document.location.hash.substring(1).split("&");
+    for each (var s in hasharray) {
+        var q = s.split("=");
+        qsdata[q[0]] = q[1];
+    }
+
+    if (qsdata["type"] == "value") {
+	gGraphType = GRAPH_TYPE_VALUE;
+    } else if (qsdata["type"] == "series") {
+	gGraphType = GRAPH_TYPE_SERIES;
+    } else if (qsdata["type"] == "series-value") {
+	gGraphType = GRAPH_TYPE_SERIES_VALUE;
+    }
+}
+
 function handleLoad()
 {
-    initGraphCore();
+    initOptions();
+
+    initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
 
     $("#availabletests").append("<div class='testline'><i>Loading...</i></div>");
 
-    Tinderbox.requestTestList(function (tests) {
-                                  transformRawData(tests);
-                                  populateFilters();
-                                  doResetFilter();
-                              });
+    if (gGraphType == GRAPH_TYPE_VALUE) {
+        Tinderbox.requestTestList(
+            function (tests) {
+                transformLegacyData(tests);
+                populateFilters();
+                doResetFilter();
+            });
+    } else if (gGraphType == GRAPH_TYPE_SERIES) {
+        Tinderbox.requestTestList(30 /* days */, null, null, null,
+                                    function (tests) {
+                                        transformLegacySeriesData(tests);
+                                        populateFilters();
+                                        doResetFilter();
+                                    });
+    } else {
+        alert("Unsupported graph type");
+        return;
+    }
+
 
     $("#activetests").droppable({
         accept: ".testline",

@@ -1,3 +1,4 @@
+/* -*- Mode: javascript; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 20; -*- */
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -43,7 +44,7 @@ var getdatacgi = "getdata.cgi?"
 if (document.location.hostname.indexOf("localhost") != -1)
     getdatacgi = getdatacgi_local;
 
-//getdatacgi = "http://graphs-stage.mozilla.org/getdata.cgi?";
+getdatacgi = "http://graphs-stage.mozilla.org/getdata.cgi?";
 
 function checkErrorReturn(obj) {
     if (!obj || obj.resultcode != 0) {

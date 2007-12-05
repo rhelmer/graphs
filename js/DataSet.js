@@ -1,3 +1,4 @@
+/* -*- Mode: javascript; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 20; -*- */
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -111,13 +112,8 @@ TimeDataSet.prototype = {
 };
 
 function TimeValueDataSet(data, color) {
-    this.data = data;
-
-    this.firstTime = data[0];
-    if (data.length > 2)
-        this.lastTime = data[data.length-2];
-    else
-        this.lastTime = data[0];
+    if (data)
+        this.initWithData(data);
 
     if (color) {
         this.color = color;
@@ -140,6 +136,18 @@ TimeValueDataSet.prototype = {
 
     color: "black",
     title: '',
+
+    initWithData: function (data) {
+        this.data = data;
+
+        this.firstTime = data[0];
+        if (data.length > 2)
+            this.lastTime = data[data.length-2];
+        else
+            this.lastTime = data[0];
+
+        // XXX do something about relativeToSets
+    },
 
     minMaxValueForTimeRange: function (startTime, endTime) {
         var minValue = Number.POSITIVE_INFINITY;
@@ -317,3 +325,29 @@ TimeStringDataSet.prototype = {
     },
 };
 
+function TalosRunDataSet(data) {
+    this.initWithData(data);
+}
+
+TalosRunDataSet.prototype = {
+    data: null,
+
+    // array of special names (start with $)
+    specialValues: null,
+
+    // object with {k: v}, where k is test name, and v is the computed
+    // average value
+    normalData: null,
+
+    initWithData: function(data) {
+        this.data = data;
+        this.specialValues = [];
+
+        for (var k in this.data) {
+            if (k.indexOf("$") == 0)
+                this.specialValues.push(k);
+        }
+
+
+    },
+};
