@@ -229,7 +229,7 @@ function makeTestDiv(test, fstr)
     html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span>";
     html += "</td><td style='white-space: nowrap'>";
     if (forActive) {
-        html += "<div class='iconcell'><img src='js/img/Throbber-small.gif' class='throbber'></div><div class='iconcell removecell'></div>";
+        html += "<div class='iconcell'><img src='images/throbber-small.gif' class='throbber'></div><div class='iconcell removecell'></div>";
     } else {
         if (showDateSel)
             html += "<div class='iconcell dateaddcell'></div>";
@@ -589,7 +589,7 @@ function handleLoad()
 
     initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
 
-    $("#availabletests").append("<div class='testline'><i>Loading...</i></div>");
+    $("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
 
     if (gGraphType == GRAPH_TYPE_VALUE) {
         Tinderbox.requestTestList(

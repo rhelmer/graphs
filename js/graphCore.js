@@ -441,7 +441,7 @@ function showFloater(time, value) {
 
 function showLoadingAnimation(message) {
     //log("starting loading animation: " + message);
-    $("#loading").replace($.html("<span><img src='js/img/Throbber-small.gif'> loading: " + message + "</span>"));
+    $("#loading").replace($.html("<span><img src='images/throbber-small.gif'> loading: " + message + "</span>"));
 }
 
 function clearLoadingAnimation() {
