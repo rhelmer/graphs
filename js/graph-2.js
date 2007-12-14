@@ -278,8 +278,9 @@ function doAddWithDate(evt) {
     // newest on top
     for (var i = allDateTests.length - 1; i >= 0; --i) {
         var d = allDateTests[i];
-        datesel.append("<option value='" + d.tid + "' " + (i == allDateTests.length-1 ? "selected='true'" : "") + ">" + formatTime(d.date) + "</option>");
+        datesel.append("<option value='" + d.tid + "'>" + formatTime(d.date) + "</option>");
     }
+    $("#datesel > :first-child").attr("selected", "");
 
     if (dialogOpen) {
         $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
