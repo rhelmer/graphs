@@ -14,13 +14,19 @@
     <script type="text/javascript" src="jq/jquery.ui-1.0/ui.draggable.js"></script>
     <script type="text/javascript" src="jq/jquery.ui-1.0/ui.droppable.js"></script>
     <script type="text/javascript" src="jq/jquery.ui-1.0/ui.accordion.js"></script>
+    <script type="text/javascript" src="jq/jquery.ui-1.0/ui.resizable.js"></script>
+    <script type="text/javascript" src="jq/jquery.ui-1.0/ui.dialog.js"></script>
 
-    <style type="text/css" src="jq/jquery.ui-1.0/themes/light.css"></style>
-    <style type="text/css" src="jq/jquery.ui-1.0/themes/light.form.css"></style>
-    <style type="text/css" src="jq/jquery.ui-1.0/themes/light.menu.css"></style>
-    <style type="text/css" src="jq/jquery.ui-1.0/themes/light.modal.css"></style>
-    <style type="text/css" src="jq/jquery.ui-1.0/themes/light.tabs.css"></style>
-    <style type="text/css" src="jq/jquery.ui-1.0/themes/light.tree.css"></style>
+<!--
+    <link rel="stylesheet" type="text/css" href="jq/jquery.ui-1.0/themes/light/light.css">
+    <link rel="stylesheet" type="text/css" href="jq/jquery.ui-1.0/themes/light/light.form.css">
+    <link rel="stylesheet" type="text/css" href="jq/jquery.ui-1.0/themes/light/light.menu.css">
+    <link rel="stylesheet" type="text/css" href="jq/jquery.ui-1.0/themes/light/light.modal.css">
+    <link rel="stylesheet" type="text/css" href="jq/jquery.ui-1.0/themes/light/light.tabs.css">
+    <link rel="stylesheet" type="text/css" href="jq/jquery.ui-1.0/themes/light/light.tree.css">
+-->
+
+    <link rel="stylesheet" type="text/css" href="jq/jquery.ui-1.0/themes/flora/flora.all.css">
 
     <!-- Core -->
     <script type="text/javascript" src="js/TinderboxData.js"></script>
@@ -83,7 +89,7 @@ select {
   padding-right: 5px;
 }
 
-.testline td:not(.bar) {
+.testline td {
   background: #dddddd;
 }
 
@@ -113,17 +119,28 @@ select {
   height: 15px ! important;
 }
 
+.barcharticon {
+  background: url("images/chart_bar.png");
+}
+
+.linecharticon {
+  background: url("images/chart_line.png");
+}
+
 .colorcell {
   background: blue;
 }
 
 .addcell {
+  cursor: hand;
   background: url("images/add.png");
   /*background: url("images/chart_line_add.png");*/
 }
 
-.addcell:hover {
-  /*background: yellow;*/
+.dateaddcell {
+  cursor: hand;
+  margin-right: 3px;
+  background: url("images/calendar_add.png");
 }
 
 .removecell {
@@ -139,8 +156,8 @@ select {
   background: darkgray;
   color: #222266;
 */
-  color: #aaaaff;
-  width: 20em;
+  color: white;
+  width: 100%;
 }
 
 .leftcolumncell {
@@ -186,33 +203,59 @@ select {
 
 /* platforms */
 .test-platform-linux {
-color: green;
+  color: green;
 }
 
 .test-platform-windowsxp {
-color: blue;
+  color: blue;
 }
 
 .test-platform-macosx {
-color: red;
+  color: red;
 }
 
 .test-name {
 }
 
 .test-extra-info {
-font-size: small;
-color: #2F4F4F;
+  font-size: small;
+  color: #2F4F4F;
+}
+
+#seriesdialog {
+  position: absolute;
+  width: 11em;
+  border: 2px solid white;
+  top: 100px;
+  left: 70px;
+  display: none;
+}
+
+#seriesdialog select {
+  height: 15em;
+  width: 100%;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.dateselshown {
+  background: yellow ! important;
+}
+
+.buttonbox {
+  text-align: right;
 }
 
 </style>
   </head>
 
   <body>
+    <!-- Main contents -->
+
     <table><tr>
     <td class="leftcolumncell">
 	  <div class="gradbk">
-    <div class="sectionheader"><span style="margin: auto" class="rightside smalllink"><img onclick="$('#testsel').slideToggle('fast')" src="images/wand.png"></span><span>Available Graphs</span></div>
+    <div class="sectionheader"><span style="margin: auto" class="rightside smalllink"><img onclick="$('#testsel').slideToggle('fast')" src="images/wand.png"></span><span><div id="charttypeicon" class="iconcell" style="margin-right: 2px;"></div>Available Graphs</span></div>
 
     <div id="testsel">
       <div id="testfilterform">
@@ -296,6 +339,17 @@ color: #2F4F4F;
     </td></tr>
     </table>
 
-<div id="log"></div>
+    <!-- the datepicker dialog for series tests -->
+    <div id="seriesdialog" class="gradbk">
+      <div class="sectionheader"><span style="margin: auto" class="rightside smalllink"><img onclick="doSeriesDialogCancel();" src="images/cancel.png"></span><span>Select dates</span></div>
+      <select id="datesel" multiple="true"></select>
+      <div class="buttonbox">
+        <button onclick="doSeriesDialogAdd();">Add</button>
+      </div>
+    </div>
+
+    <!-- logging helper -->
+    <div id="log"></div>
+
   </body>
 </html>

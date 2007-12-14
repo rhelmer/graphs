@@ -9,6 +9,9 @@ var GRAPH_TYPE_SERIES_VALUE = 2;
 var gGraphType = GRAPH_TYPE_VALUE;
 
 var gTestList = [];
+var gSeriesTestList = {};
+var gSeriesDialogShownForTestId = -1;
+
 var gActiveTests = [];
 
 // 2 weeks
@@ -119,7 +122,6 @@ function doRemoveTest(id)
     gActiveTests = gActiveTests.filter(function(k) { return k != id; });
     $("#activetests #testid" + id).remove();
 
-    log("removing " + id);
     removeTestFromGraph(id);
 }
 
@@ -141,6 +143,16 @@ function doAddAll()
 
 }
 
+function findTestById(id) {
+    for (var i = 0; i < gTestList.length; i++) {
+        if (gTestList[i].tid == id) {
+            return gTestList[i];
+        }
+    }
+
+    return null;
+}
+
 function doAddTest(id, optSkipAnimation)
 {
     if (gActiveTests.indexOf(id) != -1) {
@@ -150,19 +162,13 @@ function doAddTest(id, optSkipAnimation)
         return;
     }
 
-    var t = null;
-    for (var i = 0; i < gTestList.length; i++) {
-        if (gTestList[i].tid == id) {
-            t = gTestList[i];
-            break;
-        }
-    }
+    var t = findTestById(id);
     if (t == null)
 	return;
 
     gActiveTests.push(id);
 
-    var html = makeTestDiv(t, true);
+    var html = makeTestDiv(t, "active");
 
     $("#activetests").append(html);
     if (!optSkipAnimation) {
@@ -177,8 +183,6 @@ function doAddTest(id, optSkipAnimation)
             doRemoveTest(parseInt(tid));
         }
     );
-
-    log("adding " + id);
 
     var color = randomColor();
     $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
@@ -203,8 +207,17 @@ function makeTestNameHtml(tname)
         return tname;
 }
 
-function makeTestDiv(test, forActive)
+function makeTestDiv(test, fstr)
 {
+    var flags = fstr ? fstr.split(",") : [];
+    var forActive = false;
+    var showDateSel = false;
+
+    if (flags.indexOf("active") != -1)
+        forActive = true;
+    if (flags.indexOf("datesel") != -1)
+        showDateSel = true;
+
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\SA-Za-z0-9-]/g, "");
     var html = "";
     html += "<div class='testline' id='testid" + test.tid + "'>";
@@ -214,15 +227,71 @@ function makeTestDiv(test, forActive)
     html += "<td class='testmain' width='100%'>";
     html += "<b class='test-name'>" + makeTestNameHtml(test.test) + "</b> on <b class='" + platformclass + "'>" + test.platform + "</b><br>";
     html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span>";
-    html += "</td><td>";
+    html += "</td><td style='white-space: nowrap'>";
     if (forActive) {
-        html += "<div><img src='js/img/Throbber-small.gif' class='throbber'></div><div class='iconcell removecell'></div>";
+        html += "<div class='iconcell'><img src='js/img/Throbber-small.gif' class='throbber'></div><div class='iconcell removecell'></div>";
     } else {
+        if (showDateSel)
+            html += "<div class='iconcell dateaddcell'></div>";
         html += "<div class='iconcell addcell'></div>";
     }
     html += "</td></tr></table></div>";
 
     return html;
+}
+
+function doSeriesDialogCancel() {
+    if (gSeriesDialogShownForTestId == -1)
+        return;
+
+    $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
+    $("#seriesdialog").hide('fast');
+    gSeriesDialogShownForTestId = -1;
+}
+
+function doSeriesDialogAdd() {
+    if (gSeriesDialogShownForTestId == -1)
+        return;
+
+    $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
+    $("#seriesdialog").hide('fast');
+    gSeriesDialogShownForTestId = -1;
+}
+
+function doAddWithDate(evt) {
+    var tid = testIdFromElement(this);
+    var dialogOpen = (gSeriesDialogShownForTestId != -1);
+    var t = findTestById(tid);
+    if (t == null) {
+        alert("Couldn't find a test with ID " + tid + " -- what happened?");
+        return;
+    }
+
+    if (dialogOpen) {
+    }
+
+    var datesel = $("#datesel");
+    datesel.empty();
+    var allDateTests = gSeriesTestList[makeSeriesTestKey(t)];
+
+    // these are sorted by ascending date, but we really want the
+    // newest on top
+    for (var i = allDateTests.length - 1; i >= 0; --i) {
+        var d = allDateTests[i];
+        datesel.append("<option value='" + d.tid + "' " + (i == allDateTests.length-1 ? "selected='true'" : "") + ">" + formatTime(d.date) + "</option>");
+    }
+
+    if (dialogOpen) {
+        $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
+        $("#seriesdialog").animate({ left: evt.pageX, top: evt.pageY }, 'fast');
+    } else {
+        $("#seriesdialog")[0].style.left = evt.pageX;
+        $("#seriesdialog")[0].style.top = evt.pageY;
+        $("#seriesdialog").show('fast');
+    }
+
+    $("#availabletests #testid" + tid + " td").addClass("dateselshown");
+    gSeriesDialogShownForTestId = tid;
 }
 
 function updateAvailableTests()
@@ -231,8 +300,14 @@ function updateAvailableTests()
 
     $("#availabletests").empty();
 
+    // if we're a selector for SERIES tests,
+    // then add the date selector flag to get it to appear
+    var flags = null;
+    if (gGraphType == GRAPH_TYPE_SERIES)
+        flags = "datesel";
+
     for (var i = 0; i < tests.length; i++) {
-        var el = $(makeTestDiv(tests[i]))
+        var el = $(makeTestDiv(tests[i], flags))
             .draggable({ helper: 'clone', dragPrevention: '.iconcell' });
         $("#availabletests").append(el);
     }
@@ -247,6 +322,7 @@ function updateAvailableTests()
         doAddTest(tid);
     };
 
+    $("#availabletests .dateaddcell").click(doAddWithDate);
     $("#availabletests .addcell").click(doAdd);
     $("#availabletests #testline").dblclick(doAdd);
 }
@@ -356,20 +432,26 @@ function transformLegacyData(testList)
     }
 }
 
+function makeSeriesTestKey(t) {
+    return t.machine + t.branch + t.test;
+}
+
 function transformLegacySeriesData(testList)
 {
     gTestList = [];
+    gSeriesTestList = {};
 
     var quickList = {};
 
     for (var i = 0; i < testList.length; i++) {
         var t = testList[i];
-
-        var key = t.machine + t.branch + t.test;
+        var key = makeSeriesTestKey(t);
 
         if (key in quickList) {
-            if (quickList[key].newest < t.date)
+            if (quickList[key].newest < t.date) {
+                quickList[key].tid = t.id;
                 quickList[key].newest = t.date;
+            }
         } else {
             var ob = {
                 tid: t.id,
@@ -382,7 +464,11 @@ function transformLegacySeriesData(testList)
 
             gTestList.push(ob);
             quickList[key] = ob;
+
+            gSeriesTestList[key] = [];
         }
+
+        gSeriesTestList[key].push({ tid: t.id, date: t.date });
     }
 }
 
@@ -406,6 +492,7 @@ function populateFilters()
                                                  uniques[s].push(t[s]);
                                          });
                       });
+
     fields.forEach(function (s) {
                        $("#test" + s).empty();
                        uniques[s] = uniques[s].sort();
@@ -493,6 +580,12 @@ function initOptions()
 function handleLoad()
 {
     initOptions();
+
+    if (gGraphType == GRAPH_TYPE_SERIES) {
+        $("#charttypeicon").addClass("barcharticon");
+    } else {
+        $("#charttypeicon").addClass("linecharticon");
+    }
 
     initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
 
