@@ -348,8 +348,11 @@ function platformFromData(t)
     if ('machine' in t) {
         var m = t.machine;
         if (/^qm-pxp/.test(m) ||
+            /^qm-mini-xp/.test(m) ||
             /.*bldxp.*/.test(m))
             return "Windows XP";
+        if (/^qm-mini-vista/.test(m))
+            return "Windows Vista";
         if (/.*bldlnx.*/.test(m) ||
             /.*linux.*/.test(m) ||
             /.*ubuntu.*/.test(m))
@@ -416,9 +419,7 @@ function transformLegacyData(testList)
     for (var i = 0; i < testList.length; i++) {
         var t = testList[i];
 
-        t.newest = Date.now() - Math.random() * 25 *24*60*60*1000;
-        if (/places/.test(t.machine))
-            t.newest = Date.now() - 25 *24*60*60*1000;
+        t.newest = Date.now();
 
         var ob = {
             tid: t.id,
@@ -439,6 +440,8 @@ function makeSeriesTestKey(t) {
 
 function transformLegacySeriesData(testList)
 {
+    //log(testList.toSource());
+
     gTestList = [];
     gSeriesTestList = {};
 
@@ -449,9 +452,9 @@ function transformLegacySeriesData(testList)
         var key = makeSeriesTestKey(t);
 
         if (key in quickList) {
-            if (quickList[key].newest < t.date) {
+            if (quickList[key].newest < (t.date * 1000)) {
                 quickList[key].tid = t.id;
-                quickList[key].newest = t.date;
+                quickList[key].newest = t.date * 1000;
             }
         } else {
             var ob = {
@@ -517,8 +520,8 @@ function onNewRangeClick(ev)
 
     var range = dataSetsRange(dss);
     var tnow = Date.now() / 1000;
+    var skipAutoScale = false;
 
-    log ('tnow: ' + tnow + " range " + range);
     var t1, t2;
 
     if (which == "All") {
@@ -526,6 +529,24 @@ function onNewRangeClick(ev)
         t2 = range[1];
     } else if (which == "Custom...") {
     } else if (which == "Older" || which == "Newer") {
+        t1 = SmallPerfGraph.startTime;
+        t2 = SmallPerfGraph.endTime;
+
+        if (!t1 || !t2) {
+            t1 = range[0];
+            t2 = tnow;
+        }
+
+        var tdelta = (t2 - t1) * 0.75;
+        if (which == "Older") {
+            t1 -= tdelta;
+            t2 -= tdelta;
+        } else {
+            t1 += tdelta;
+            t2 += tdelta;
+        }
+
+        skipAutoScale = true;
     } else {
         var m;
         var tlength = null;
@@ -543,7 +564,8 @@ function onNewRangeClick(ev)
     }
 
     SmallPerfGraph.setTimeRange(t1, t2);
-    SmallPerfGraph.autoScale();
+    if (!skipAutoScale)
+        SmallPerfGraph.autoScale();
     SmallPerfGraph.redraw();
 
     if (SmallPerfGraph.selectionStartTime &&
@@ -554,7 +576,7 @@ function onNewRangeClick(ev)
     }
 
     // nothing was selected
-    zoomToTimes(t1, t2);
+    zoomToTimes(t1, t2, skipAutoScale);
 }
 
 function initOptions()

@@ -2411,40 +2411,6 @@ jQuery.extend({
 		if ( s.data && s.processData && typeof s.data != "string" )
 			s.data = jQuery.param(s.data);
 
-		// Handle JSONP Parameter Callbacks
-		if ( s.dataType == "jsonp" ) {
-			if ( s.type.toLowerCase() == "get" ) {
-				if ( !s.url.match(jsre) )
-					s.url += (s.url.match(/\?/) ? "&" : "?") + (s.jsonp || "callback") + "=?";
-			} else if ( !s.data || !s.data.match(jsre) )
-				s.data = (s.data ? s.data + "&" : "") + (s.jsonp || "callback") + "=?";
-			s.dataType = "json";
-		}
-
-		// Build temporary JSONP function
-		if ( s.dataType == "json" && (s.data && s.data.match(jsre) || s.url.match(jsre)) ) {
-			jsonp = "jsonp" + jsc++;
-
-			// Replace the =? sequence both in the query string and the data
-			if ( s.data )
-				s.data = (s.data + "").replace(jsre, "=" + jsonp);
-			s.url = s.url.replace(jsre, "=" + jsonp);
-
-			// We need to make sure
-			// that a JSONP style response is executed properly
-			s.dataType = "script";
-
-			// Handle JSONP-style loading
-			window[ jsonp ] = function(tmp){
-				data = tmp;
-				success();
-				complete();
-				// Garbage collect
-				window[ jsonp ] = undefined;
-				try{ delete window[ jsonp ]; } catch(e){}
-			};
-		}
-
 		if ( s.dataType == "script" && s.cache == null )
 			s.cache = false;
 
@@ -2467,35 +2433,6 @@ jQuery.extend({
 		// Watch for a new set of requests
 		if ( s.global && ! jQuery.active++ )
 			jQuery.event.trigger( "ajaxStart" );
-
-		// If we're requesting a remote document
-		// and trying to load JSON or Script with a GET
-		if ( (!s.url.indexOf("http") || !s.url.indexOf("//")) && ( s.dataType == "script" || s.dataType =="json" ) && s.type.toLowerCase() == "get" ) {
-			var head = document.getElementsByTagName("head")[0];
-			var script = document.createElement("script");
-			script.src = s.url;
-
-			// Handle Script loading
-			if ( !jsonp ) {
-				var done = false;
-
-				// Attach handlers for all browsers
-				script.onload = script.onreadystatechange = function(){
-					if ( !done && (!this.readyState || 
-							this.readyState == "loaded" || this.readyState == "complete") ) {
-						done = true;
-						success();
-						complete();
-						head.removeChild( script );
-					}
-				};
-			}
-
-			head.appendChild(script);
-
-			// We handle everything using the script element injection
-			return;
-		}
 
 		var requestDone = false;
 

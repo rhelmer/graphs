@@ -192,8 +192,6 @@ function removeAllTestsFromGraph() {
 //
 
 function onGraphSelectionChanged(event, selectionType, arg1, arg2) {
-    log ("selchanged");
-
     if (selectionType == "range") {
         var t1 = SmallPerfGraph.startTime;
         var t2 = SmallPerfGraph.endTime;
@@ -309,7 +307,7 @@ function saveOptions() {
 // graphing toolset methods
 //
 
-function zoomToTimes(t1, t2) {
+function zoomToTimes(t1, t2, skipAutoScale) {
     var foundIndexes = [];
 
     if (t1 == SmallPerfGraph.startTime &&
@@ -337,8 +335,6 @@ function zoomToTimes(t1, t2) {
         if (!foundPoints) {
             // we didn't find at least two points in at least
             // one graph; so munge the time numbers until we do.
-            log("Orig t1 " + t1 + " t2 " + t2);
-
             for (var i = 0; i < dss.length; i++) {
                 if (foundIndexes[i] == null)
                     continue;
@@ -348,8 +344,6 @@ function zoomToTimes(t1, t2) {
                     t2 = Math.max(dss[i].data[(foundIndexes[i][1] + 1) * 2], t2);
                 }
             }
-        
-            log("Fixed t1 " + t1 + " t2 " + t2);
         }
 
         SmallPerfGraph.selectionStartTime = t1;
@@ -362,7 +356,8 @@ function zoomToTimes(t1, t2) {
     SmallPerfGraph.redrawOverlayOnly();
 
     BigPerfGraph.setTimeRange (t1, t2);
-    BigPerfGraph.autoScale();
+    if (!skipAutoScale)
+        BigPerfGraph.autoScale();
     BigPerfGraph.redraw();
 }
 

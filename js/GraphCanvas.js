@@ -467,8 +467,8 @@ Graph.prototype = {
         }
 
         // yScale = pixels-per-value
-        log("this.startTime: " + this.startTime);
-        log("this.endTime: " + this.endTime);
+        //log("this.startTime: " + this.startTime);
+        //log("this.endTime: " + this.endTime);
         with (ctx) {
             clearRect (0, 0, cw, ch);
             lineWidth = 1.0;
