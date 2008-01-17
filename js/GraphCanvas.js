@@ -209,6 +209,8 @@ Graph.prototype = {
                 Array.splice(this.dataSets, i, 1);
                 Array.splice(this.dataSetIndices, i, 1);
                 Array.splice(this.dataSetMinMaxes, i, 1);
+
+                this.dirty = true;
                 return;
             }
         }
@@ -437,9 +439,6 @@ Graph.prototype = {
     },
 
     redraw: function () {
-        if (this.dataSets.length <= 0)
-            return;
-
         if (this.dirty)
             this.recompute();
 
@@ -464,6 +463,16 @@ Graph.prototype = {
                 hasAverageDSs = true;
                 break;
             }
+        }
+
+        if (this.dataSets.length == 0) {
+            ctx.clearRect (0, 0, cw, ch);
+            this.redrawOverlayOnly();
+            $(this.eventTarget).trigger("graphNewGraph", [ this.dataSets ]);
+
+            this.makeLabels();
+            this.valid = true;
+            return;
         }
 
         // yScale = pixels-per-value

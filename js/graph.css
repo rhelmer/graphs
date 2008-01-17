@@ -107,6 +107,10 @@ select.other {
       text-align: right;
 }
 
+.y-axis-label > div {
+    padding-right: 2px;
+}
+
 .x-axis-label {
       font-family: Tahoma, Verdana, Vera Sans, "Bitstream Vera Sans", Arial, Helvetica, sans-serif;
       font-size: 75%;

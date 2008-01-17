@@ -9,6 +9,7 @@ var GRAPH_TYPE_SERIES_VALUE = 2;
 var gGraphType = GRAPH_TYPE_VALUE;
 
 var gTestList = [];
+var gAllTestsList = [];
 var gSeriesTestList = {};
 var gSeriesDialogShownForTestId = -1;
 
@@ -115,6 +116,7 @@ function doFilterTests()
 function doRemoveTest(id)
 {
     if (gActiveTests.indexOf(id) == -1) {
+        alert("test was never added? " + id);
         // test was never added?
         return;
     }
@@ -144,9 +146,9 @@ function doAddAll()
 }
 
 function findTestById(id) {
-    for (var i = 0; i < gTestList.length; i++) {
-        if (gTestList[i].tid == id) {
-            return gTestList[i];
+    for (var i = 0; i < gAllTestsList.length; i++) {
+        if (gAllTestsList[i].tid == id) {
+            return gAllTestsList[i];
         }
     }
 
@@ -155,6 +157,9 @@ function findTestById(id) {
 
 function doAddTest(id, optSkipAnimation)
 {
+    if (typeof(id) != "number")
+        id = parseInt(id);
+
     if (gActiveTests.indexOf(id) != -1) {
         // test already exists, indicate that
         $("#activetests #testid" + id).hide();
@@ -252,6 +257,11 @@ function doSeriesDialogCancel() {
 function doSeriesDialogAdd() {
     if (gSeriesDialogShownForTestId == -1)
         return;
+
+    var tests = $("#datesel").val();
+    for (var i = 0; i < tests.length; i++) {
+        doAddTest(tests[i]);
+    }
 
     $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
     $("#seriesdialog").hide('fast');
@@ -432,6 +442,8 @@ function transformLegacyData(testList)
 
         gTestList.push(ob);
     }
+
+    gAllTestsList = gTestList;
 }
 
 function makeSeriesTestKey(t) {
@@ -443,6 +455,7 @@ function transformLegacySeriesData(testList)
     //log(testList.toSource());
 
     gTestList = [];
+    gAllTestsList = [];
     gSeriesTestList = {};
 
     var quickList = {};
@@ -451,27 +464,29 @@ function transformLegacySeriesData(testList)
         var t = testList[i];
         var key = makeSeriesTestKey(t);
 
+        var ob = {
+            tid: t.id,
+            platform: platformFromData(t),
+            machine: t.machine,
+            branch: t.branch,
+            test: t.test,
+        };
+
         if (key in quickList) {
             if (quickList[key].newest < (t.date * 1000)) {
                 quickList[key].tid = t.id;
                 quickList[key].newest = t.date * 1000;
             }
         } else {
-            var ob = {
-                tid: t.id,
-                platform: platformFromData(t),
-                machine: t.machine,
-                branch: t.branch,
-                test: t.test,
-                newest: t.date * 1000
-            };
+            var obcore = { tid: ob.tid, platform: ob.platform, machine: ob.machine, branch: ob.branch, test: ob.test };
 
-            gTestList.push(ob);
-            quickList[key] = ob;
+            gTestList.push(obcore);
+            quickList[key] = obcore;
 
             gSeriesTestList[key] = [];
         }
 
+        gAllTestsList.push(ob);
         gSeriesTestList[key].push({ tid: t.id, date: t.date });
     }
 }
