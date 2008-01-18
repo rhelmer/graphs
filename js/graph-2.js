@@ -173,7 +173,11 @@ function doAddTest(id, optSkipAnimation)
 
     gActiveTests.push(id);
 
-    var html = makeTestDiv(t, "active");
+    var opts = { active: true };
+    if (gGraphType == GRAPH_TYPE_SERIES)
+        opts.showDate = true;
+
+    var html = makeTestDiv(t, opts);
 
     $("#activetests").append(html);
     if (!optSkipAnimation) {
@@ -212,31 +216,34 @@ function makeTestNameHtml(tname)
         return tname;
 }
 
-function makeTestDiv(test, fstr)
+function makeTestDiv(test, opts)
 {
-    var flags = fstr ? fstr.split(",") : [];
-    var forActive = false;
-    var showDateSel = false;
-
-    if (flags.indexOf("active") != -1)
-        forActive = true;
-    if (flags.indexOf("datesel") != -1)
-        showDateSel = true;
+    if (opts == null || typeof(opts) != "object")
+        opts = {};
 
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\SA-Za-z0-9-]/g, "");
     var html = "";
     html += "<div class='testline' id='testid" + test.tid + "'>";
     html += "<table><tr>";
-    if (forActive)
+
+    // Show the color cell on the left, if this is an active test
+    if (opts.active)
         html += "<td class='colorcell'><div style='width: 1em; height: 10px;'></div></td>";
+
+    // The body content of the test entry
     html += "<td class='testmain' width='100%'>";
     html += "<b class='test-name'>" + makeTestNameHtml(test.test) + "</b> on <b class='" + platformclass + "'>" + test.platform + "</b><br>";
-    html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span>";
-    html += "</td><td style='white-space: nowrap'>";
-    if (forActive) {
+    html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span><br>";
+    if (opts.showDate)
+        html += "<span class='test-extra-info'>" + formatTime(test.date) + "</span><br>";
+    html += "</td>";
+
+    // any trailing buttons/throbbers/etc.
+    html += "<td style='white-space: nowrap'>";
+    if (opts.active) {
         html += "<div class='iconcell'><img src='images/throbber-small.gif' class='throbber'></div><div class='iconcell removecell'></div>";
     } else {
-        if (showDateSel)
+        if (opts.dateSelector)
             html += "<div class='iconcell dateaddcell'></div>";
         html += "<div class='iconcell addcell'></div>";
     }
@@ -313,12 +320,12 @@ function updateAvailableTests()
 
     // if we're a selector for SERIES tests,
     // then add the date selector flag to get it to appear
-    var flags = null;
+    var opts = {};
     if (gGraphType == GRAPH_TYPE_SERIES)
-        flags = "datesel";
+        opts.dateSelector = true;
 
     for (var i = 0; i < tests.length; i++) {
-        var el = $(makeTestDiv(tests[i], flags))
+        var el = $(makeTestDiv(tests[i], opts))
             .draggable({ helper: 'clone', dragPrevention: '.iconcell' });
         $("#availabletests").append(el);
     }
@@ -470,6 +477,7 @@ function transformLegacySeriesData(testList)
             machine: t.machine,
             branch: t.branch,
             test: t.test,
+            date: t.date,
         };
 
         if (key in quickList) {
@@ -478,7 +486,7 @@ function transformLegacySeriesData(testList)
                 quickList[key].newest = t.date * 1000;
             }
         } else {
-            var obcore = { tid: ob.tid, platform: ob.platform, machine: ob.machine, branch: ob.branch, test: ob.test };
+            var obcore = { tid: ob.tid, platform: ob.platform, machine: ob.machine, branch: ob.branch, test: ob.test, date: ob.date };
 
             gTestList.push(obcore);
             quickList[key] = obcore;
