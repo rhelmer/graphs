@@ -79,6 +79,18 @@ select {
   background: url("../images/chart_line.png");
 }
 
+.barchartlinkicon {
+  background: url("../images/chart_bar_link.png");
+}
+
+.linechartlinkicon {
+  background: url("../images/chart_line_link.png");
+}
+
+#chartlinkicon:hover {
+  outline: 2px solid blue;
+}
+
 .colorcell {
   background: blue;
 }

@@ -15,6 +15,8 @@ var gSeriesDialogShownForTestId = -1;
 
 var gActiveTests = [];
 
+var gPostDataLoadFunction = null;
+
 // 2 weeks
 var kRecentDate = 14*24*60*60*1000;
 
@@ -199,6 +201,8 @@ function doAddTest(id, optSkipAnimation)
                        $("#activetests #testid" + id + " .throbber")[0].removeAttribute("loading");
                        ds.color = color;
                   });
+
+    updateLinks();
 }
 
 function makeTestNameHtml(tname)
@@ -621,6 +625,35 @@ function initOptions()
     } else if (qsdata["type"] == "series-value") {
 	gGraphType = GRAPH_TYPE_SERIES_VALUE;
     }
+
+    if ("show" in qsdata) {
+        var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
+
+        gPostDataLoadFunction = function() {
+            for (var i = 0; i < ids.length; i++)
+                doAddTest(ids[i], true);
+        };
+    }
+}
+
+function updateLinks() {
+    var loc = document.location.toString();
+    if (loc.indexOf("#") == -1) {
+        loc += "#";
+    } else {
+        loc = loc.substring(0, loc.indexOf("#")) + "#";
+    }
+
+    if (gGraphType == GRAPH_TYPE_SERIES) {
+        loc += "type=series,";
+    }
+
+    if (gActiveTests.length > 0) {
+        loc += "show=";
+        loc += gActiveTests.join(",");
+    }
+
+    $("#linkanchor").attr("href", loc);
 }
 
 function handleLoad()
@@ -629,8 +662,10 @@ function handleLoad()
 
     if (gGraphType == GRAPH_TYPE_SERIES) {
         $("#charttypeicon").addClass("barcharticon");
+        $("#chartlinkicon").addClass("barchartlinkicon");
     } else {
         $("#charttypeicon").addClass("linecharticon");
+        $("#chartlinkicon").addClass("linechartlinkicon");
     }
 
     initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
@@ -643,6 +678,10 @@ function handleLoad()
                 transformLegacyData(tests);
                 populateFilters();
                 doResetFilter();
+                if (gPostDataLoadFunction) {
+                    gPostDataLoadFunction.call(window);
+                    gPostDataLoadFunction = null;
+                }
             });
     } else if (gGraphType == GRAPH_TYPE_SERIES) {
         Tinderbox.requestTestList(30 /* days */, null, null, null,
@@ -650,6 +689,10 @@ function handleLoad()
                                         transformLegacySeriesData(tests);
                                         populateFilters();
                                         doResetFilter();
+                                        if (gPostDataLoadFunction) {
+                                            gPostDataLoadFunction.call(window);
+                                            gPostDataLoadFunction = null;
+                                        }
                                     });
     } else {
         alert("Unsupported graph type");
