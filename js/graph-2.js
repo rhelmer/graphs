@@ -645,7 +645,7 @@ function updateLinks() {
     }
 
     if (gGraphType == GRAPH_TYPE_SERIES) {
-        loc += "type=series,";
+        loc += "type=series&";
     }
 
     if (gActiveTests.length > 0) {
