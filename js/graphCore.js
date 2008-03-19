@@ -5,10 +5,6 @@ var ONE_YEAR_SECONDS = 365*ONE_DAY_SECONDS; // leap years whatever.
 
 var MONTH_ABBREV = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
 
-var CONTINUOUS_GRAPH = 0;
-var DISCRETE_GRAPH = 1;
-var DATA_GRAPH = 2;
-
 // the default average interval
 var gAverageInterval = 3*ONE_HOUR_SECONDS;
 var gCurrentLoadRange = null;
@@ -20,12 +16,12 @@ var SmallPerfGraph;
 var Bonsai;
 var graphType;
 
-var ResizableBigGraph;
-
 var SmallGraphSizeRuleIndex;
 var BigGraphSizeRuleIndex;
 
 var CurrentDataSets = {};
+
+var GraphIsSeries;
 
 var gOptions = {
     autoScaleYAxis: true,
@@ -35,6 +31,8 @@ var gOptions = {
 function initGraphCore(useDiscrete)
 {
     loadOptions();
+
+    GraphIsSeries = useDiscrete ? true : false;
 
     if (useDiscrete) {
         Tinderbox = new DiscreteTinderboxData();
@@ -57,7 +55,7 @@ function initGraphCore(useDiscrete)
         }
     }
 
-    if (graphType == DISCRETE_GRAPH && "doDeltaSort" in gOptions) {
+    if (GraphIsSeries && "doDeltaSort" in gOptions) {
         var box = $("#deltasort")[0];
         if (box) {
             box.checked = gOptions.doDeltaSort ? true : false;
@@ -80,7 +78,19 @@ function initGraphCore(useDiscrete)
             document.styleSheets[0].cssRules.length);
     }
 
-    var resizeFunction = function (nw, nh) {
+    var resizeFunction = function () {
+        var leftw = 340;
+        if (document.body.getBoundingClientRect) {
+            var b = $(".leftcolumncell")[0].getBoundingClientRect();
+            leftw = b.right;
+        }
+
+        /* Account for border and y axis labels */
+        leftw += 75;
+
+        var nw = document.width - leftw;
+        var nh = 400;
+
         $("#graph")[0].width = nw;
         $("#graph")[0].height = nh;
 
@@ -93,17 +103,10 @@ function initGraphCore(useDiscrete)
             document.styleSheets[0].cssRules[SmallGraphSizeRuleIndex].style.width = nw + "px";
             SmallPerfGraph.resize();
         }
+    };
 
-        saveGraphDimensions(nw, nh);
-    }
-
-    var graphSize = { };
-    if (loadGraphDimensions(graphSize))
-        resizeFunction(graphSize.width, graphSize.height);
-
-    // make the big graph resizable
-    ResizableBigGraph = new ResizeGraph();
-    ResizableBigGraph.init('graph', resizeFunction);
+    resizeFunction();
+    window.onresize = resizeFunction;
 
     Tinderbox.init();
 
@@ -215,7 +218,7 @@ function onCursorMoved(event, time, val, extra_data) {
         return;
     }
 
-    if (graphType == DISCRETE_GRAPH) {
+    if (GraphIsSeries) {
         showStatus("Index: " + time + " Value: " + val.toFixed(2) + " " + extra_data);
         showFloater(time, val);
     } else {
@@ -227,49 +230,6 @@ function onCursorMoved(event, time, val, extra_data) {
 //
 // Options, load/save
 //
-
-function loadGraphDimensions(data) {
-    if (!globalStorage || document.domain == "")
-        return false;
-
-    try {
-        var store = globalStorage[document.domain];
-
-        if (!("graphWidth" in store) || !("graphHeight" in store))
-            return false;
-
-        var w = parseInt(store.graphWidth);
-        var h = parseInt(store.graphHeight);
-
-        if (w != w || h != h || w <= 0 || h <= 0)
-            return false;
-        
-        data.width = w;
-        data.height = h;
-
-        return true;
-    } catch (ex) {
-    }
-
-    return false;
-}
-
-function saveGraphDimensions(w, h) {
-    if (!globalStorage || document.domain == "")
-        return false;
-
-    try {
-        if (parseInt(w) != w || parseInt(h) != h)
-            return false;
-
-        globalStorage[document.domain].graphWidth = w;
-        globalStorage[document.domain].graphHeight = h;
-        return true;
-    } catch (ex) {
-    }
-
-    return false;
-}
 
 function loadOptions() {
     if (!globalStorage || document.domain == "")
@@ -427,9 +387,16 @@ function showFloater(time, value) {
     }
     s += "</table>";
 
-    // then put the floater in the right spot
+    var w = 0;
+
+    if (fdiv.getBoundingClientRect) {
+        // then put the floater in the right spot
+        var rect = fdiv.getBoundingClientRect();
+        w = rect.right - rect.left;
+    }
+
     var xy = BigPerfGraph.timeValueToXY(time, value);
-    fdiv.style.left = Math.floor(xy.x + 65) + "px";
+    fdiv.style.left = Math.floor(xy.x + 65 - w) + "px";
     fdiv.style.top = Math.floor((BigPerfGraph.frontBuffer.height - xy.y) + 15) + "px";
     fdiv.innerHTML = s;
 }
