@@ -327,6 +327,8 @@ function showFloater(time, value) {
 
     if (time == null) {
         fdiv.style.visibility = "hidden";
+        fdiv.style.left = "0px";
+        fdiv.style.top = "0px";
         return;
     }
 
