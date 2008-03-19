@@ -1,10 +1,3 @@
-var ONE_HOUR_SECONDS = 60*60;
-var ONE_DAY_SECONDS = 24*ONE_HOUR_SECONDS;
-var ONE_WEEK_SECONDS = 7*ONE_DAY_SECONDS;
-var ONE_YEAR_SECONDS = 365*ONE_DAY_SECONDS; // leap years whatever.
-
-var MONTH_ABBREV = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
-
 // the default average interval
 var gAverageInterval = 3*ONE_HOUR_SECONDS;
 var gCurrentLoadRange = null;
@@ -207,8 +200,7 @@ function onGraphSelectionChanged(event, selectionType, arg1, arg2) {
         zoomToTimes(t1, t2);
     }
 
-    updateLinkToThis();
-    updateDumpToCsv();
+    updateLinks();
 }
 
 function onCursorMoved(event, time, val, extra_data) {
@@ -486,12 +478,6 @@ function makeBonsaiLink(start, end) {
 // DataSet.js checks for this function and will call it
 function getNewColorForDataset() {
     return randomColor();
-}
-
-function updateDumpToCsv() {
-}
-
-function updateLinkToThis() {
 }
 
 if (!("log" in window)) {

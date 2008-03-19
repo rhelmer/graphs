@@ -37,6 +37,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+var ONE_MINUTE_SECONDS = 60;
+var ONE_HOUR_SECONDS = 60*ONE_MINUTE_SECONDS;
+var ONE_DAY_SECONDS = 24*ONE_HOUR_SECONDS;
+var ONE_WEEK_SECONDS = 7*ONE_DAY_SECONDS;
+var ONE_YEAR_SECONDS = 365*ONE_DAY_SECONDS; // leap years whatever.
+
+var MONTH_ABBREV = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+
 function Graph() {
 }
 
@@ -77,6 +85,16 @@ Graph.prototype = {
     // should the Y axis be autoscaled (true),
     // or always start at 0 (false)
     autoScaleYAxis: true,
+
+    scaleLabelIntervals: [ 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000 ],
+    timeLabelIntervals: [ 1, 30, ONE_MINUTE_SECONDS, 2*ONE_MINUTE_SECONDS, 5*ONE_MINUTE_SECONDS,
+                          10*ONE_MINUTE_SECONDS, 15*ONE_MINUTE_SECONDS, 30*ONE_MINUTE_SECONDS,
+                          ONE_HOUR_SECONDS, 2*ONE_HOUR_SECONDS, 3*ONE_HOUR_SECONDS,
+                          6*ONE_HOUR_SECONDS, 12*ONE_HOUR_SECONDS,
+                          ONE_DAY_SECONDS, 2*ONE_DAY_SECONDS,
+                          ONE_WEEK_SECONDS, 2*ONE_WEEK_SECONDS, 4*ONE_WEEK_SECONDS,
+                          8*ONE_WEEK_SECONDS, 16*ONE_WEEK_SECONDS, 32*ONE_WEEK_SECONDS,
+                          ONE_YEAR_SECONDS ],
 
     //
     // Selection configuration
@@ -799,76 +817,56 @@ Graph.prototype = {
 
     },
 
+    computeLabels: function (pixelSize, pixelsPerValue, minValue, maxLabels, labelIntervals) {
+        var yLabelHeight = pixelSize / maxLabels;
 
-    getValueAxisLabels: function () {
-        if (!this.dirty)
-            return this.yAxisLabels;
+        var visibleValues = pixelSize * pixelsPerValue;
+        var valuePerPixel = 1/pixelsPerValue;
+        var labelValue = yLabelHeight * valuePerPixel;
 
-        // see getTimeAxisLabels for more commentary
-
-        // y axis is either an arbitrary value or a percent
-        var visibleValues = this.frontBuffer.height * this.yScale;
-        var valuePerPixel = 1/this.yScale;
-        var labelValue = this.yLabelHeight * valuePerPixel;
-
-        // round to nearest integer, but that's it; we can try to get
-        // fancy later on
-        var fixedPrecision;
-        if (this.hasRelative) {
-/*
-            labelValue = 1;
-
-            var vdiff = Math.ceil(this.dataSetMaxMaxVal) - Math.floor(this.dataSetMinMinVal);
-            if (vdiff <= 2) {
-                labelValue = .25;
-            } else if (vdiff <= 3) {
-                labelValue = .5;
-            } else {
-                labelValue = 1;
-            }
-*/
-        } else {
-            if (visibleValues > 1000) {
-                fixedPrecision = 1;
-            } else if (visibleValues > 100) {
-                fixedPrecision = 1;
-            } else if (visibleValues > 10) {
-                fixedPrecision = 2;
-            } else if (visibleValues > 1) {
-                fixedPrecision = 3;
+        for (var i = 0; i < labelIntervals.length; i++) {
+            if (labelValue < labelIntervals[i]) {
+                labelValue = labelIntervals[i];
+                break;
             }
         }
 
-        var numLabels = Math.floor(this.frontBuffer.height / this.yLabelHeight) + 1;
+        // round to nearest integer, but that's it; we can try to get
+        // fancy later on
+        var fixedPrecision = 0;
+
         var labels = [];
-        var firstLabelOffsetValue = (this.yOffset % labelValue);
+        var firstLabelOffsetValue = Math.ceil (minValue / labelValue) * labelValue;
 
-        var visibleYMax = this.yOffset + this.frontBuffer.height/this.yScale;
+        var visibleYMax = minValue + pixelSize * valuePerPixel;
 
-        //log("yoffset", this.yOffset, "ymax", visibleYMax, "labelValue", labelValue, "numLabels", numLabels, "flo", firstLabelOffsetValue, "visibleYMax", visibleYMax);
-        for (var i = 0; i < numLabels; i++) {
+        for (var i = 0; i < maxLabels; i++) {
             // figure out the time value of this label
-            var lvalue = this.yOffset + firstLabelOffsetValue + i*labelValue;
+            var lvalue = firstLabelOffsetValue + i*labelValue;
             if (lvalue > visibleYMax)
                 break;
 
             // we want the text to correspond to the value drawn at the start of the block
             // also note that Y axis is inverted
             // XXX put back the -y/2 once we figure out how to vertically center a label's text
-            var lpos = ((lvalue - this.yOffset)/valuePerPixel /* - (this.yLabelHeight/2)*/);
+            var lpos = ((lvalue - minValue)/valuePerPixel /* - (this.yLabelHeight/2)*/);
             var l;
-            //log ("i", i, "lpos: ", lpos, "lvalue", lvalue, "ysc", this.yScale);
-            if (this.hasRelative) {
-                l = [lpos, lvalue, (lvalue * 100).toFixed(0).toString() + "%"];
-            } else {
-                l = [lpos, lvalue, lvalue.toFixed(fixedPrecision).toString()];
-            }
-            //log("lval", lvalue, "lpos", l[0]);
+
+            l = [lpos, lvalue, lvalue.toFixed(fixedPrecision).toString()];
+
             labels.push(l);
         }
 
-        this.yAxisLabels = labels;
         return labels;
+    },
+
+    getValueAxisLabels: function () {
+        if (this.dirty) {
+            var numLabels = Math.floor(this.frontBuffer.height / this.yLabelHeight) + 1;
+            this.yAxisLabels = this.computeLabels(this.frontBuffer.height, this.yScale, this.yOffset, numLabels, this.scaleLabelIntervals);
+        }
+
+        return this.yAxisLabels;
     },
 
     getTimeAxisLabels: function () {
