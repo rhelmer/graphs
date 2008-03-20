@@ -27,6 +27,12 @@ if (!("now" in Date)) {
     }
 }
 
+function makeBonsaiLink(start, end) {
+    // hardcode module, oh well.
+    var module = "MozillaTinderboxAll";
+    return "http://bonsai.mozilla.org/cvsquery.cgi?treeid=default&module=" + module + "&branch=HEAD&branchtype=match&dir=&file=&filetype=match&who=&whotype=match&sortby=Date&hours=2&date=explicit&cvsroot=%2Fcvsroot&mindate=" + Math.floor(start) + "&maxdate=" + Math.ceil(end);
+}
+
 function onIncludeOldChanged()
 {
     populateFilters();
@@ -678,6 +684,17 @@ function updateLinks() {
     }
 
     $("#linkanchor").attr("href", loc);
+
+    // update bonsai
+    if (gGraphType == GRAPH_TYPE_VALUE) {
+        if (SmallPerfGraph.selectionStartTime != null &&
+            SmallPerfGraph.selectionEndTime != null)
+        {
+            $("#bonsaianchor").attr("href", makeBonsaiLink(SmallPerfGraph.selectionStartTime, SmallPerfGraph.selectionEndTime));
+        } else {
+            $("#bonsaianchor").attr("href", makeBonsaiLink(SmallPerfGraph.startTime, SmallPerfGraph.endTime));
+        }
+    }
 }
 
 function handleLoad()
@@ -713,6 +730,8 @@ function handleLoad()
                 }
             });
     } else if (gGraphType == GRAPH_TYPE_SERIES) {
+        $("#bonsaispan").hide();
+
         Tinderbox.requestTestList(30 /* days */, null, null, null,
                                     function (tests) {
                                         transformLegacySeriesData(tests);

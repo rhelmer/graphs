@@ -1,7 +1,6 @@
 // the default average interval
 var gAverageInterval = 3*ONE_HOUR_SECONDS;
 var gCurrentLoadRange = null;
-var gForceBonsai = false;
 
 var Tinderbox;
 var BigPerfGraph;
