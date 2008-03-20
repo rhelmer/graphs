@@ -1119,6 +1119,23 @@ Graph.prototype = {
         $(this.eventTarget).trigger("graphSelectionChanged", ["range", this.selectionStartTime, this.selectionEndTime]);
     },
 
+    setSelection: function(a, b) {
+        if (this.selectionType == "range") {
+            this.selectionStartTime = a;
+            this.selectionEndTime = b;
+
+            this.redrawOverlayOnly();
+
+            $(this.eventTarget).trigger("graphSelectionChanged", ["range", this.selectionStartTime, this.selectionEndTime]);
+        } else if (this.selectionType == "cursor") {
+            this.selectionCursorTime = a;
+
+            this.redrawOverlayOnly();
+
+            $(this.eventTarget).trigger("graphSelectionChanged", ["cursor", this.selectionCursorTime]);
+        }
+    },
+
     /*
      * cursor stuff
      */

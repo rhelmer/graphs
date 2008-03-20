@@ -626,12 +626,29 @@ function initOptions()
 	gGraphType = GRAPH_TYPE_SERIES_VALUE;
     }
 
+    var loadFunctions = [];
+
     if ("show" in qsdata) {
         var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
 
-        gPostDataLoadFunction = function() {
-            for (var i = 0; i < ids.length; i++)
-                doAddTest(ids[i], true);
+        loadFunctions.push (function() {
+                for (var i = 0; i < ids.length; i++)
+                    doAddTest(ids[i], true);
+            });
+    }
+
+    if ("sel" in qsdata) {
+        var range = qsdata["sel"].split(",").map(function (k) { return parseInt(k); });
+
+        loadFunctions.push (function() {
+                SmallPerfGraph.setSelection (range[0], range[1]);
+            });
+    }
+
+    if (loadFunctions.length) {
+        gPostDataLoadFunction = function () {
+            for (var i = 0; i < loadFunctions.length; i++)
+                loadFunctions[i]();
         };
     }
 }
@@ -653,6 +670,13 @@ function updateLinks() {
         loc += gActiveTests.join(",");
     }
 
+    if (SmallPerfGraph.selectionStartTime != null &&
+        SmallPerfGraph.selectionEndTime != null)
+    {
+        loc += "&sel=";
+        loc += Math.floor(SmallPerfGraph.selectionStartTime) + "," + Math.ceil(SmallPerfGraph.selectionEndTime);
+    }
+
     $("#linkanchor").attr("href", loc);
 }
 
@@ -671,6 +695,11 @@ function handleLoad()
     initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
 
     $("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
+
+    $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged",
+                                       function (ev, selType, arg1, arg2) {
+                                           updateLinks();
+                                       });
 
     if (gGraphType == GRAPH_TYPE_VALUE) {
         Tinderbox.requestTestList(

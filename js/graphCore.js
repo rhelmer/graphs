@@ -200,8 +200,6 @@ function onGraphSelectionChanged(event, selectionType, arg1, arg2) {
 
         zoomToTimes(t1, t2);
     }
-
-    updateLinks();
 }
 
 function onCursorMoved(event, time, val, extra_data) {
