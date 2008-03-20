@@ -12,6 +12,7 @@ var SmallGraphSizeRuleIndex;
 var BigGraphSizeRuleIndex;
 
 var CurrentDataSets = {};
+var CurrentAverageDataSets = {};
 
 var GraphIsSeries;
 
@@ -19,6 +20,8 @@ var gOptions = {
     autoScaleYAxis: true,
     doDeltaSort: false,
 };
+
+var gAveragesVisible = false;
 
 function initGraphCore(useDiscrete)
 {
@@ -137,16 +140,12 @@ function addTestToGraph(tid, cb) {
                 return;
             }
 
-            var avgds = null;
-            if (average)
-                avgds = ds.createAverage(gAverageInterval);
-
             CurrentDataSets[tid] = ds;
+            syncAverages();
 
             for each (var g in [BigPerfGraph, SmallPerfGraph]) {
                 g.addDataSet(ds);
-                if (avgds)
-                    g.addDataSet(avgds);
+
                 if (g == SmallPerfGraph || autoExpand) {
                     g.expandTimeRange(Math.max(ds.firstTime, gCurrentLoadRange ? gCurrentLoadRange[0] : ds.firstTime),
                                       Math.min(ds.lastTime, gCurrentLoadRange ? gCurrentLoadRange[1] : ds.lastTime));
@@ -173,10 +172,15 @@ function removeTestFromGraph(tid, cb) {
         g.autoScale();
         g.redraw();
     }
+
+    delete CurrentDataSets[tid];
+    syncAverages();
 }
 
 function removeAllTestsFromGraph() {
     CurrentDataSets = {};
+    syncAverages();
+
     for each (var g in [BigPerfGraph, SmallPerfGraph]) {
         g.clearDataSets();
         g.redraw();
@@ -299,9 +303,6 @@ function zoomToTimes(t1, t2, skipAutoScale) {
         SmallPerfGraph.selectionStartTime = t1;
         SmallPerfGraph.selectionEndTime = t2;
     }
-
-    if (document.getElementById("bonsailink"))
-        document.getElementById("bonsailink").href = makeBonsaiLink(t1, t2);
 
     SmallPerfGraph.redrawOverlayOnly();
 
@@ -480,9 +481,62 @@ function getNewColorForDataset() {
     return randomColor();
 }
 
+// Whether average lines should be shown for the tests
+function showAverages(shouldShow) {
+    if (gAveragesVisible == shouldShow)
+        return;
+
+    gAveragesVisible = shouldShow;
+    syncAverages();
+
+    /* Protect against someone who calls this before the graphs are initialized */
+    if (SmallPerfGraph)
+        SmallPerfGraph.redraw();
+    if (BigPerfGraph)
+        BigPerfGraph.redraw();
+}
+
+// sync up the CurrentAverageDataSets with CurrentDataSets, adding/removing data sets
+// from the graphs as necessary
+function syncAverages() {
+    // not visible? then just remove
+    if (!gAveragesVisible) {
+        for (var tid in CurrentAverageDataSets) {
+            var ds = CurrentAverageDataSets[tid];
+            SmallPerfGraph.removeDataSet(ds);
+            BigPerfGraph.removeDataSet(ds);
+        }
+
+        CurrentAverageDataSets = [];
+        return;
+    }
+
+    for (var tid in CurrentDataSets) {
+        if (tid in CurrentAverageDataSets)
+            continue;
+
+        var avgds = CurrentDataSets[tid].createAverage(gAverageInterval);
+        CurrentAverageDataSets[tid] = avgds;
+
+        SmallPerfGraph.addDataSet(avgds);
+        BigPerfGraph.addDataSet(avgds);
+    }
+
+    for (var tid in CurrentAverageDataSets) {
+        if (tid in CurrentDataSets)
+            continue;
+        var avgds = CurrentAverageDataSets[tid];
+        SmallPerfGraph.removeDataSet(avgds);
+        BigPerfGraph.removeDataSet(avgds);
+
+        delete CurrentAverageDataSets[tid];
+    }
+}
+
 if (!("log" in window)) {
     window.log = function(s) {
         var l = document.getElementById("log");
         l.innerHTML += "<br>" + s;
     }
 }
+

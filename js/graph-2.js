@@ -540,6 +540,13 @@ function populateFilters()
                    });
 }
 
+function onToggleAveragesClick(ev)
+{
+    var show = ev.target.checked;
+    showAverages(show);
+    updateLinks();
+}
+
 function onNewRangeClick(ev)
 {
     var which = this.textContent;
@@ -651,6 +658,11 @@ function initOptions()
             });
     }
 
+    if ("avg" in qsdata) {
+        $("#avgcheckbox")[0].checked = true;
+        showAverages(true);
+    }
+
     if (loadFunctions.length) {
         gPostDataLoadFunction = function () {
             for (var i = 0; i < loadFunctions.length; i++)
@@ -682,6 +694,9 @@ function updateLinks() {
         loc += "&sel=";
         loc += Math.floor(SmallPerfGraph.selectionStartTime) + "," + Math.ceil(SmallPerfGraph.selectionEndTime);
     }
+
+    if (gAveragesVisible)
+        loc += "&avg";
 
     $("#linkanchor").attr("href", loc);
 
@@ -747,7 +762,6 @@ function handleLoad()
         return;
     }
 
-
     $("#activetests").droppable({
         accept: ".testline",
         activeClass: "droppable-active",
@@ -760,6 +774,8 @@ function handleLoad()
 
     // wrap the range-spans
     $(".clicky-ranges span").click(onNewRangeClick);
+
+    $("#avgcheckbox").change(onToggleAveragesClick);
 }
 
 window.addEventListener("load", handleLoad, false);
