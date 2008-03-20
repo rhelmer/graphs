@@ -86,7 +86,7 @@ Graph.prototype = {
     // or always start at 0 (false)
     autoScaleYAxis: true,
 
-    scaleLabelIntervals: [ 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000 ],
+    scaleLabelIntervals: [ 1, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000 ],
     timeLabelIntervals: [ 1, 30, ONE_MINUTE_SECONDS, 2*ONE_MINUTE_SECONDS, 5*ONE_MINUTE_SECONDS,
                           10*ONE_MINUTE_SECONDS, 15*ONE_MINUTE_SECONDS, 30*ONE_MINUTE_SECONDS,
                           ONE_HOUR_SECONDS, 2*ONE_HOUR_SECONDS, 3*ONE_HOUR_SECONDS,

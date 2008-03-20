@@ -79,21 +79,22 @@ function initGraphCore(useDiscrete)
         }
 
         /* Account for border and y axis labels */
-        leftw += 75;
+        var ylabelsize = 55;
+        leftw += 15 + ylabelsize;
 
-        var nw = document.width - leftw;
+        var nw = Math.max(100, document.width - leftw);
         var nh = 400;
 
         $("#graph")[0].width = nw;
         $("#graph")[0].height = nh;
 
-        document.styleSheets[0].cssRules[BigGraphSizeRuleIndex].style.width = nw + "px";
+        document.styleSheets[0].cssRules[BigGraphSizeRuleIndex].style.width = (nw+ylabelsize) + "px";
         document.styleSheets[0].cssRules[BigGraphSizeRuleIndex].style.height = nh + "px";
         BigPerfGraph.resize();
 
         if (nw != $("#smallgraph")[0].width) {
             $("#smallgraph")[0].width = nw;
-            document.styleSheets[0].cssRules[SmallGraphSizeRuleIndex].style.width = nw + "px";
+            document.styleSheets[0].cssRules[SmallGraphSizeRuleIndex].style.width = (nw+ylabelsize) + "px";
             SmallPerfGraph.resize();
         }
     };

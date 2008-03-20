@@ -1,4 +1,3 @@
-
 body {
   font-family: sans-serif;
 }
@@ -131,6 +130,7 @@ select {
 
 .contentcell {
   vertical-align: top;
+  overflow: hidden;
 }
 
 .rightside {
