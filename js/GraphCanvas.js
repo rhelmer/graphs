@@ -100,11 +100,14 @@ Graph.prototype = {
     // Selection configuration
     //
 
-    // selection type; 'none', 'range'
-    selectionType: "none",
+    // default selection type; 'none', 'range', 'cursor'
+    // used if the user does a mousedown without modifier keys
+    defaultSelectionType: "none",
     // selection color
     selectionColor: "rgba(0,0,255,0.5)",
-    // holds the selection start/end/cursor time
+
+    // holds the details of the current selection
+    selectionType: null,
     selectionCursorTime: null,
     selectionStartTime: null,
     selectionEndTime: null,
@@ -258,8 +261,19 @@ Graph.prototype = {
         this.dirty = true;
     },
 
-    setSelectionType: function (stype) {
-        if (this.selectionType == stype)
+    getSelection: function () {
+        if (this.selectionType == "range")
+            return { type: "range", start: this.selectionStartTime, end: this.selectionEndTime };
+        if (this.selectionType == "cursor")
+            return { type: "cursor", value: this.selectionCursorTime };
+        return { type: "none" };
+    },
+
+    setDefaultSelectionType: function (stype) {
+        if (this.defaultSelectionType == stype)
+            return;
+
+        if (stype != "none" && stype != "range" && stype != "cursor")
             return;
 
         var self = this;
@@ -270,26 +284,13 @@ Graph.prototype = {
 
         this.removeEventList (this.frontBuffer, "selection");
 
-        this.selectionStartTime = null;
-        this.selectionEndTime = null;
-        this.selectionCursorTime = null;
+        this.addEventList (this.frontBuffer, "selection",
+                           [ "mousedown", function (event) { return self.selectionMouseDown(event); },
+                             "mousemove", function (event) { return self.selectionMouseMove(event); },
+                             "mouseup", function (event) { return self.selectionMouseUp(event); },
+                             "mouseout", function (event) { return self.selectionMouseOut(event); } ] );
 
-        if (stype == "range") {
-            this.addEventList (this.frontBuffer, "selection",
-                               [ "mousedown", function (event) { return self.selectionMouseDown(event); },
-                                 "mousemove", function (event) { return self.selectionMouseMove(event); },
-                                 "mouseup", function (event) { return self.selectionMouseUp(event); },
-                                 "mouseout", function (event) { return self.selectionMouseOut(event); } ] );
-
-            this.selectionType = "range";
-        } else if (stype == "cursor") {
-            this.addEventList (this.frontBuffer, "selection",
-                               [ "mousedown", function (event) { return self.selectionMouseDown(event); } ] );
-
-            this.selectionType = "cursor";
-        }
-
-        this.redrawOverlayOnly();
+        this.defaultSelectionType = stype;
     },
 
     setSelectionColor: function (scolor) {
@@ -763,15 +764,16 @@ Graph.prototype = {
         var doDrawOverlay = false;
 
         with (this.overlayBuffer.getContext("2d")) {
+            /* Draw selection, if any */
             clearRect(0, 0, this.overlayBuffer.width, this.overlayBuffer.height);
-            if (this.selectionCursorTime || (this.selectionStartTime && this.selectionEndTime)) {
+            if (this.selectionType == "cursor" || this.selectionType == "range") {
                 var spixel, epixel;
                 var pps = (this.frontBuffer.width / (this.endTime - this.startTime + this.offsetTime));
 
-                if (this.selectionCursorTime) {
+                if (this.selectionType == "cursor" && this.selectionCursorTime) {
                     spixel = Math.round((this.selectionCursorTime-this.startTime) * pps);
                     epixel = spixel + 1;
-                } else if (this.selectionStartTime && this.selectionEndTime) {
+                } else if (this.selectionType == "range" && this.selectionStartTime && this.selectionEndTime) {
                     spixel = Math.round((this.selectionStartTime-this.startTime) * pps);
                     epixel = Math.round((this.selectionEndTime-this.startTime) * pps);
                 }
@@ -783,6 +785,7 @@ Graph.prototype = {
                 doDrawOverlay = true;
             }
 
+            /* Draw cursor, if any */
             if ((this.cursorType != "none") && this.cursorTime != null && this.cursorValue != null) {
                 globalCompositeOperation = "over";
                 strokeStyle = this.cursorColor;
@@ -1018,7 +1021,17 @@ Graph.prototype = {
         if (!this.valid)
             return;
 
-        if (this.selectionType == "range") {
+        var seltype = this.defaultSelectionType;
+
+        /* Allow modifier keys to override selection type */
+        if (event.shiftKey)
+            seltype = "range";
+        else if (event.ctrlKey || event.metaKey)
+            seltype = "cursor";
+
+        this.selectionType = seltype;
+
+        if (seltype == "range") {
             var pos = $(this.frontBuffer).offset().left + this.borderLeft;
             this.dragState = { startX: event.pageX - pos };
             var ds = this.dragState;
@@ -1029,10 +1042,12 @@ Graph.prototype = {
             this.selectionStartTime = ds.startX * ds.secondsPerPixel + this.startTime;
             this.selectionEndTime = ds.curX * ds.secondsPerPixel + this.startTime;
 
+            this.hideCursor();
+
             this.redrawOverlayOnly();
-            
+
             this.selectionSweeping = true;
-        } else if (this.selectionType == "cursor") {
+        } else if (seltype == "cursor") {
             var pos = $(this.frontBuffer).offset().left + this.borderLeft;
             var secondsPerPixel = (this.endTime - this.startTime + this.offsetTime) / this.frontBuffer.width;
 
@@ -1056,6 +1071,7 @@ Graph.prototype = {
         this.selectionSweeping = false;
         this.selectionStartTime = null;
         this.selectionEndTime = null;
+        this.selectionType = "none";
 
         this.redrawOverlayOnly();
     },
@@ -1119,15 +1135,17 @@ Graph.prototype = {
         $(this.eventTarget).trigger("graphSelectionChanged", ["range", this.selectionStartTime, this.selectionEndTime]);
     },
 
-    setSelection: function(a, b) {
-        if (this.selectionType == "range") {
+    setSelection: function(type, a, b) {
+        if (type == "range") {
+            this.selectionType = type;
             this.selectionStartTime = a;
             this.selectionEndTime = b;
 
             this.redrawOverlayOnly();
 
             $(this.eventTarget).trigger("graphSelectionChanged", ["range", this.selectionStartTime, this.selectionEndTime]);
-        } else if (this.selectionType == "cursor") {
+        } else if (type == "cursor") {
+            this.selectionType = type;
             this.selectionCursorTime = a;
 
             this.redrawOverlayOnly();
@@ -1141,6 +1159,9 @@ Graph.prototype = {
      */
     cursorMouseMove: function (event) {
         if (!this.valid)
+            return;
+
+        if (this.selectionSweeping)
             return;
 
         if (this.cursorType != "free" && this.cursorType != "snap")
@@ -1212,15 +1233,22 @@ Graph.prototype = {
         if (!this.valid)
             return;
 
+        if (this.selectionSweeping)
+            return;
+
         if (this.cursorType != "free" && this.cursorType != "snap")
             return;
 
         this.cursorTime = null;
         this.cursorValue = null;
 
-        $(this.eventTarget).trigger("graphCursorMoved", [this.cursorTime, this.cursorValue, null]);
+        this.hideCursor();
 
         this.redrawOverlayOnly();
+    },
+
+    hideCursor: function () {
+        $(this.eventTarget).trigger("graphCursorMoved", [null, null, null]);
     },
 
     /*

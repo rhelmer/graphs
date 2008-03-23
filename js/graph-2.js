@@ -656,7 +656,7 @@ function initOptions()
         var range = qsdata["sel"].split(",").map(function (k) { return parseInt(k); });
 
         loadFunctions.push (function() {
-                SmallPerfGraph.setSelection (range[0], range[1]);
+                SmallPerfGraph.setSelection ("range", range[0], range[1]);
             });
     }
 
@@ -704,13 +704,21 @@ function updateLinks() {
 
     // update bonsai
     if (gGraphType == GRAPH_TYPE_VALUE) {
-        if (SmallPerfGraph.selectionStartTime != null &&
-            SmallPerfGraph.selectionEndTime != null)
-        {
-            $("#bonsaianchor").attr("href", makeBonsaiLink(SmallPerfGraph.selectionStartTime, SmallPerfGraph.selectionEndTime));
+        var start, end;
+
+        var sel = BigPerfGraph.getSelection();
+        if (sel.type != "range")
+            sel = SmallPerfGraph.getSelection();
+
+        if (sel.type == "range") {
+            start = sel.start;
+            end = sel.end;
         } else {
-            $("#bonsaianchor").attr("href", makeBonsaiLink(SmallPerfGraph.startTime, SmallPerfGraph.endTime));
+            start = SmallPerfGraph.startTime;
+            end = SmallPerfGraph.endTime;
         }
+
+        $("#bonsaianchor").attr("href", makeBonsaiLink(start, end));
     }
 }
 

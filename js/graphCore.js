@@ -110,8 +110,8 @@ function initGraphCore(useDiscrete)
         Bonsai = new BonsaiService();
 
     SmallPerfGraph.yLabelHeight = 20;
-    SmallPerfGraph.setSelectionType("range");
-    BigPerfGraph.setSelectionType("cursor");
+    SmallPerfGraph.setDefaultSelectionType("range");
+    BigPerfGraph.setDefaultSelectionType("none");
     BigPerfGraph.setCursorType("snap");
 
     $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged", onGraphSelectionChanged);
