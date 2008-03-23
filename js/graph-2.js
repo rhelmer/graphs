@@ -133,6 +133,7 @@ function doRemoveTest(id)
     $("#activetests #testid" + id).remove();
 
     removeTestFromGraph(id);
+    updateLinks();
 }
 
 function doRemoveAll()
@@ -141,6 +142,7 @@ function doRemoveAll()
     $("#activetests").empty();
 
     removeAllTestsFromGraph();
+    updateLinks();
 }
 
 function doAddAll()
