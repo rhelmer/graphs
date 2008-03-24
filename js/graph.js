@@ -1,1064 +1,794 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is new-graph code.
- *
- * The Initial Developer of the Original Code is
- *    Mozilla Corporation
- * Portions created by the Initial Developer are Copyright (C) 2006
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *   Vladimir Vukicevic <vladimir@pobox.com> (Original Author)
- *   Alice Nodelman <anodelman@mozilla.com>
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK ***** */
 
-// all times are in seconds
+// Just the single value for each result; reports value over time
+var GRAPH_TYPE_VALUE = 0;
+// Each result is a single series, reported over an index
+var GRAPH_TYPE_SERIES = 1;
+// A specific value from each series, reported over time
+var GRAPH_TYPE_SERIES_VALUE = 2;
 
-const ONE_HOUR_SECONDS = 60*60;
-const ONE_DAY_SECONDS = 24*ONE_HOUR_SECONDS;
-const ONE_WEEK_SECONDS = 7*ONE_DAY_SECONDS;
-const ONE_YEAR_SECONDS = 365*ONE_DAY_SECONDS; // leap years whatever.
+var gGraphType = GRAPH_TYPE_VALUE;
 
-const MONTH_ABBREV = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+var gTestList = [];
+var gAllTestsList = [];
+var gSeriesTestList = {};
+var gSeriesDialogShownForTestId = -1;
 
-const CONTINUOUS_GRAPH = 0;
-const DISCRETE_GRAPH = 1;
-const DATA_GRAPH = 2;
+var gActiveTests = [];
 
-const bonsaicgi = "bonsaibouncer.cgi";
+var gPostDataLoadFunction = null;
 
-// more days than this and we'll force user confirmation for the bonsai query
-const bonsaiNoForceDays = 90;
+// 2 weeks
+var kRecentDate = 14*24*60*60*1000;
 
-// the default average interval
-var gAverageInterval = 3*ONE_HOUR_SECONDS;
-var gCurrentLoadRange = null;
-var gForceBonsai = false;
-
-var gOptions = {
-    autoScaleYAxis: true,
-    doDeltaSort: false,
-};
-
-var Tinderbox;
-var BigPerfGraph;
-var SmallPerfGraph;
-var Bonsai;
-var graphType;
-
-var ResizableBigGraph;
-
-var SmallGraphSizeRuleIndex;
-var BigGraphSizeRuleIndex;
-
-// discrete graph config
-var DGC;
-
-function initDiscreteGraph() {
-    window.GraphFormModules = [];
-
-    DGC = { };
-
-    DGC.isLimit = $("#num-days-radio").get(0);
-    DGC.limitDays = $("#load-days-entry").get(0);
-    DGC.testSelect = $("#testselect").get(0);
-    DGC.branchSelect = $("#branchselect").get(0);
-    DGC.machineSelect = $("#machineselect").get(0);
-    DGC.testtypeSelect = $("#testtypeselect").get(0);
-
-    // just grab an element somewhere, doesn't matter which
-    DGC.eventTarget = $("#graphconfig").get(0);
-
-    DGC.onChangeTest = function (forceTestIds) {
-        DGC.tests = [];
-        for each (var opt in this.testSelect.options) {
-            if (opt.selected)
-                this.tests.push([opt.value, opt.text]);
-        }
-
-        $(DGC.eventTarget).trigger("DGCAddedInitialInfo");
-    };
-
-    DGC.getQueryString = function () {
-    };
-
-    DGC.getDumpString = function () {
-    };
-
-    DGC.update = function (limitD, branch, machine, testname) {
-        $(DGC.eventTarget).trigger("formLoading", ["updating test list"]);
-        Tinderbox.requestTestList(limitD, branch, machine, testname, function(tests) {
-                                      var branch_opts = [];
-                                      if (tests == '') {
-                                        log("empty test list"); 
-                                        $(DGC.eventTarget).trigger("formLoadingDone");
-                                        $(DGC.testSelect).empty();
-                                        $("#graphbutton").attr("disabled", "true");
-                                        return;
-                                      }
-                                      // let's sort by machine name
-                                      var sortedTests = Array.sort(tests, function (a, b) {
-                                                                       if (a.machine < b.machine) return -1;
-                                                                       if (a.machine > b.machine) return 1;
-                                                                       if (a.test < b.test) return -1;
-                                                                       if (a.test > b.test) return 1;
-                                                                       if (a.test_type < b.test_type) return -1;
-                                                                       if (a.test_type > b.test_type) return 1;
-                                                                       if (a.date < b.date) return -1;
-                                                                       if (a.date > b.date) return 1;
-                                                                       return 0;
-                                                                   });
-
-                                      $(DGC.testSelect).empty();
-
-                                      for each (var test in sortedTests) {
-                                          var d = new Date(test.date*1000);
-                                          var s1 = (d.getHours() < 10 ? "0" : "") + d.getHours() + (d.getMinutes() < 10 ? ":0" : ":") + d.getMinutes() +
-                                                                  //(d.getSeconds() < 10 ? ":0" : ":") + d.getSeconds() +
-                                                                  " " + (d.getDate() < 10 ? "0" : "") + d.getDate();
-                                          s1 +=  "/" + MONTH_ABBREV[d.getMonth()] + "/" + (d.getFullYear() -2000 < 10 ? "0" : "") + (d.getFullYear() - 2000);
-                                          var padstr = "--------------------";
-                                          var tstr = "" + //test.test + padstr.substr(0, 20-test.test.length) + 
-                                              test.branch.toString() + padstr.substr(0, 6-test.branch.toString().length) + 
-                                              "-" + test.machine + padstr.substr(0, 10-test.machine.length) + 
-                                              "-" + s1;
-                                          startSelected = false;
-
-                                          var opt = $("<option>" + tstr + "</option>");
-                                          opt.attr("value", test.id);
-                                          opt.appendTo(DGC.testSelect);
-                                          opt.get(0).selected = startSelected;
-                                      }
-
-                                      $("#listname").empty();
-                                      $("#listname").append("Select from " + testname + ":");
-
-                                      $("#graphbutton").removeAttr("disabled");
-
-                                      setTimeout(function () { DGC.onChangeTest(); }, 0);
-                                      $(DGC.eventTarget).trigger("formLoadingDone");
-                                  });
-
-    };
-
-    // do this after we finish loading
-    var userName = null;
-    var forceTestIds = null;
-
-    // grab the list of test types
-    Tinderbox.requestSearchList(null, null, 1, function (list) {
-                                    try {
-                                        $(DGC.testtypeSelect).empty();
-                                        for each (var listvalue in list)  {
-                                            var opt = $("<option>" + listvalue.value + "</option>");
-                                            opt.attr("value", listvalue.value);
-                                            if ((userName) && (userName == listvalue.value))
-                                                opt.attr("selected", "true");
-                                            $(DGC.testtypeSelect).append(opt);
-                                        }
-
-                                        if (forceTestIds == null) {
-                                            DGC.testtypeSelect.options[0].selected = true;
-                                            DGC.update(null, null, null, DGC.testtypeSelect.value, forceTestIds);
-                                        } else {
-                                            DGC.update(null, null, null, userName, forceTestIds);
-                                        }} catch (ex) { log(ex); }
-                                });
-
-    // grab the list of branch names
-    Tinderbox.requestSearchList(1, null, null, function (list) {
-                                    $(DGC.branchSelect).empty();
-                                    for each (var listvalue in list) {
-                                        var opt = $("<option>" + listvalue.value + "</option>");
-                                        opt.attr("value", listvalue.value);
-                                        opt.get(0).selected = true;
-                                        $(DGC.branchSelect).append(opt);
-                                    }
-                                });
-
-    // grab the list of machine name
-    Tinderbox.requestSearchList(1, null, null, function (list) {
-                                    $(DGC.machineSelect).empty();
-                                    for each (var listvalue in list) {
-                                        var opt = $("<option>" + listvalue.value + "</option>");
-                                        opt.attr("value", listvalue.value);
-                                        opt.get(0).selected = true;
-                                        $(DGC.machineSelect).append(opt);
-                                    }
-                                });
+// put now into Date if it's not there
+if (!("now" in Date)) {
+    Date.now = function() {
+        return (new Date()).getTime();
+    }
 }
 
-function loadingDone(graphTypePref) {
+function makeBonsaiLink(start, end) {
+    // hardcode module, oh well.
+    var module = "MozillaTinderboxAll";
+    return "http://bonsai.mozilla.org/cvsquery.cgi?treeid=default&module=" + module + "&branch=HEAD&branchtype=match&dir=&file=&filetype=match&who=&whotype=match&sortby=Date&hours=2&date=explicit&cvsroot=%2Fcvsroot&mindate=" + Math.floor(start) + "&maxdate=" + Math.ceil(end);
+}
 
-    loadOptions();
+function onIncludeOldChanged()
+{
+    populateFilters();
+    doResetFilter(true);
+    updateAvailableTests();
+}
 
-    //createLoggingPane(true);
-    graphType = graphTypePref;
+function filterTestListForSelections()
+{
+    var match = {
+	platform: $("#testplatform")[0].value,
+	machine: $("#testmachine")[0].value,
+	branch: $("#testbranch")[0].value,
+	test: $("#testtest")[0].value
+    };
 
-    if (graphType == CONTINUOUS_GRAPH) {
-        Tinderbox = new TinderboxData();
-        SmallPerfGraph = new CalendarTimeGraph("smallgraph");
-        BigPerfGraph = new CalendarTimeGraph("graph");
+    for (var prop in match) {
+	if (match[prop] == "All")
+	    delete match[prop];
+    }
 
-        BigPerfGraph.drawPoints = true;
+    var tests = [];
 
-        onDataLoadChanged();
-    } else if (graphType == DATA_GRAPH) {
-        Tinderbox = new ExtraDataTinderboxData();
-        SmallPerfGraph = new CalendarTimeGraph("smallgraph");
-        BigPerfGraph = new CalendarTimeGraph("graph");
-    } else if (graphType == DISCRETE_GRAPH) {
-        Tinderbox = new DiscreteTinderboxData();
-        Tinderbox.raw = 1;
-        SmallPerfGraph = new DiscreteGraph("smallgraph");
-        BigPerfGraph = new DiscreteGraph("graph");
+    var minRecentDate = null;
+    if (!$("#testincludeold")[0].checked)
+        minRecentDate = Date.now() - kRecentDate;
 
-        initDiscreteGraph();
+    OUTER: for (var i = 0; i < gTestList.length; i++) {
+        // skip old dates
+        if (minRecentDate && gTestList[i].newest &&
+            gTestList[i].newest < minRecentDate)
+            continue;
 
-        onDiscreteDataLoadChanged();
-    } else {
-        alert("What?");
+	for (var prop in match) {
+	    if (!(prop in gTestList[i]) ||
+		gTestList[i][prop] != match[prop])
+		continue OUTER;
+	}
+
+	tests.push(gTestList[i]);
+    }
+
+    return tests;
+}
+
+function findTestForSelections()
+{
+    var match = {
+	platform: $("#testplatform")[0].value,
+	machine: $("#testmachine")[0].value,
+	branch: $("#testbranch")[0].value,
+	test: $("#testtest")[0].value
+    };
+
+    var test = null;
+
+    OUTER: for (var i = 0; i < gTestList.length; i++) {
+	for (var prop in match) {
+	    if (!(prop in gTestList[i]) ||
+		gTestList[i][prop] != match[prop])
+		continue OUTER;
+	}
+
+	test = gTestList[i];
+	break;
+    }
+
+    return test;
+}
+
+function doResetFilter(skipIncludeOld)
+{
+    $("#testplatform")[0].value = "All";
+    $("#testmachine")[0].value = "All";
+    $("#testbranch")[0].value = "All";
+    $("#testtest")[0].value = "All";
+
+    if (!skipIncludeOld)
+        $("#testincludeold")[0].checked = false;
+
+    updateAvailableTests();
+}
+
+function doFilterTests()
+{
+    updateAvailableTests();
+}
+
+function doRemoveTest(id)
+{
+    if (gActiveTests.indexOf(id) == -1) {
+        alert("test was never added? " + id);
+        // test was never added?
         return;
     }
 
-    // handle saved options
-    if ("autoScaleYAxis" in gOptions) {
-        var box = getElement("autoscale");
-        box.checked = gOptions.autoScaleYAxis ? true : false;
-        onAutoScaleClick(box.checked);
+    gActiveTests = gActiveTests.filter(function(k) { return k != id; });
+    $("#activetests #testid" + id).remove();
+
+    removeTestFromGraph(id);
+    updateLinks();
+}
+
+function doRemoveAll()
+{
+    gActiveTests = [];
+    $("#activetests").empty();
+
+    removeAllTestsFromGraph();
+    updateLinks();
+}
+
+function doAddAll()
+{
+    var children = $("#availabletests").children();
+    for (var i = 0; i < children.length; i++) {
+        var tid = testIdFromElement(children[i]);
+        doAddTest(tid, children.length > 3 ? true : false);
     }
 
-    if (graphType == DISCRETE_GRAPH && "doDeltaSort" in gOptions) {
-        var box = getElement("deltasort");
-        box.checked = gOptions.doDeltaSort ? true : false;
-        onDeltaSortClick(box.checked);
+}
+
+function findTestById(id) {
+    for (var i = 0; i < gAllTestsList.length; i++) {
+        if (gAllTestsList[i].tid == id) {
+            return gAllTestsList[i];
+        }
     }
 
-    // create CSS "smallgraph-size" and "graph-size" rules that the
-    // layout depends on
+    return null;
+}
+
+function doAddTest(id, optSkipAnimation)
+{
+    if (typeof(id) != "number")
+        id = parseInt(id);
+
+    if (gActiveTests.indexOf(id) != -1) {
+        // test already exists, indicate that
+        $("#activetests #testid" + id).hide();
+        $("#activetests #testid" + id).fadeIn(300);
+        return;
+    }
+
+    var t = findTestById(id);
+    if (t == null)
+	return;
+
+    gActiveTests.push(id);
+
+    var opts = { active: true };
+    if (gGraphType == GRAPH_TYPE_SERIES)
+        opts.showDate = true;
+
+    var html = makeTestDiv(t, opts);
+
+    $("#activetests").append(html);
+    if (!optSkipAnimation) {
+        $("#activetests #testid" + id).hide();
+        $("#activetests #testid" + id).fadeIn(300);
+    }
+
+    $("#activetests #testid" + id + " .throbber")[0].setAttribute("loading", "true");
+    $("#activetests #testid" + id + " .removecell").click(
+        function(evt) {
+            var tid = testIdFromElement(this);
+            doRemoveTest(parseInt(tid));
+        }
+    );
+
+    var color = randomColor();
+    $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
+    addTestToGraph(id, function(ds) {
+                       $("#activetests #testid" + id + " .throbber")[0].removeAttribute("loading");
+                       ds.color = color;
+                  });
+
+    updateLinks();
+}
+
+function makeTestNameHtml(tname)
+{
+    var testDescs = {
+        'Tp': 'Original pageload test; loads content from remote server.',
+        'Tp2': 'iframe-based pageload test; loads content locally.',
+        'Tp3': 'iframe-based pageload test embedded into Talos; loads content via local proxy server.',
+        'Tp4': 'pageloader extension based test; content is loaded based on manifest file (either locally or remotely)',
+    };
+
+    if (tname in testDescs)
+        return "<abbr title='" + testDescs[tname] + "'>" + tname + "</abbr>";
+    else
+        return tname;
+}
+
+function makeTestDiv(test, opts)
+{
+    if (opts == null || typeof(opts) != "object")
+        opts = {};
+
+    var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\SA-Za-z0-9-]/g, "");
+    var html = "";
+    html += "<div class='testline' id='testid" + test.tid + "'>";
+    html += "<table><tr>";
+
+    // Show the color cell on the left, if this is an active test
+    if (opts.active)
+        html += "<td class='colorcell'><div style='width: 1em; height: 10px;'></div></td>";
+
+    // The body content of the test entry
+    html += "<td class='testmain' width='100%'>";
+    html += "<b class='test-name'>" + makeTestNameHtml(test.test) + "</b> on <b class='" + platformclass + "'>" + test.platform + "</b><br>";
+    html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span><br>";
+    if (opts.showDate)
+        html += "<span class='test-extra-info'>" + formatTime(test.date) + "</span><br>";
+    html += "</td>";
+
+    // any trailing buttons/throbbers/etc.
+    html += "<td style='white-space: nowrap'>";
+    if (opts.active) {
+        html += "<div class='iconcell'><img src='images/throbber-small.gif' class='throbber'></div><div class='iconcell removecell'></div>";
+    } else {
+        if (opts.dateSelector)
+            html += "<div class='iconcell dateaddcell'></div>";
+        html += "<div class='iconcell addcell'></div>";
+    }
+    html += "</td></tr></table></div>";
+
+    return html;
+}
+
+function doSeriesDialogCancel() {
+    if (gSeriesDialogShownForTestId == -1)
+        return;
+
+    $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
+    $("#seriesdialog").hide('fast');
+    gSeriesDialogShownForTestId = -1;
+}
+
+function doSeriesDialogAdd() {
+    if (gSeriesDialogShownForTestId == -1)
+        return;
+
+    var tests = $("#datesel").val();
+    for (var i = 0; i < tests.length; i++) {
+        doAddTest(tests[i]);
+    }
+
+    $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
+    $("#seriesdialog").hide('fast');
+    gSeriesDialogShownForTestId = -1;
+}
+
+function doAddWithDate(evt) {
+    var tid = testIdFromElement(this);
+    var dialogOpen = (gSeriesDialogShownForTestId != -1);
+    var t = findTestById(tid);
+    if (t == null) {
+        alert("Couldn't find a test with ID " + tid + " -- what happened?");
+        return;
+    }
+
+    if (dialogOpen) {
+    }
+
+    var datesel = $("#datesel");
+    datesel.empty();
+    var allDateTests = gSeriesTestList[makeSeriesTestKey(t)];
+
+    // these are sorted by ascending date, but we really want the
+    // newest on top
+    for (var i = allDateTests.length - 1; i >= 0; --i) {
+        var d = allDateTests[i];
+        datesel.append("<option value='" + d.tid + "'>" + formatTime(d.date) + "</option>");
+    }
+    $("#datesel > :first-child").attr("selected", "");
+
+    if (dialogOpen) {
+        $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
+        $("#seriesdialog").animate({ left: evt.pageX, top: evt.pageY }, 'fast');
+    } else {
+        $("#seriesdialog")[0].style.left = evt.pageX;
+        $("#seriesdialog")[0].style.top = evt.pageY;
+        $("#seriesdialog").show('fast');
+    }
+
+    $("#availabletests #testid" + tid + " td").addClass("dateselshown");
+    gSeriesDialogShownForTestId = tid;
+}
+
+function updateAvailableTests()
+{
+    var tests = filterTestListForSelections();
+
+    $("#availabletests").empty();
+
+    // if we're a selector for SERIES tests,
+    // then add the date selector flag to get it to appear
+    var opts = {};
+    if (gGraphType == GRAPH_TYPE_SERIES)
+        opts.dateSelector = true;
+
+    for (var i = 0; i < tests.length; i++) {
+        var el = $(makeTestDiv(tests[i], opts))
+            .draggable({ helper: 'clone', dragPrevention: '.iconcell' });
+        $("#availabletests").append(el);
+    }
+
+    if (tests.length == 0) {
+        $("#availabletests").append("<div class='testline'><i>No tests matched.</i></div>");
+    }
+
+    //$("#availabletests .testmain").draggable();
+    var doAdd = function(evt) {
+        var tid = testIdFromElement(this);
+        doAddTest(tid);
+    };
+
+    $("#availabletests .dateaddcell").click(doAddWithDate);
+    $("#availabletests .addcell").click(doAdd);
+    $("#availabletests #testline").dblclick(doAdd);
+}
+
+function testIdFromElement(el) {
+    var k;
+
+    while (el.tagName != "body" &&
+           !(k = el.id.match(/^testid([\d]+)$/)))
     {
-        var sg = document.getElementById("smallgraph");
-        var g = document.getElementById("graph");
-
-        SmallGraphSizeRuleIndex = document.styleSheets[0].insertRule (
-            ".smallgraph-size { width: " + sg.width + "px; height: " + sg.height + "px; }",
-            document.styleSheets[0].cssRules.length);
-
-        BigGraphSizeRuleIndex = document.styleSheets[0].insertRule (
-            ".graph-size { width: " + g.width + "px; height: " + g.height + "px; }",
-            document.styleSheets[0].cssRules.length);
+        el = el.parentNode;
     }
 
-    var resizeFunction = function (nw, nh) {
-        document.getElementById("graph").width = nw;
-        document.getElementById("graph").height = nh;
+    if (el.tagName == "body")
+        return -1;
 
-        document.styleSheets[0].cssRules[BigGraphSizeRuleIndex].style.width = nw + "px";
-        document.styleSheets[0].cssRules[BigGraphSizeRuleIndex].style.height = nh + "px";
-        BigPerfGraph.resize();
-
-        if (nw != document.getElementById("smallgraph").width) {
-            document.getElementById("smallgraph").width = nw;
-            document.styleSheets[0].cssRules[SmallGraphSizeRuleIndex].style.width = nw + "px";
-            SmallPerfGraph.resize();
-        }
-
-        saveGraphDimensions(nw, nh);
-    }
-
-    var graphSize = { };
-    if (loadGraphDimensions(graphSize))
-        resizeFunction(graphSize.width, graphSize.height);
-
-    // make the big graph resizable
-    ResizableBigGraph = new ResizeGraph();
-    ResizableBigGraph.init('graph', resizeFunction);
-
-    Tinderbox.init();
-
-    if (BonsaiService)
-        Bonsai = new BonsaiService();
-
-    SmallPerfGraph.yLabelHeight = 20;
-    SmallPerfGraph.setSelectionType("range");
-    BigPerfGraph.setSelectionType("cursor");
-    BigPerfGraph.setCursorType("snap");
-
-    $(SmallPerfGraph.eventTarget).bind ("graphSelectionChanged", onGraphSelectionChanged);
-    $(BigPerfGraph.eventTarget).bind("graphCursorMoved", onCursorMoved);
-
-    if (graphType == CONTINUOUS_GRAPH) {
-        $(BigPerfGraph.eventTarget).bind("graphNewGraph",
-                                         function (event, dss) {
-                                             if (dss.length >= GraphFormModules.length)
-                                                 clearLoadingAnimation();
-                                         });
-    } else if (graphType == DATA_GRAPH || graphType == DISCRETE_GRAPH) {
-        $(BigPerfGraph.eventTarget).bind("graphNewGraph",
-                                         function (event, dss) {
-                                             showGraphList(dss);
-                                         });
-
-        $(BigPerfGraph.eventTarget).bind("graphSelectionChanged",
-                                         function (event, selectionType, arg1, arg2) {
-                                             if (selectionType == "cursor") {
-                                                 var val = Math.floor(arg1);
-                                                 zoomToTimes(val - 15, val + 15);
-                                             }
-                                         });
-    }
-
-    if (document.location.hash) {
-        handleHash(document.location.hash);
-    } else {
-        if (graphType == CONTINUOUS_GRAPH) {
-            addGraphForm();
-        } else if (graphType == DATA_GRAPH) {
-            addExtraDataGraphForm();
-        } else {
-            addDiscreteGraphForm();
-        }
-    }
+    return parseInt(k[1]);
 }
 
-function zoomToTimes(t1, t2) {
-    var foundIndexes = [];
-
-    if (t1 == SmallPerfGraph.startTime &&
-        t2 == SmallPerfGraph.endTime)
-    {
-        SmallPerfGraph.selectionStartTime = null;
-        SmallPerfGraph.selectionEndTime = null;
-    } else {
-        // make sure that there are at least two points
-        // on at least one graph for this
-        var foundPoints = false;
-        var dss = BigPerfGraph.dataSets;
-        for (var i = 0; i < dss.length; i++) {
-            var idcs = dss[i].indicesForTimeRange(t1, t2);
-            if (idcs[1] - idcs[0] > 1) {
-                foundPoints = true;
-                break;
-            }
-            foundIndexes.push(idcs);
-        }
-
-        if (!foundPoints) {
-            // we didn't find at least two points in at least
-            // one graph; so munge the time numbers until we do.
-            log("Orig t1 " + t1 + " t2 " + t2);
-
-            for (var i = 0; i < dss.length; i++) {
-                if (foundIndexes[i][0] > 0) {
-                    t1 = Math.min(dss[i].data[(foundIndexes[i][0] - 1) * 2], t1);
-                } else if (foundIndexes[i][1]+1 < (ds.data.length/2)) {
-                    t2 = Math.max(dss[i].data[(foundIndexes[i][1] + 1) * 2], t2);
-                }
-            }
-        
-            log("Fixed t1 " + t1 + " t2 " + t2);
-        }
-
-        SmallPerfGraph.selectionStartTime = t1;
-        SmallPerfGraph.selectionEndTime = t2;
+function platformFromData(t)
+{
+    if ('machine' in t) {
+        var m = t.machine;
+        if (/^qm-pxp/.test(m) ||
+            /^qm-mini-xp/.test(m) ||
+            /.*bldxp.*/.test(m))
+            return "Windows XP";
+        if (/^qm-mini-vista/.test(m))
+            return "Windows Vista";
+        if (/.*bldlnx.*/.test(m) ||
+            /.*linux.*/.test(m) ||
+            /.*ubuntu.*/.test(m))
+            return "Linux";
+        if (/.*xserve.*/.test(m) ||
+            /.*pmac.*/.test(m))
+            return "MacOS X";
     }
 
-    if (document.getElementById("bonsailink"))
-        document.getElementById("bonsailink").href = makeBonsaiLink(t1, t2);
-
-    SmallPerfGraph.redrawOverlayOnly();
-
-    BigPerfGraph.setTimeRange (t1, t2);
-    BigPerfGraph.autoScale();
-    BigPerfGraph.redraw();
+    return "Unknown";
 }
 
-function loadGraphDimensions(data) {
-    if (!globalStorage || document.domain == "")
-        return false;
+function branchFromData(t)
+{
+    if ("branch" in t)
+        return t.branch;
 
-    try {
-        var store = globalStorage[document.domain];
-
-        if (!("graphWidth" in store) || !("graphHeight" in store))
-            return false;
-
-        var w = parseInt(store.graphWidth);
-        var h = parseInt(store.graphHeight);
-
-        if (w != w || h != h || w <= 0 || h <= 0)
-            return false;
-        
-        data.width = w;
-        data.height = h;
-
-        return true;
-    } catch (ex) {
+    if ("extra_data" in t) {
+        var d = t.extra_data;
+        if (/branch=1\.9/.test(d))
+            return "1.9";
+        if (/branch=1\.8/.test(d))
+            return "1.8";
     }
 
-    return false;
-}
-
-function saveGraphDimensions(w, h) {
-    if (!globalStorage || document.domain == "")
-        return false;
-
-    try {
-        if (parseInt(w) != w || parseInt(h) != h)
-            return false;
-
-        globalStorage[document.domain].graphWidth = w;
-        globalStorage[document.domain].graphHeight = h;
-        return true;
-    } catch (ex) {
+    if ("machine" in t) {
+        var m = t.machine;
+        if (/-18/.test(m))
+            return "1.8";
     }
 
-    return false;
+    return "Unknown";
 }
 
-function addExtraDataGraphForm(config, name) {
-    showLoadingAnimation("populating lists");
-    var ed = new ExtraDataGraphFormModule(config, name);
-    $(ed.eventTarget).bind ("formLoading", function(event, notice) {
-                                showLoadingAnimation(notice);
-                            });
-    $(ed.eventTarget).bind ("formLoadingDone", function(event) {
-                                clearLoadingAnimation();
-                            });
-    if (config) {
-        $(ed.eventTarget).bind ("formAddedInitialInfo", function(event) {
-                                    graphInitial();
-                                });
-    }
-    ed.render (getElement("graphforms"));
-    return ed;
+function testFromData(t)
+{
+    var testTranslation = {
+        'tp_Percent Processor Time_avg': 'Tp3 (CPU)',
+        'ts_avg': 'Ts',
+        'tp_loadtime_avg': 'Tp3',
+        'tp_Private Bytes_avg': 'Tp3 (Mem-PB)',
+        'tp_Working Set_avg': 'Tp3 (Mem-WS)',
+        'dhtml': 'DHTML',
+        'pageload': 'Tp',
+        'pageload2': 'Tp2',
+        'refcnt_leaks': 'Refcnt Leaks',
+        'trace_malloc_leaks': 'Trace Malloc Leaks',
+        'startup': 'Ts',
+        'xulwinopen': 'Txul',
+    };
+
+    if (t.test in testTranslation)
+        return testTranslation[t.test];
+
+    return t.test;
 }
 
-function addDiscreteGraphForm(config, name) {
-    showLoadingAnimation("populating lists");
-    $(DGC.eventTarget).bind("formLoading",
-                            function (event, notice) {
-                                showLoadingAnimation(notice);
-                            });
-    $(DGC.eventTarget).bind ("formLoadingDone", function(event) {
-                                 clearLoadingAnimation();
-                             });
+function transformLegacyData(testList)
+{
+    testList = testList ? testList : rawTestList;
 
-    // ???
-    // m.addedInitialInfo.subscribe(function(type,args,obj) { graphInitial();});
-}
+    gTestList = [];
 
-function addGraphForm(config) {
-    showLoadingAnimation("populating list");
-    var m = new GraphFormModule();
-    m.init($("#graphforms"));
-    m.setColor(randomColor());
-    $(m.eventTarget).bind("formLoadingProgress", function(event, message) { showLoadingAnimation(message); });
-    $(m.eventTarget).bind("formLoadingDone", function(event) { clearLoadingAnimation(); });
-    return m;
-}
+    for (var i = 0; i < testList.length; i++) {
+        var t = testList[i];
 
-function onNoBaseLineClick() {
-    GraphFormModules.forEach (function (g) { g.baseline = false; });
-}
+        t.newest = Date.now();
 
-// whether the bonsai data query should redraw the graph or not
-var gReadyForRedraw = true;
-
-function onUpdateBonsai() {
-    BigPerfGraph.deleteAllMarkers();
-
-    getElement("bonsaibutton").disabled = true;
-
-    if (gCurrentLoadRange) {
-        if ((gCurrentLoadRange[1] - gCurrentLoadRange[0]) < (bonsaiNoForceDays * ONE_DAY_SECONDS) || gForceBonsai) {
-            Bonsai.requestCheckinsBetween (gCurrentLoadRange[0], gCurrentLoadRange[1],
-                                           function (bdata) {
-                                               for (var i = 0; i < bdata.times.length; i++) {
-                                                   BigPerfGraph.addMarker (bdata.times[i], bdata.who[i] + ": " + bdata.comment[i]);
-                                               }
-                                               if (gReadyForRedraw)
-                                                   BigPerfGraph.redraw();
-
-                                               getElement("bonsaibutton").disabled = false;
-                                           });
-        }
-    }
-}
-
-
-
-function onGraph()  {
-    showLoadingAnimation("building graph");
-    showStatus(null);
-    for each (var g in [BigPerfGraph, SmallPerfGraph]) {
-        g.clearDataSets();
-        g.setTimeRange(null, null);
-    }
-
-    gReadyForRedraw = false;
-
-    // do the actual graph data request
-    var baselineModule = null;
-    if (GraphFormModules)
-        GraphFormModules.forEach (function (g) { if (g.baseline) baselineModule = g; });
-
-    // we have to request the baseline first, because we need to generate the other
-    // datasets relative to it.
-    if (baselineModule) {
-        Tinderbox.requestDataSetFor (baselineModule.testId,
-                                     function (testid, ds) {
-                                         try {
-                                             //log ("Got results for baseline: '" + testid + "' ds: " + ds);
-                                             ds.color = baselineModule.color;
-                                             onGraphLoadRemainder(ds);
-                                         } catch(e) { log(e); }
-                                     });
-    } else {
-        onGraphLoadRemainder();
-    }
-}
-
-function onGraphLoadRemainder(baselineDataSet) {
-    var testIds = [];
-    var isAverage = [];
-    var dsTitle = [];
-
-    if (DGC) {
-        for each (var t in DGC.tests) {
-            testIds.push(t[0]);
-            isAverage.push(false);
-            dsTitle.push(t[1]);
-        }
-    } else {
-        for each (var gm in GraphFormModules) {
-            if (gm.baseline)
-                continue;
-
-            testIds.push(gm.testId);
-            isAverage.push(gm.average);
-            dsTitle.push(null);
-        }
-    }
-
-    log (testIds);
-
-    for (var i = 0; i < testIds.length; i++) {
-        var autoExpand = true;
-        if (SmallPerfGraph.selectionType == "range" &&
-            SmallPerfGraph.selectionStartTime &&
-            SmallPerfGraph.selectionEndTime)
-        {
-            if (gCurrentLoadRange && (SmallPerfGraph.selectionStartTime < gCurrentLoadRange[0] ||
-                SmallPerfGraph.selectionEndTime > gCurrentLoadRange[1]))
-            {
-                SmallPerfGraph.selectionStartTime = Math.max (SmallPerfGraph.selectionStartTime, gCurrentLoadRange[0]);
-                SmallPerfGraph.selectionEndTime = Math.min (SmallPerfGraph.selectionEndTime, gCurrentLoadRange[1]);
-            }
-
-            BigPerfGraph.setTimeRange (SmallPerfGraph.selectionStartTime, SmallPerfGraph.selectionEndTime);
-            autoExpand = false;
-        }
-
-        var makeCallback = function (average, title) {
-            return function (testid, ds) {
-                try {
-                    log("ds.firstTime " + ds.firstTime + " ds.lastTime " + ds.lastTime);
-                    if (!("firstTime" in ds) || !("lastTime" in ds)) {
-                        // got a data set with no data in this time range, or damaged data
-                        // better to not graph
-                        for each (g in [BigPerfGraph, SmallPerfGraph]) {
-                            g.clearGraph();
-
-                        }
-
-                        showStatus("No data in the given time range -- got an invalid data set (testid " + testid + "?");
-                        clearLoadingAnimation();
-                    } else {
-                        ds.title = title ? title : ds.title;
-
-                        if (baselineDataSet)
-                            ds = ds.createRelativeTo(baselineDataSet);
-
-                        //log ("got ds: (", module.id, ")", ds.firstTime, ds.lastTime, ds.data.length);
-                        var avgds = null;
-                        if (baselineDataSet == null && average)
-                            avgds = ds.createAverage(gAverageInterval);
-
-                        if (avgds)
-                            log ("got avgds: (", module.id, ")", avgds.firstTime, avgds.lastTime, avgds.data.length);
-                        
-                        for each (g in [BigPerfGraph, SmallPerfGraph]) {
-                            g.addDataSet(ds);
-                            if (avgds)
-                                g.addDataSet(avgds);
-                            if (g == SmallPerfGraph || autoExpand) {
-                                g.expandTimeRange(Math.max(ds.firstTime, gCurrentLoadRange ? gCurrentLoadRange[0] : ds.firstTime),
-                                                  Math.min(ds.lastTime, gCurrentLoadRange ? gCurrentLoadRange[1] : ds.lastTime));
-                            }
-
-                            g.autoScale();
-
-                            g.redraw();
-                            gReadyForRedraw = true;
-                        }
-
-                        updateLinkToThis();
-                        updateDumpToCsv();
-                    }
-                } catch(e) { log(e); }
-            };
+        var ob = {
+            tid: t.id,
+            platform: platformFromData(t),
+            machine: t.machine,
+            branch: branchFromData(t),
+            test: testFromData(t),
+            newest: t.newest,
         };
 
-
-        Tinderbox.requestDataSetFor (testIds[i], makeCallback(isAverage[i], dsTitle[i]));
+        gTestList.push(ob);
     }
+
+    gAllTestsList = gTestList;
 }
 
+function makeSeriesTestKey(t) {
+    return t.machine + t.branch + t.test;
+}
 
-function onDataLoadChanged() {
-    log ("loadchanged");
-    if (getElement("load-days-radio").checked) {
-        var dval = new Number(getElement("load-days-entry").value);
-        log ("dval", dval);
-        if (dval <= 0) {
-            //getElement("load-days-entry").style.background-color = "red";
-            return;
+function transformLegacySeriesData(testList)
+{
+    //log(testList.toSource());
+
+    gTestList = [];
+    gAllTestsList = [];
+    gSeriesTestList = {};
+
+    var quickList = {};
+
+    for (var i = 0; i < testList.length; i++) {
+        var t = testList[i];
+        var key = makeSeriesTestKey(t);
+
+        var ob = {
+            tid: t.id,
+            platform: platformFromData(t),
+            machine: t.machine,
+            branch: t.branch,
+            test: t.test,
+            date: t.date,
+        };
+
+        if (key in quickList) {
+            if (quickList[key].newest < (t.date * 1000)) {
+                quickList[key].tid = t.id;
+                quickList[key].newest = t.date * 1000;
+            }
         } else {
-            //getElement("load-days-entry").style.background-color = "inherit";
+            var obcore = { tid: ob.tid, platform: ob.platform, machine: ob.machine, branch: ob.branch, test: ob.test, date: ob.date };
+
+            gTestList.push(obcore);
+            quickList[key] = obcore;
+
+            gSeriesTestList[key] = [];
         }
 
-        var d2 = Math.ceil(Date.now() / 1000);
-        d2 = (d2 - (d2 % ONE_DAY_SECONDS)) + ONE_DAY_SECONDS;
-        var d1 = Math.floor(d2 - (dval * ONE_DAY_SECONDS));
-        log ("drange", d1, d2);
-
-        Tinderbox.defaultLoadRange = [d1, d2];
-        gCurrentLoadRange = [d1, d2];
-    } else {
-        Tinderbox.defaultLoadRange = null;
-        gCurrentLoadRange = null;
+        gAllTestsList.push(ob);
+        gSeriesTestList[key].push({ tid: t.id, date: t.date });
     }
-
-    Tinderbox.clearValueDataSets();
-
-    // hack, reset colors
-    randomColorBias = 0;
 }
 
-function onExtraDataLoadChanged() {
-    log ("loadchanged");
-    Tinderbox.defaultLoadRange = null;
-    gCurrentLoadRange = null;
+function populateFilters()
+{
+    var uniques = {};
+    var fields = [ "branch", "machine", "test", "platform" ];
 
-    // hack, reset colors
-    randomColorBias = 0;
+    var minRecentDate = null;
+    if (!$("#testincludeold")[0].checked)
+        minRecentDate = Date.now() - kRecentDate;
+
+    fields.forEach(function (s) { uniques[s] = []; });
+    gTestList.forEach(function (t) {
+                          if (minRecentDate && t.newest &&
+                              t.newest < minRecentDate)
+                              return;
+
+                          fields.forEach(function (s) {
+                                             if (uniques[s].indexOf(t[s]) == -1)
+                                                 uniques[s].push(t[s]);
+                                         });
+                      });
+
+    fields.forEach(function (s) {
+                       $("#test" + s).empty();
+                       uniques[s] = uniques[s].sort();
+                       $("#test" + s).append("<option>All</option>");
+                       for (var k = 0; k < uniques[s].length; k++) {
+                           $("#test" + s).append("<option>" + uniques[s][k] + "</option>");
+                       }
+                   });
 }
 
-
-function onDiscreteDataLoadChanged() {
-    log ("loadchanged");
-    Tinderbox.defaultLoadRange = null;
-    gCurrentLoadRange = null;
-
-    // hack, reset colors
-    randomColorBias = 0;
+function onToggleAveragesClick(ev)
+{
+    var show = ev.target.checked;
+    showAverages(show);
+    updateLinks();
 }
 
-function updateDumpToCsv() {
-    var ds = "?";
-    var prefix = "";
+function onNewRangeClick(ev)
+{
+    var which = this.textContent;
+    var activeIds = [];
 
-    if (DGC) {
-        ds += DGC.getDumpString();
-    } else {
-        for each (var gm in GraphFormModules) {
-            ds += prefix + gm.getDumpString();
-            prefix = "&";
+    var dss = SmallPerfGraph.dataSets;
+    if (dss.length == 0)
+        return;
+
+    $("#activetests .testline").each(function (k,v) { activeIds.push(testIdFromElement(v)); });
+
+    var range = dataSetsRange(dss);
+    var tnow = Date.now() / 1000;
+    var skipAutoScale = false;
+
+    var t1, t2;
+
+    if (which == "All") {
+        t1 = range[0];
+        t2 = range[1];
+    } else if (which == "Custom...") {
+    } else if (which == "Older" || which == "Newer") {
+        t1 = SmallPerfGraph.startTime;
+        t2 = SmallPerfGraph.endTime;
+
+        if (!t1 || !t2) {
+            t1 = range[0];
+            t2 = tnow;
         }
-    }
 
-    getElement("dumptocsv").href = "http://" + document.location.host + "/dumpdata.cgi" + ds;
-}
-
-function updateLinkToThis() {
-    var qs = "";
-
-    qs += SmallPerfGraph.getQueryString("sp");
-    qs += "&";
-    qs += BigPerfGraph.getQueryString("bp");
-
-    if (DGC) {
-        qs += "&gt=d&name=" + DGC.name + "&" + DGC.getQueryString("m0");
-    } else {
-        var ctr = 1;
-        for each (var gm in GraphFormModules) {
-            qs += "&" + gm.getQueryString("m" + ctr);
-            ctr++;
+        var tdelta = (t2 - t1) * 0.75;
+        if (which == "Older") {
+            t1 -= tdelta;
+            t2 -= tdelta;
+        } else {
+            t1 += tdelta;
+            t2 += tdelta;
         }
+
+        skipAutoScale = true;
+    } else {
+        var m;
+        var tlength = null;
+
+        var mult = { d: ONE_DAY_SECONDS, m: 4*ONE_WEEK_SECONDS, y: ONE_YEAR_SECONDS };
+
+        m = which.match(/^(\d+)([dmy])$/);
+        if (!m)
+            return;
+
+        tlength = parseInt(m[1]) * mult[m[2]];
+
+        t2 = tnow;
+        t1 = t2 - tlength;
     }
 
-    getElement("linktothis").href = document.location.pathname + "#" + qs;
+    SmallPerfGraph.setTimeRange(t1, t2);
+    if (!skipAutoScale)
+        SmallPerfGraph.autoScale();
+    SmallPerfGraph.redraw();
+
+    if (SmallPerfGraph.selectionStartTime &&
+        SmallPerfGraph.selectionEndTime)
+    {
+        t1 = Math.max(SmallPerfGraph.selectionStartTime, t1);
+        t2 = Math.min(SmallPerfGraph.selectionEndTime, t2);
+    }
+
+    // nothing was selected
+    zoomToTimes(t1, t2, skipAutoScale);
 }
 
-function handleHash(hash) {
+function initOptions()
+{
+    if (!document.location.hash)
+	return;
+
     var qsdata = {};
-    for each (var s in hash.substring(1).split("&")) {
+    var hasharray = document.location.hash.substring(1).split("&");
+    for each (var s in hasharray) {
         var q = s.split("=");
         qsdata[q[0]] = q[1];
     }
 
-    if (graphType == CONTINUOUS_GRAPH) {
-        var ctr = 1;
-        while (("m" + ctr + "tid") in qsdata) {
-            var prefix = "m" + ctr;
-            addGraphForm({testid: qsdata[prefix + "tid"],
-                      average: qsdata[prefix + "avg"]});
-            ctr++;
-        }
-    }
-    else {
-        var ctr=1;
-        testids = [];
-        while (("m" + ctr + "tid") in qsdata) {
-            var prefix = "m" + ctr;
-            testids.push(Number(qsdata[prefix + "tid"]));       
-            ctr++;
-        }
-       // log("qsdata[name] " + qsdata["name"]);
-        addDiscreteGraphForm(testids, qsdata["name"]);
+    if (qsdata["type"] == "value") {
+	gGraphType = GRAPH_TYPE_VALUE;
+    } else if (qsdata["type"] == "series") {
+	gGraphType = GRAPH_TYPE_SERIES;
+    } else if (qsdata["type"] == "series-value") {
+	gGraphType = GRAPH_TYPE_SERIES_VALUE;
     }
 
-    SmallPerfGraph.handleQueryStringData("sp", qsdata);
-    BigPerfGraph.handleQueryStringData("bp", qsdata);
+    var loadFunctions = [];
 
-    var tstart = new Number(qsdata["spstart"]);
-    var tend = new Number(qsdata["spend"]);
+    if ("show" in qsdata) {
+        var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
 
-    //Tinderbox.defaultLoadRange = [tstart, tend];
+        loadFunctions.push (function() {
+                for (var i = 0; i < ids.length; i++)
+                    doAddTest(ids[i], true);
+            });
+    }
 
-    if (graphType == CONTINUOUS_GRAPH) {
-        Tinderbox.requestTestList(function (tests) {
-            setTimeout (onGraph, 0); // let the other handlers do their thing
-        });
+    if ("sel" in qsdata) {
+        var range = qsdata["sel"].split(",").map(function (k) { return parseInt(k); });
+
+        loadFunctions.push (function() {
+                SmallPerfGraph.setSelection ("range", range[0], range[1]);
+            });
+    }
+
+    if ("avg" in qsdata) {
+        $("#avgcheckbox")[0].checked = true;
+        showAverages(true);
+    }
+
+    if (loadFunctions.length) {
+        gPostDataLoadFunction = function () {
+            for (var i = 0; i < loadFunctions.length; i++)
+                loadFunctions[i]();
+        };
     }
 }
 
-function graphInitial() {
-    GraphFormModules[0].addedInitialInfo.unsubscribeAll();
-    Tinderbox.requestTestList(null, null, null, null, function (tests) { 
-        setTimeout(onGraph, 0);
-    });
-}
+function updateLinks() {
+    var loc = document.location.toString();
+    if (loc.indexOf("#") == -1) {
+        loc += "#";
+    } else {
+        loc = loc.substring(0, loc.indexOf("#")) + "#";
+    }
 
-function showStatus(s) {
-    replaceChildNodes("status", s);
-}
+    if (gGraphType == GRAPH_TYPE_SERIES) {
+        loc += "type=series&";
+    }
 
-function showLoadingAnimation(message) {
-    //log("starting loading animation: " + message);
-    td = new SPAN();
-    el = new IMG({ src: "js/img/Throbber-small.gif"}); 
-    appendChildNodes(td, el);
-    appendChildNodes(td, " loading: " + message + " ");
-    replaceChildNodes("loading", td);
-}
+    if (gActiveTests.length > 0) {
+        loc += "show=";
+        loc += gActiveTests.join(",");
+    }
 
-function clearLoadingAnimation() {
-    //log("ending loading animation");
-    replaceChildNodes("loading", null);
-}
-
-function showGraphList(s) {
-    replaceChildNodes("graph-label-list",null);
-    var tbl = new TABLE({});
-    var tbl_tr = new TR();
-    appendChildNodes(tbl_tr, new TD(""));
-    appendChildNodes(tbl_tr, new TD("avg"));
-    appendChildNodes(tbl_tr, new TD("max"));
-    appendChildNodes(tbl_tr, new TD("min"));
-    appendChildNodes(tbl_tr, new TD("test name"));
-    appendChildNodes(tbl, tbl_tr);
-    for each (var ds in s) {
-       var tbl_tr = new TR();
-       var rstring = ds.stats + " ";
-       var colorDiv = new DIV({ id: "whee", style: "display: inline; border: 1px solid black; height: 15; " +
-                              "padding-right: 15; vertical-align: middle; margin: 3px;" });
-       colorDiv.style.backgroundColor = colorToRgbString(ds.color);
-      // log("ds.stats" + ds.stats);
-       appendChildNodes(tbl_tr, colorDiv);
-       for each (var val in ds.stats) {
-         appendChildNodes(tbl_tr, new TD(val.toFixed(2)));
-       }
-       appendChildNodes(tbl, tbl_tr);
-       appendChildNodes(tbl_tr, new TD(ds.title));
-    } 
-    appendChildNodes("graph-label-list", tbl);
-    if (GraphFormModules.length > 0 &&
-        GraphFormModules[0].testIds &&
-        s.length == GraphFormModules[0].testIds.length)
+    if (SmallPerfGraph.selectionStartTime != null &&
+        SmallPerfGraph.selectionEndTime != null)
     {
-      clearLoadingAnimation();
-    }
-    //replaceChildNodes("graph-label-list",rstring);
-}
-
-/* Get some pre-set colors in for the first 5 graphs, thens start randomly generating stuff */
-var presetColorIndex = 0;
-var presetColors = [
-    [0.0, 0.0, 0.7, 1.0],
-    [0.7, 0.0, 0.0, 1.0],
-    [0.0, 0.5, 0.0, 1.0],
-    [1.0, 0.3, 0.0, 1.0],
-    [0.7, 0.0, 0.7, 1.0],
-    [0.0, 0.7, 0.7, 1.0],
-];
-
-var randomColorBias = 0;
-function randomColor() {
-    if (presetColorIndex < presetColors.length) {
-        return presetColors[presetColorIndex++];
+        loc += "&sel=";
+        loc += Math.floor(SmallPerfGraph.selectionStartTime) + "," + Math.ceil(SmallPerfGraph.selectionEndTime);
     }
 
-    var col = [
-        (Math.random()*0.5) + ((randomColorBias==0) ? 0.5 : 0.2),
-        (Math.random()*0.5) + ((randomColorBias==1) ? 0.5 : 0.2),
-        (Math.random()*0.5) + ((randomColorBias==2) ? 0.5 : 0.2),
-        1.0
-    ];
-    randomColorBias++;
-    if (randomColorBias == 3)
-        randomColorBias = 0;
+    if (gAveragesVisible)
+        loc += "&avg";
 
-    return col;
-}
+    $("#linkanchor").attr("href", loc);
 
-function lighterColor(col) {
-    return [
-        Math.min(0.85, col[0] * 1.2),
-        Math.min(0.85, col[1] * 1.2),
-        Math.min(0.85, col[2] * 1.2),
-        col[3]
-    ];
-}
+    // update bonsai
+    if (gGraphType == GRAPH_TYPE_VALUE) {
+        var start, end;
 
-function colorToRgbString(col, forcealpha) {
-   // log ("in colorToRgbString");
-    if (forcealpha != null || col[3] < 1) {
-        return "rgba("
-            + Math.floor(col[0]*255) + ","
-            + Math.floor(col[1]*255) + ","
-            + Math.floor(col[2]*255) + ","
-            + (forcealpha ? forcealpha : col[3])
-            + ")";
+        var sel = BigPerfGraph.getSelection();
+        if (sel.type != "range")
+            sel = SmallPerfGraph.getSelection();
+
+        if (sel.type == "range") {
+            start = sel.start;
+            end = sel.end;
+        } else {
+            start = SmallPerfGraph.startTime;
+            end = SmallPerfGraph.endTime;
+        }
+
+        $("#bonsaianchor").attr("href", makeBonsaiLink(start, end));
     }
-    return "rgb("
-        + Math.floor(col[0]*255) + ","
-        + Math.floor(col[1]*255) + ","
-        + Math.floor(col[2]*255) + ")";
 }
 
-function makeBonsaiLink(start, end) {
-    // harcode PhoenixTinderbox, oh well.
-    return "http://bonsai.mozilla.org/cvsquery.cgi?treeid=default&module=PhoenixTinderbox&branch=HEAD&branchtype=match&dir=&file=&filetype=match&who=&whotype=match&sortby=Date&hours=2&date=explicit&cvsroot=%2Fcvsroot&mindate=" + Math.floor(start) + "&maxdate=" + Math.ceil(end);
-}
+function handleLoad()
+{
+    initOptions();
 
-function onAutoScaleClick(override) {
-    var checked;
-    if (override != null) {
-        checked = override;
+    if (gGraphType == GRAPH_TYPE_SERIES) {
+        $("#charttypeicon").addClass("barcharticon");
+        $("#chartlinkicon").addClass("barchartlinkicon");
+
+        $("#graphoptionsbox").hide();
+        $(".clicky-ranges")[0].style.visibility = "hidden";
     } else {
-        checked = getElement("autoscale").checked;
+        $("#charttypeicon").addClass("linecharticon");
+        $("#chartlinkicon").addClass("linechartlinkicon");
     }
 
-    var graphs = [ BigPerfGraph, SmallPerfGraph ];
-    for each (var g in graphs) {
-        if (g.autoScaleYAxis != checked) {
-            g.autoScaleYAxis = checked;
-            g.autoScale();
-            g.redraw();
-        }
-    }
+    initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
 
-    gOptions.autoScaleYAxis = checked;
-    saveOptions();
-}
+    $("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
 
-function onDeltaSortClick(override) {
-    var checked;
-    if (override != null) {
-        checked = override;
+    $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged",
+                                       function (ev, selType, arg1, arg2) {
+                                           updateLinks();
+                                       });
+
+    if (gGraphType == GRAPH_TYPE_VALUE) {
+        Tinderbox.requestTestList(
+            function (tests) {
+                transformLegacyData(tests);
+                populateFilters();
+                doResetFilter();
+                if (gPostDataLoadFunction) {
+                    gPostDataLoadFunction.call(window);
+                    gPostDataLoadFunction = null;
+                }
+            });
+    } else if (gGraphType == GRAPH_TYPE_SERIES) {
+        $("#bonsaispan").hide();
+
+        Tinderbox.requestTestList(30 /* days */, null, null, null,
+                                    function (tests) {
+                                        transformLegacySeriesData(tests);
+                                        populateFilters();
+                                        doResetFilter();
+                                        if (gPostDataLoadFunction) {
+                                            gPostDataLoadFunction.call(window);
+                                            gPostDataLoadFunction = null;
+                                        }
+                                    });
     } else {
-        checked = getElement("deltasort").checked;
-    }
-
-    
-}
-
-function loadOptions() {
-    if (!globalStorage || document.domain == "")
-        return false;
-
-    try {
-        var store = globalStorage[document.domain];
-
-        if ("graphOptions" in store) {
-            var s = (store["graphOptions"]).toString();
-            var tmp = eval(s);
-            // don't clobber newly defined options
-            for (var opt in tmp)
-                gOptions[opt] = tmp[opt];
-        }
-    } catch (ex) {
-    }
-}
-
-// This just needs to be called whenever an option changes, we don't
-// have a good mechanism for this, so we just call it from wherever
-// we change an option
-function saveOptions() {
-    if (!globalStorage || document.domain == "")
-        return false;
-
-    try {
-        var store = globalStorage[document.domain];
-        store["graphOptions"] = uneval(gOptions);
-    } catch (ex) {
-    }
-}
-
-function onGraphSelectionChanged(event, selectionType, arg1, arg2) {
-    log ("selchanged");
-
-    if (selectionType == "range") {
-        var t1 = SmallPerfGraph.startTime;
-        var t2 = SmallPerfGraph.endTime;
-
-        if (arg1 && arg2) {
-            t1 = arg1;
-            t2 = arg2;
-        }
-
-        zoomToTimes(t1, t2);
-    }
-
-    updateLinkToThis();
-    updateDumpToCsv();
-}
-
-function onCursorMoved(event, time, val, extra_data) {
-
-    if (time == null || val == null) {
-        showStatus(null);
-        showFloater(null);
+        alert("Unsupported graph type");
         return;
     }
 
-    if (graphType == DISCRETE_GRAPH) {
-        showStatus("Index: " + time + " Value: " + val.toFixed(2) + " " + extra_data);
-        showFloater(time, val);
-    } else {
-        showStatus("Date: " + formatTime(time) + " Value: " + val.toFixed(2));
-        showFloater(time, val);
-    }
-}
-
-function showFloater(time, value) {
-    var fdiv = getElement("floater");
-
-    if (time == null) {
-        fdiv.style.visibility = "hidden";
-        return;
-    }
-
-    fdiv.style.visibility = "visible";
-
-    var dss = BigPerfGraph.dataSets;
-    if (dss.length == 0)
-        return;
-
-    var s = "";
-
-    var dstv = [];
-
-    for (var i = 0; i < dss.length; i++) {
-        if ("averageOf" in dss[i])
-            continue;
-
-        var idx = dss[i].indexForTime(time, true);
-        if (idx != -1) {
-            var t = dss[i].data[idx*2];
-            var v = dss[i].data[idx*2+1];
-            dstv.push( {time: t, value: v, color: dss[i].color} );
+    $("#activetests").droppable({
+        accept: ".testline",
+        activeClass: "droppable-active",
+        hoverClass: "droppable-hover",
+        drop: function(ev, arg) {
+            var tid = testIdFromElement(arg.draggable.element);
+            doAddTest(tid);
         }
-    }
+    });
 
-    var columns = [];
-    for (var i = 0; i < dstv.length; i++) {
-        var column = [];
-        for (var j = 0; j < dstv.length; j++) {
-            if (i == j) {
-                var v = dstv[i].value;
-                if (v != Math.floor(v))
-                    v = v.toFixed(2);
-                column.push("<b>" + v + "</b>");
-            } else {
-                var ratio = dstv[j].value / dstv[i].value;
-                column.push("<span style='font-size: small'>" + (ratio * 100).toFixed(0) + "%</span>");
-            }
-        }
-        columns.push(column);
-    }
+    // wrap the range-spans
+    $(".clicky-ranges span").click(onNewRangeClick);
 
-    var s = "<table class='floater-table'>";
-    for (var i = 0; i < dstv.length; i++) {
-        s += "<tr style='color: " + colorToRgbString(dstv[i].color) + "'>";
-        for (var j = 0; j < columns.length; j++) {
-            s += "<td>" + columns[i][j] + "</td>";
-        }
-        s += "</tr>";
-    }
-    s += "</table>";
-
-    // then put the floater in the right spot
-    var xy = BigPerfGraph.timeValueToXY(time, value);
-    fdiv.style.left = Math.floor(xy.x + 65) + "px";
-    fdiv.style.top = Math.floor((BigPerfGraph.frontBuffer.height - xy.y) + 15) + "px";
-    fdiv.innerHTML = s;
+    $("#avgcheckbox").change(onToggleAveragesClick);
 }
 
-// DataSet.js checks for this function and will call it
-function getNewColorForDataset() {
-    return randomColor();
-}
-
-if (!("log" in window)) {
-    window.log = function(s) {
-        var l = document.getElementById("log");
-        l.innerHTML += "<br>" + s;
-    }
-}
+window.addEventListener("load", handleLoad, false);
