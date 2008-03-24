@@ -75,7 +75,7 @@ Graph.prototype = {
     dataSetMaxMaxVal: 0,
 
     xLabelContainer: null,
-    xLabelWidth: 100,
+    xLabelWidth: 75,
     xLabelHeight: 50,
 
     yLabelContainer: null,
@@ -820,7 +820,10 @@ Graph.prototype = {
 
     },
 
-    computeLabels: function (pixelSize, pixelsPerValue, minValue, maxLabels, labelIntervals) {
+    computeLabels: function (pixelSize, pixelsPerValue, minValue, maxLabels, labelIntervals, formatFunc) {
+        if (pixelsPerValue == 0)
+            return [];
+
         var yLabelHeight = pixelSize / maxLabels;
 
         var visibleValues = pixelSize * pixelsPerValue;
@@ -855,7 +858,11 @@ Graph.prototype = {
             var lpos = ((lvalue - minValue)/valuePerPixel /* - (this.yLabelHeight/2)*/);
             var l;
 
-            l = [lpos, lvalue, lvalue.toFixed(fixedPrecision).toString()];
+            if (formatFunc) {
+                l = [lpos, lvalue, formatFunc(lvalue)];
+            } else {
+                l = [lpos, lvalue, lvalue.toFixed(fixedPrecision).toString()];
+            }
 
             labels.push(l);
         }
@@ -876,6 +883,15 @@ Graph.prototype = {
         if (!this.dirty)
             return this.xAxisLabels;
 
+        if (this.endTime == this.startTime) {
+            this.xAxisLabels = [];
+            return this.xAxisLabels;
+        }
+
+        /* The time axis is really crappy, because time isn't nice to work with.  We try to deal
+         * in terms of time units like days etc., but that's not always possible.
+         */
+
         // x axis is always time in seconds
 
         // duration is in seconds
@@ -888,32 +904,106 @@ Graph.prototype = {
         // so what's the exact duration of one label of our desired size?
         var labelDuration = this.xLabelWidth * secondsPerPixel;
 
-        // let's come up with a more round duration for our label.
-        if (labelDuration <= 60) {
-            labelDuration = 60;
-        } else if (labelDuration <= 14*60) {
-            labelDuration = Math.ceil(labelDuration / 60) * 60;
-        } else if (labelDuration <= 15*60) {
-            labelDuration = 15*60;
-        } else if (labelDuration <= 59*60) {
-            labelDuration = Math.ceil(labelDuration / (5*60)) * (5*60);
-        } else if (labelDuration <= 23*ONE_HOUR_SECONDS) {
-            labelDuration = Math.ceil(labelDuration / ONE_HOUR_SECONDS) * ONE_HOUR_SECONDS;
-        } else if (labelDuration <= 6*ONE_DAY_SECONDS) {
-            labelDuration = Math.ceil(labelDuration / ONE_DAY_SECONDS) * ONE_DAY_SECONDS;
-        } else {
-            // round to the nearest day at least
-            labelDuration = labelDuration - (labelDuration%ONE_DAY_SECONDS);
-        }
-
         // how many labels max can we fit?
         var numLabels = (this.frontBuffer.width / this.xLabelWidth);
 
+        log ("labelDuration " + labelDuration + " hr: " + labelDuration / ONE_HOUR_SECONDS);
+
+        // ld == "label duration"; these are used for munging the actual time later on
+        // so that we know what our intent was
+        var ldMin = 0;
+        var ldHour = 0;
+        var ldDay = 0;
+
+        // let's come up with a more round duration for our label.
+        // this is really crappy, and we do a lot more rounding up than necessary
+        if (labelDuration <= 60) {
+            ldMin = 1;
+            labelDuration = 60;
+        } else if (labelDuration <= 15*ONE_MINUTE_SECONDS) {
+            ldMin = 15;
+            labelDuration = 15*ONE_MINUTE_SECONDS;
+        } else if (labelDuration <= 1.5*ONE_HOUR_SECONDS) {
+            ldHour = 1;
+            labelDuration = ONE_HOUR_SECONDS;
+        } else if (labelDuration <= 6*ONE_HOUR_SECONDS) {
+            ldHour = 3;
+            labelDuration = 3*ONE_HOUR_SECONDS;
+        } else if (labelDuration <= 9*ONE_HOUR_SECONDS) {
+            ldHour = 6;
+            labelDuration = 6*ONE_HOUR_SECONDS;
+        } else if (labelDuration <= 15*ONE_HOUR_SECONDS) {
+            ldHour = 12;
+            labelDuration = 12*ONE_HOUR_SECONDS;
+        } else if (labelDuration <= 1.5*ONE_DAY_SECONDS) {
+            ldDay = 1;
+            labelDuration = ONE_DAY_SECONDS;
+        } else if (labelDuration <= 2.5*ONE_DAY_SECONDS) {
+            ldDay = 2;
+            labelDuration = 2*ONE_DAY_SECONDS;
+        } else if (labelDuration <= 3.5*ONE_DAY_SECONDS) {
+            ldDay = 3;
+            labelDuration = 3*ONE_DAY_SECONDS;
+        } else if (labelDuration <= 4.5*ONE_DAY_SECONDS) {
+            ldDay = 4;
+            labelDuration = 4*ONE_DAY_SECONDS;
+        } else if (labelDuration <= 5.5*ONE_DAY_SECONDS) {
+            ldDay = 5;
+            labelDuration = 5*ONE_DAY_SECONDS;
+        } else if (labelDuration <= 6.5*ONE_DAY_SECONDS) {
+            ldDay = 6;
+            labelDuration = 6*ONE_DAY_SECONDS;
+        } else if (labelDuration <= ONE_WEEK_SECONDS) {
+            ldDay = 7;
+            labelDuration = ONE_WEEK_SECONDS;
+        } else {
+            labelDuration = Math.ceil(duration / numLabels);
+            // round to the nearest day here
+            ldDay = 1;
+        }
+
+        log ("ld " + ldMin + " " + ldHour + " " + ldDay);
+
+        // reset the number of labels based on our duration
+        numLabels = Math.ceil(duration / labelDuration);
+
         var labels = [];
 
-        // we want our first label to land on a multiple of the label duration;
-        // figure out where that lies.
-        var firstLabelOffsetSeconds = (labelDuration - (this.startTime % labelDuration));
+        // we want our first label to fit somewhere sane.
+        var firstLabelOffsetSeconds = 0;
+
+        var firstTime = dateFromSeconds(this.startTime);
+        var h = firstTime.getUTCHours();
+        var m = firstTime.getUTCMinutes();
+        var s = firstTime.getUTCSeconds();
+
+        var normalize = function () {
+            if (s > 59) { m += 1; s = 0; }
+            if (m > 59) { h += 1; m = 0; }
+            if (h > 23) h = 0;
+        }
+
+        /* always normalize the seconds */
+        if (s) {
+            firstLabelOffsetSeconds += ONE_MINUTE_SECONDS - s;
+            m += 1; normalize();
+        }
+
+        /* then normalize minutes, either to 0 or multiple of ldMin */
+        if (ldDay > 0 || ldHour > 0 || ldMin > 0) {
+            var mFact = ldMin ? ldMin : 60;
+            if (m) {
+                firstLabelOffsetSeconds += ((60 - m) % mFact) * ONE_MINUTE_SECONDS;
+                h += 1; normalize();
+            }
+        }
+
+        /* then normalize hours, either to 0 or multiple of ldHour */
+        if (ldDay > 0 || ldHour > 0) {
+            var hFact = ldHour ? ldHour : 24;
+            if (h)
+                firstLabelOffsetSeconds += ((24 - h) % hFact) * ONE_HOUR_SECONDS;
+        }
 
         //log ("sps", secondsPerPixel, "ldur", labelDuration, "nl", numLabels, "flo", firstLabelOffsetSeconds);
 
@@ -932,7 +1022,8 @@ Graph.prototype = {
         }
 
         this.xAxisLabels = labels;
-        return labels;
+
+        return this.xAxisLabels;
     },
 
     formatTimeLabel: function (ltime) {
@@ -1352,30 +1443,49 @@ function dst(ltime) {
   return ((d > spring) && (d < fall));
 }
 
-function formatTime(ltime, twoLines) {
+function dateFromSeconds(ltime) {
     // ltime is in seconds since the epoch in, um, so
     //figure out dst offset for the time
-    offset = 0;
+    var offset = 0;
     if (dst(ltime)) {
       offset = 7*60*60*1000;
     } else {
       offset = 8*60*60*1000;
     }
     // offset adjusts time to pst/pdt - to be the same as the tinderboxes
-    var d = new Date (ltime*1000 - offset);
+    return new Date (ltime*1000 - offset);
+}
 
-    var s1 = d.getUTCHours() +
-        (d.getUTCMinutes() < 10 ? ":0" : ":") + d.getUTCMinutes() +
-        (d.getUTCSeconds() < 10 ? ":0" : ":") + d.getUTCSeconds();
+function formatTime(ltime, twoLines) {
+    var d = dateFromSeconds(ltime);
+
+    var h = d.getUTCHours();
+    var m = d.getUTCMinutes();
+    var s = d.getUTCSeconds();
+
+    var timestr = (h == 0 ? "12" : (h > 12 ? h - 12 : h)) +
+        (m < 10 ? ":0" : ":") + m +
+        (s < 10 ? ":0" : ":") + s;
+
+    if (h < 12)
+        timestr += " AM";
+    else
+        timestr += " PM";
+
     if (twoLines) {
-        var s2 = d.getUTCDate() + " " + MONTH_ABBREV[d.getUTCMonth()] + " " + d.getUTCFullYear();
-        return [s1, s2];
+        var datestr = d.getUTCDate() + " " + MONTH_ABBREV[d.getUTCMonth()] + " " + d.getUTCFullYear();
+
+        if (h + m + s == 0) {
+            timestr = "";
+        }
+
+        return [datestr, timestr];
     } else {
         var yr = d.getUTCFullYear();
         //if (yr > 100) yr -= 100;
         //if (yr < 10) yr = "0" + yr;
-        var s2 = (d.getUTCMonth()+1) + "/" + d.getUTCDate() + "/" + yr;
-        return s2 + " " + s1;
+        var datestr = (d.getUTCMonth()+1) + "/" + d.getUTCDate() + "/" + yr;
+        return datestr + " " + timestr;
     }
 }
 
