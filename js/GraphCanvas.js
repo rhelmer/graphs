@@ -157,6 +157,20 @@ Graph.prototype = {
 
         this.eventTarget = this.frontBuffer;
 
+        var self = this;
+
+        // we have to bind these as capturing events, otherwise I don't get the events;
+        // not sure why.  jQuery doesn't support capture phase events (due to cross-browser
+        // compat), so we use the DOM here.
+
+        this.removeEventList (this.frontBuffer, "selection");
+
+        this.addEventList (this.frontBuffer, "selection",
+                           [ "mousedown", function (event) { return self.selectionMouseDown(event); },
+                             "mousemove", function (event) { return self.selectionMouseMove(event); },
+                             "mouseup", function (event) { return self.selectionMouseUp(event); },
+                             "mouseout", function (event) { return self.selectionMouseOut(event); } ] );
+
         //log(this.offsetTime + " offsetTime");
     },
 
@@ -275,20 +289,6 @@ Graph.prototype = {
 
         if (stype != "none" && stype != "range" && stype != "cursor")
             return;
-
-        var self = this;
-
-        // we have to bind these as capturing events, otherwise I don't get the events;
-        // not sure why.  jQuery doesn't support capture phase events (due to cross-browser
-        // compat), so we use the DOM here.
-
-        this.removeEventList (this.frontBuffer, "selection");
-
-        this.addEventList (this.frontBuffer, "selection",
-                           [ "mousedown", function (event) { return self.selectionMouseDown(event); },
-                             "mousemove", function (event) { return self.selectionMouseMove(event); },
-                             "mouseup", function (event) { return self.selectionMouseUp(event); },
-                             "mouseout", function (event) { return self.selectionMouseOut(event); } ] );
 
         this.defaultSelectionType = stype;
     },
