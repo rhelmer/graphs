@@ -104,7 +104,7 @@ function initGraphCore(useDiscrete)
     BigPerfGraph.setDefaultSelectionType("none");
     BigPerfGraph.setCursorType("snap");
 
-    $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged", onGraphSelectionChanged);
+    $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged", onSmallGraphSelectionChanged);
     $(BigPerfGraph.eventTarget).bind("graphCursorMoved", onCursorMoved);
 }
 
@@ -181,7 +181,7 @@ function removeAllTestsFromGraph() {
 // Graph event handlers
 //
 
-function onGraphSelectionChanged(event, selectionType, arg1, arg2) {
+function onSmallGraphSelectionChanged(event, selectionType, arg1, arg2) {
     if (selectionType == "range") {
         var t1 = SmallPerfGraph.startTime;
         var t2 = SmallPerfGraph.endTime;

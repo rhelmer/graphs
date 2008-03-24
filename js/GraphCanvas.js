@@ -907,8 +907,6 @@ Graph.prototype = {
         // how many labels max can we fit?
         var numLabels = (this.frontBuffer.width / this.xLabelWidth);
 
-        log ("labelDuration " + labelDuration + " hr: " + labelDuration / ONE_HOUR_SECONDS);
-
         // ld == "label duration"; these are used for munging the actual time later on
         // so that we know what our intent was
         var ldMin = 0;
@@ -958,11 +956,9 @@ Graph.prototype = {
             labelDuration = ONE_WEEK_SECONDS;
         } else {
             labelDuration = Math.ceil(duration / numLabels);
-            // round to the nearest day here
+            // round to the nearest day hereog
             ldDay = 1;
         }
-
-        log ("ld " + ldMin + " " + ldHour + " " + ldDay);
 
         // reset the number of labels based on our duration
         numLabels = Math.ceil(duration / labelDuration);
