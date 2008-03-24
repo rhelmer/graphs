@@ -90,17 +90,12 @@
 	  </div>
     <br>
     <div class="gradbk">
-    <div class="sectionheader"><span style="margin-right: 3px;" class="rightside smalllink"> <span id="bonsaispan"><a id="bonsaianchor" href="" target="_new">Bonsai</a> | </span><a id="csvanchor" href="" target="_new">CSV</a> | <a id="linkanchor" href="" target="_new">Link</a></span><span>Displayed Graphs</span></div>
+    <div class="sectionheader"><span>Displayed Graphs</span></div>
     <div class="testlist" id="activetests"></div>
     <input type="button" value="Remove All" onclick="doRemoveAll()"></input>
     </div>
     
     <br>
-    
-    <div id="graphoptionsbox" class="gradbk">
-    <div class="sectionheader"><span>Graph Options</span></div>
-    <input id="avgcheckbox" type="checkbox" value="Show Average Lines"><label for="avgcheckbox">Show Average Lines</label><br>
-    </div>
 
 <!--
     <div class="sectionheader">Time range</div>
@@ -140,6 +135,30 @@
   
           <div class="floater" id="floater"></div>
       </div>
+
+      <table width="100%">
+	<tr><td width="70%" valign="top">
+	  <div id="toolbox" class="gradbk">
+	  <div class="sectionheader"><span>Toolbox</span></div>
+	  <div class="toolsblock">
+	  <ul>
+	    <li>Here's a <a id="linkanchor" href="" target="_new">link to this graph</a>.</li>
+	    <li><a id="bonsaianchor" href="" target="_new">Query Bonsai</a> for the selected range.</li>
+	    <li>Get the <a id="csvanchor" href="" target="_new">CSV data</a> for the selected range.</li>
+	  </ul>
+	  </div>
+	  </div>
+	</td><td  valign="top">
+	  <div id="graphoptionsbox" class="gradbk">
+          <div class="sectionheader"><span>Graph Options</span></div>
+ 	  <div class="toolsblock">
+	    <div style="height:0.75em"></div>
+	    <input id="avgcheckbox" type="checkbox"><label for="avgcheckbox">Show Average Lines</label><br>
+	  </div>
+         </div>
+
+        </td></tr>
+      </table>
     </td></tr>
     </table>
 
