@@ -542,10 +542,9 @@ function populateFilters()
                    });
 }
 
-function onToggleAveragesClick(ev)
+function onChangeDerived(ev)
 {
-    var show = ev.target.checked;
-    showAverages(show);
+    showDerived(ev.target.value);
     updateLinks();
 }
 
@@ -703,9 +702,6 @@ function updateLinks() {
         loc += Math.floor(SmallPerfGraph.selectionStartTime) + "," + Math.ceil(SmallPerfGraph.selectionEndTime);
     }
 
-    if (gAveragesVisible)
-        loc += "&avg";
-
     $("#linkanchor").attr("href", loc);
 
     // update bonsai
@@ -794,11 +790,13 @@ function handleLoad()
     // wrap the range-spans
     $(".clicky-ranges span").click(onNewRangeClick);
 
-    $("#avgcheckbox").change(onToggleAveragesClick);
+    $("#derived_none_radio").change(onChangeDerived);
+    $("#derived_avg_radio").change(onChangeDerived);
+    $("#derived_deriv_radio").change(onChangeDerived);
     $("#autoscalecheckbox").change(onToggleAutoScaleClick);
 
     // force defaults until we can save/restore
-    $("#avgcheckbox")[0].checked = false;
+    $("#derived_none_radio")[0].checked = true;
     $("#autoscalecheckbox")[0].checked = true;
 }
 

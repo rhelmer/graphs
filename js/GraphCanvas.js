@@ -379,8 +379,6 @@ Graph.prototype = {
             this.dataSetMaxMaxVal = 100;
         }
 
-        //log ("minmin:", this.dataSetMinMinVal, "maxmax:", this.dataSetMaxMaxVal);
-
         this.getTimeAxisLabels();
         this.getValueAxisLabels();
 
@@ -394,8 +392,11 @@ Graph.prototype = {
         var vmin, vmax;
 
         if (!this.autoScaleYAxis) {
-            this.yOffset = 0.0;
-            this.yScale = (this.frontBuffer.height-10) / Math.ceil(this.dataSetMaxMaxVal);
+            vmin = 0.0;
+            if (this.dataSetMinMinVal < 0)
+                vmin = this.dataSetMinMinVal;
+            this.yOffset = vmin;
+            this.yScale = (this.frontBuffer.height-10) / Math.ceil(this.dataSetMaxMaxVal - vmin);
             this.dirty = true;
             return;
         }
@@ -422,11 +423,14 @@ Graph.prototype = {
             scaled = true;
         } else {
             var scaled = false;
-            for each (var sfactor in [1000, 500, 250, 100, 25, 10, 1]) {
+            for each (var sfactor in [100, 25, 10, 1]) {
                 if (delta > sfactor) {
-                    vmin = this.dataSetMinMinVal - (this.dataSetMinMinVal % sfactor);
+                    if (this.dataSetMinMinVal < 0)
+                        vmin = this.dataSetMinMinVal - (sfactor - Math.abs(this.dataSetMinMinVal) % sfactor);
+                    else
+                        vmin = this.dataSetMinMinVal - (Math.abs(this.dataSetMinMinVal) % sfactor);
                     vmax = (this.dataSetMaxMaxVal - (this.dataSetMaxMaxVal % sfactor)) + sfactor;
-                    
+
                     this.yOffset = vmin;
                     this.yScale = this.frontBuffer.height / (vmax - vmin);
                     scaled = true;
@@ -476,10 +480,10 @@ Graph.prototype = {
             xscale = 1.0;
         }
 
-        var hasAverageDSs = false;
+        var hasDerivedDSs = false;
         for each (var ds in this.dataSets) {
-            if ("averageOf" in ds) {
-                hasAverageDSs = true;
+            if ("averageOf" in ds || "derivateOf" in ds) {
+                hasDerivedDSs = true;
                 break;
             }
         }
@@ -551,14 +555,14 @@ Graph.prototype = {
                     continue;
                 }
 
-                var dsHasAverage = false;
-                if (hasAverageDSs) {
-                    // figure out if there is an average for this ds being drawn
+                var dsHasDerived = false;
+                if (hasDerivedDSs) {
+                    // figure out if there is a derived set for this ds being drawn
                     for each (var ds in this.dataSets) {
-                        if ("averageOf" in ds &&
-                            ds.averageOf == this.dataSets[i])
+                        if (("averageOf" in ds && ds.averageOf == this.dataSets[i]) ||
+                            ("derivateiveOf" in ds && ds.derivateiveOf == this.dataSets[i]))
                         {
-                            dsHasAverage = true;
+                            dsHasDerived = true;
                             break;
                         }
                     }
@@ -612,7 +616,7 @@ Graph.prototype = {
                     // do a line width in absolute pixel size
                     restore();
 
-                    if (dsHasAverage) {
+                    if (dsHasDerived) {
                         lineWidth = 0.5;
                     } else {
                         lineWidth = 1.0;
@@ -630,11 +634,14 @@ Graph.prototype = {
                     if (endIdx != startIdx && ((endIdx - startIdx) * 2 * this.pointRadius > cw))
                         shouldMaybeDrawPoints = false;
 
-                    if (shouldMaybeDrawPoints && this.drawPoints && !("averageOf" in this.dataSets[i])) {
+                    if (shouldMaybeDrawPoints &&
+                        this.drawPoints &&
+                        !(("averageOf" in this.dataSets[i]) || ("derivativeOf" in this.dataSets[i])))
+                    {
                         save();
 
-                        // if this ds has an average line, make these fainter
-                        if (dsHasAverage)
+                        // if this ds has a derived set, make these fainter
+                        if (dsHasDerived)
                             globalAlpha = 0.3;
 
                         fillStyle = colorToRgbString(this.dataSets[i].color);

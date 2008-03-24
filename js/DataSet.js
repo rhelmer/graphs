@@ -303,6 +303,33 @@ TimeValueDataSet.prototype = {
 
         return newds;
     },
+
+    // create a derivative dataset, showing the change from each point to the next
+    createDerivative: function (asPercentages) {
+        var newdata = [];
+        var lastv = this.data[1];
+
+        var ns = this.data.length/2;
+        for (var i = 0; i < ns; i++) {
+            var t = this.data[i*2];
+            var v = this.data[i*2+1];
+
+            newdata.push(t);
+            if (asPercentages)
+                newdata.push(100.0 - (v/lastv * 100.0));
+            else
+                newdata.push(v - lastv);
+
+            lastv = v;
+        }
+
+        var newds = new TimeValueDataSet(newdata, lighterColor(this.color));
+        newds.derivativeOf = this;
+
+        this.derivateDataSet = newds;
+
+        return newds;
+    },
 };
 
 function TimeStringDataSet(data) {

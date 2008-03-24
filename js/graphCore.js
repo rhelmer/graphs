@@ -12,7 +12,7 @@ var SmallGraphSizeRuleIndex;
 var BigGraphSizeRuleIndex;
 
 var CurrentDataSets = {};
-var CurrentAverageDataSets = {};
+var CurrentDerivedDataSets = {};
 
 var GraphIsSeries;
 
@@ -20,7 +20,7 @@ var gOptions = {
     doDeltaSort: false,
 };
 
-var gAveragesVisible = false;
+var gDerivedTypeVisible = "none";
 var gAutoScale = true;
 
 function initGraphCore(useDiscrete)
@@ -131,7 +131,7 @@ function addTestToGraph(tid, cb) {
             }
 
             CurrentDataSets[tid] = ds;
-            syncAverages();
+            syncDerived();
 
             for each (var g in [BigPerfGraph, SmallPerfGraph]) {
                 g.addDataSet(ds);
@@ -164,12 +164,12 @@ function removeTestFromGraph(tid, cb) {
     }
 
     delete CurrentDataSets[tid];
-    syncAverages();
+    syncDerived();
 }
 
 function removeAllTestsFromGraph() {
     CurrentDataSets = {};
-    syncAverages();
+    syncDerived();
 
     for each (var g in [BigPerfGraph, SmallPerfGraph]) {
         g.clearDataSets();
@@ -486,54 +486,69 @@ function doAutoScale(autoscale) {
 }
 
 // Whether average lines should be shown for the tests
-function showAverages(shouldShow) {
-    if (gAveragesVisible == shouldShow)
+function showDerived(derivedType) {
+    if (gDerivedTypeVisible == derivedType)
         return;
 
-    gAveragesVisible = shouldShow;
-    syncAverages();
+    syncDerived(derivedType);
+
+    gDerivedTypeVisible = derivedType;
 
     /* Protect against someone who calls this before the graphs are initialized */
-    if (SmallPerfGraph)
-        SmallPerfGraph.redraw();
-    if (BigPerfGraph)
-        BigPerfGraph.redraw();
+    for each (var g in [BigPerfGraph, SmallPerfGraph]) {
+        if (g) {
+            g.autoScale();
+            g.redraw();
+        }
+    }
 }
 
-// sync up the CurrentAverageDataSets with CurrentDataSets, adding/removing data sets
+
+// sync up the CurrentDerivedDataSets with CurrentDataSets, adding/removing data sets
 // from the graphs as necessary
-function syncAverages() {
-    // not visible? then just remove
-    if (!gAveragesVisible) {
-        for (var tid in CurrentAverageDataSets) {
-            var ds = CurrentAverageDataSets[tid];
+function syncDerived(newType)
+{
+    // hiding or changing? if so, remove the old ones
+    if (newType == "none" || (newType && newType != gDerivedTypeVisible)) {
+        for (var tid in CurrentDerivedDataSets) {
+            var ds = CurrentDerivedDataSets[tid];
             SmallPerfGraph.removeDataSet(ds);
             BigPerfGraph.removeDataSet(ds);
         }
 
-        CurrentAverageDataSets = [];
-        return;
+        CurrentDerivedDataSets = [];
     }
+
+    if (newType == null)
+        newType = gDerivedTypeVisible;
+
+    if (newType == "none")
+        return;
 
     for (var tid in CurrentDataSets) {
-        if (tid in CurrentAverageDataSets)
+        if (tid in CurrentDerivedDataSets)
             continue;
 
-        var avgds = CurrentDataSets[tid].createAverage(gAverageInterval);
-        CurrentAverageDataSets[tid] = avgds;
+        var newds;
+        if (newType == "average")
+            newds = CurrentDataSets[tid].createAverage(gAverageInterval);
+        else if (newType = "derivative")
+            newds = CurrentDataSets[tid].createDerivative();
 
-        SmallPerfGraph.addDataSet(avgds);
-        BigPerfGraph.addDataSet(avgds);
+        CurrentDerivedDataSets[tid] = newds;
+
+        SmallPerfGraph.addDataSet(newds);
+        BigPerfGraph.addDataSet(newds);
     }
 
-    for (var tid in CurrentAverageDataSets) {
+    for (var tid in CurrentDerivedDataSets) {
         if (tid in CurrentDataSets)
             continue;
-        var avgds = CurrentAverageDataSets[tid];
-        SmallPerfGraph.removeDataSet(avgds);
-        BigPerfGraph.removeDataSet(avgds);
+        var dds = CurrentDerivedDataSets[tid];
+        SmallPerfGraph.removeDataSet(dds);
+        BigPerfGraph.removeDataSet(dds);
 
-        delete CurrentAverageDataSets[tid];
+        delete CurrentDerivedDataSets[tid];
     }
 }
 
