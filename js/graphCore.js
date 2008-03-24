@@ -60,18 +60,16 @@ function initGraphCore(useDiscrete)
 
     // create CSS "smallgraph-size" and "graph-size" rules that the
     // layout depends on
-    {
-        var sg = $("#smallgraph")[0];
-        var g = $("#graph")[0];
+    var sg = $("#smallgraph")[0];
+    var g = $("#graph")[0];
 
-        SmallGraphSizeRuleIndex = document.styleSheets[0].insertRule (
-            ".smallgraph-size { width: " + sg.width + "px; height: " + sg.height + "px; }",
-            document.styleSheets[0].cssRules.length);
+    SmallGraphSizeRuleIndex = document.styleSheets[0].insertRule (
+        ".smallgraph-size { width: " + sg.width + "px; height: " + sg.height + "px; }",
+        document.styleSheets[0].cssRules.length);
 
-        BigGraphSizeRuleIndex = document.styleSheets[0].insertRule (
-            ".graph-size { width: " + g.width + "px; height: " + g.height + "px; }",
-            document.styleSheets[0].cssRules.length);
-    }
+    BigGraphSizeRuleIndex = document.styleSheets[0].insertRule (
+        ".graph-size { width: " + g.width + "px; height: " + g.height + "px; }",
+        document.styleSheets[0].cssRules.length);
 
     var resizeFunction = function () {
         var leftw = 340;

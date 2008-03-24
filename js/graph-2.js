@@ -729,6 +729,9 @@ function handleLoad()
     if (gGraphType == GRAPH_TYPE_SERIES) {
         $("#charttypeicon").addClass("barcharticon");
         $("#chartlinkicon").addClass("barchartlinkicon");
+
+        $("#graphoptionsbox").hide();
+        $(".clicky-ranges")[0].style.visibility = "hidden";
     } else {
         $("#charttypeicon").addClass("linecharticon");
         $("#chartlinkicon").addClass("linechartlinkicon");
