@@ -17,11 +17,11 @@ var CurrentAverageDataSets = {};
 var GraphIsSeries;
 
 var gOptions = {
-    autoScaleYAxis: true,
     doDeltaSort: false,
 };
 
 var gAveragesVisible = false;
+var gAutoScale = true;
 
 function initGraphCore(useDiscrete)
 {
@@ -42,14 +42,6 @@ function initGraphCore(useDiscrete)
     }
 
     // handle saved options
-    if ("autoScaleYAxis" in gOptions) {
-        var box = $("#autoscale")[0];
-        if (box) {
-            box.checked = gOptions.autoScaleYAxis ? true : false;
-            onAutoScaleClick(box.checked);
-        }
-    }
-
     if (GraphIsSeries && "doDeltaSort" in gOptions) {
         var box = $("#deltasort")[0];
         if (box) {
@@ -477,6 +469,20 @@ function makeBonsaiLink(start, end) {
 // DataSet.js checks for this function and will call it
 function getNewColorForDataset() {
     return randomColor();
+}
+
+// whether we should autoscale
+function doAutoScale(autoscale) {
+    if (gAutoScale == autoscale)
+        return;
+
+    for each (var g in [BigPerfGraph, SmallPerfGraph]) {
+        g.autoScaleYAxis = autoscale ? true : false;
+        g.autoScale();
+        g.redraw();
+    }
+
+    gAutoScale = autoscale;
 }
 
 // Whether average lines should be shown for the tests

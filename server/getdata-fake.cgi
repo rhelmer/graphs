@@ -89,7 +89,6 @@ def main():
 
             data.reverse()
             result = { 'resultcode': 0, 'results': data }
-            time.sleep(4)
             print json.write(result)
             return
 

@@ -549,6 +549,12 @@ function onToggleAveragesClick(ev)
     updateLinks();
 }
 
+function onToggleAutoScaleClick(ev)
+{
+    var autoscale = ev.target.checked;
+    doAutoScale(autoscale);
+}
+
 function onNewRangeClick(ev)
 {
     var which = this.textContent;
@@ -789,6 +795,11 @@ function handleLoad()
     $(".clicky-ranges span").click(onNewRangeClick);
 
     $("#avgcheckbox").change(onToggleAveragesClick);
+    $("#autoscalecheckbox").change(onToggleAutoScaleClick);
+
+    // force defaults until we can save/restore
+    $("#avgcheckbox")[0].checked = false;
+    $("#autoscalecheckbox")[0].checked = true;
 }
 
 window.addEventListener("load", handleLoad, false);
