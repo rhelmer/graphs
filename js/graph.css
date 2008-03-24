@@ -239,3 +239,7 @@ select {
   color: orange;
 }
 
+.helptext {
+  font-style: italic;
+  font-size: smaller;
+}
