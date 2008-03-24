@@ -769,20 +769,25 @@ Graph.prototype = {
             if (this.selectionType == "cursor" || this.selectionType == "range") {
                 var spixel, epixel;
                 var pps = (this.frontBuffer.width / (this.endTime - this.startTime + this.offsetTime));
+                var draw = false;
 
                 if (this.selectionType == "cursor" && this.selectionCursorTime) {
                     spixel = Math.round((this.selectionCursorTime-this.startTime) * pps);
                     epixel = spixel + 1;
+                    draw = true;
                 } else if (this.selectionType == "range" && this.selectionStartTime && this.selectionEndTime) {
                     spixel = Math.round((this.selectionStartTime-this.startTime) * pps);
                     epixel = Math.round((this.selectionEndTime-this.startTime) * pps);
+                    draw = true;
                 }
 
-                globalCompositeOperation = "over";
-                fillStyle = this.selectionColor;
-                fillRect(spixel, 0, epixel - spixel, this.frontBuffer.height);
+                if (draw) {
+                    globalCompositeOperation = "over";
+                    fillStyle = this.selectionColor;
+                    fillRect(spixel, 0, epixel - spixel, this.frontBuffer.height);
 
-                doDrawOverlay = true;
+                    doDrawOverlay = true;
+                }
             }
 
             /* Draw cursor, if any */
