@@ -748,6 +748,11 @@ function handleLoad()
                                            updateLinks();
                                        });
 
+    $(BigPerfGraph.eventTarget).bind("graphSelectionChanged",
+                                     function (ev, selType, arg1, arg2) {
+                                         updateLinks();
+                                     });
+
     if (gGraphType == GRAPH_TYPE_VALUE) {
         Tinderbox.requestTestList(
             function (tests) {
