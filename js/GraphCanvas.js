@@ -482,7 +482,7 @@ Graph.prototype = {
 
         var hasDerivedDSs = false;
         for each (var ds in this.dataSets) {
-            if ("averageOf" in ds || "derivateOf" in ds) {
+            if ("averageOf" in ds || "derivativeOf" in ds) {
                 hasDerivedDSs = true;
                 break;
             }
@@ -560,8 +560,9 @@ Graph.prototype = {
                     // figure out if there is a derived set for this ds being drawn
                     for each (var ds in this.dataSets) {
                         if (("averageOf" in ds && ds.averageOf == this.dataSets[i]) ||
-                            ("derivateiveOf" in ds && ds.derivateiveOf == this.dataSets[i]))
+                            ("derivativeOf" in ds && ds.derivativeOf == this.dataSets[i]))
                         {
+                            log ("dataset " + i + " has derived!");
                             dsHasDerived = true;
                             break;
                         }
@@ -634,9 +635,10 @@ Graph.prototype = {
                     if (endIdx != startIdx && ((endIdx - startIdx) * 2 * this.pointRadius > cw))
                         shouldMaybeDrawPoints = false;
 
+                    // points get drawn for delta derivatives, just not averages
                     if (shouldMaybeDrawPoints &&
                         this.drawPoints &&
-                        !(("averageOf" in this.dataSets[i]) || ("derivativeOf" in this.dataSets[i])))
+                        !("averageOf" in this.dataSets[i]))
                     {
                         save();
 

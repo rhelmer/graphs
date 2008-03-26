@@ -326,7 +326,7 @@ TimeValueDataSet.prototype = {
         var newds = new TimeValueDataSet(newdata, lighterColor(this.color));
         newds.derivativeOf = this;
 
-        this.derivateDataSet = newds;
+        this.derivateiveDataSet = newds;
 
         return newds;
     },
