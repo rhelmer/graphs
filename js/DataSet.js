@@ -122,8 +122,6 @@ function TimeValueDataSet(data, color) {
     } else {
         this.color = "#000000";
     }
-
-    this.relativeToSets = new Array();
 }
 
 TimeValueDataSet.prototype = {
@@ -145,8 +143,6 @@ TimeValueDataSet.prototype = {
             this.lastTime = data[data.length-2];
         else
             this.lastTime = data[0];
-
-        // XXX do something about relativeToSets
     },
 
     minMaxValueForTimeRange: function (startTime, endTime) {
@@ -172,12 +168,6 @@ TimeValueDataSet.prototype = {
     createAverage: function (avginterval) {
         if (avginterval <= 0)
             throw "avginterval <= 0";
-
-        if (this.averageDataSet != null &&
-            this.averageInterval == avginterval)
-        {
-            return this.averageDataSet;
-        }
 
         var newdata = [];
 
@@ -228,9 +218,7 @@ TimeValueDataSet.prototype = {
 
         var newds = new TimeValueDataSet(newdata, lighterColor(this.color));
         newds.averageOf = this;
-
-        this.averageDataSet = newds;
-        this.averageInterval = avginterval;
+        newds.averageInterval = avginterval;
 
         return newds;
     },
@@ -241,11 +229,6 @@ TimeValueDataSet.prototype = {
         if (otherds == this) {
             log("error, same ds");
             return null;
-        }
-
-        for each (var s in this.relativeToSets) {
-            if (s.relativeTo == otherds)
-                return s;
         }
 
         var firstTime = this.firstTime;
@@ -299,8 +282,6 @@ TimeValueDataSet.prototype = {
         var newds = new TimeValueDataSet(newdata, this.color);
         newds.relativeTo = otherds;
 
-        this.relativeToSets.push(newds);
-
         return newds;
     },
 
@@ -325,8 +306,6 @@ TimeValueDataSet.prototype = {
 
         var newds = new TimeValueDataSet(newdata, lighterColor(this.color));
         newds.derivativeOf = this;
-
-        this.derivateiveDataSet = newds;
 
         return newds;
     },

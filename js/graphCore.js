@@ -569,8 +569,10 @@ function syncDerived(newType)
         var newds;
         if (newType == "average")
             newds = CurrentDataSets[tid].createAverage(gAverageInterval);
-        else if (newType = "derivative")
+        else if (newType == "derivative")
             newds = CurrentDataSets[tid].createDerivative();
+        else if (newType == "derivativePercent")
+            newds = CurrentDataSets[tid].createDerivative(true);
 
         CurrentDerivedDataSets[tid] = newds;
 

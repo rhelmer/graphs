@@ -826,10 +826,7 @@ function handleLoad()
     // wrap the range-spans
     $(".clicky-ranges span").click(onNewRangeClick);
 
-    $("#derived_none_radio").change(onChangeDerived);
-    $("#derived_avg_radio").change(onChangeDerived);
-    $("#derived_deriv_radio").change(onChangeDerived);
-    $("#autoscalecheckbox").change(onToggleAutoScaleClick);
+    $("input[name=derived_type]").change(onChangeDerived);
     $("#showfloatercheckbox").change(onToggleFloaterClick);
 
     // force defaults until we can save/restore
