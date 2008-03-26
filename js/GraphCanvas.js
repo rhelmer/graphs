@@ -562,7 +562,6 @@ Graph.prototype = {
                         if (("averageOf" in ds && ds.averageOf == this.dataSets[i]) ||
                             ("derivativeOf" in ds && ds.derivativeOf == this.dataSets[i]))
                         {
-                            log ("dataset " + i + " has derived!");
                             dsHasDerived = true;
                             break;
                         }
