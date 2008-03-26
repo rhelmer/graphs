@@ -933,7 +933,7 @@ Graph.prototype = {
         } else if (labelDuration <= 15*ONE_MINUTE_SECONDS) {
             ldMin = 15;
             labelDuration = 15*ONE_MINUTE_SECONDS;
-        } else if (labelDuration <= 1.5*ONE_HOUR_SECONDS) {
+        } else if (labelDuration <= 2*ONE_HOUR_SECONDS) {
             ldHour = 1;
             labelDuration = ONE_HOUR_SECONDS;
         } else if (labelDuration <= 6*ONE_HOUR_SECONDS) {
@@ -974,6 +974,12 @@ Graph.prototype = {
 
         // reset the number of labels based on our duration
         numLabels = Math.ceil(duration / labelDuration);
+
+        // and then make sure they don't overlap
+        if (this.frontBuffer.width / numLabels < this.xLabelWidth) {
+            numLabels /= 2;
+            labelDuration *= 2;
+        }
 
         var labels = [];
 
@@ -1428,27 +1434,27 @@ function CalendarTimeGraph(canvasId) {
 }
 
 function dst(ltime) {
-  var d = new Date(ltime*1000);
-  var y = d.getFullYear();
-  var fall, spring;
+    var d = new Date(ltime*1000);
+    var y = d.getFullYear();
+    var fall, spring;
 
-  //rules for 2007
-  if (y >= 2007 ) {
-    spring = new Date(y, 2, 1); // the date of Mar 1
-    spring.setUTCDate(15 - spring.getUTCDay()); //second sunday in march
+    //rules for 2007
+    if (y >= 2007 ) {
+        spring = new Date(y, 2, 1); // the date of Mar 1
+        spring.setUTCDate(15 - spring.getUTCDay()); //second sunday in march
 
-    fall = new Date(y, 10, 1); // the date of Nov 1
-    fall.setUTCDate(8 - fall.getUTCDay()); //first sunday in november
-  } else { //previous rules
-    spring = new Date(y, 3, 1); // the date of april 1st
-    spring.setUTCDate(8 - spring.getUTCDay()); //first sunday in april
+        fall = new Date(y, 10, 1); // the date of Nov 1
+        fall.setUTCDate(8 - fall.getUTCDay()); //first sunday in november
+    } else { //previous rules
+        spring = new Date(y, 3, 1); // the date of april 1st
+        spring.setUTCDate(8 - spring.getUTCDay()); //first sunday in april
+        
+        fall = new Date(y, 9, 31); //last day in october
+        fall.setDate(fall.getUTCDate() - fall.getUTCDay()); //last sunday in october
+    }
 
-    fall = new Date(y, 9, 31); //last day in october
-    fall.setDate(fall.getUTCDate() - fall.getUTCDay()) //last sunday in october
-  }
-
-  // Is it Daylight or Standard time?
-  return ((d > spring) && (d < fall));
+    // Is it Daylight or Standard time?
+    return ((d > spring) && (d < fall));
 }
 
 function dateFromSeconds(ltime) {
@@ -1472,8 +1478,7 @@ function formatTime(ltime, twoLines) {
     var s = d.getUTCSeconds();
 
     var timestr = (h == 0 ? "12" : (h > 12 ? h - 12 : h)) +
-        (m < 10 ? ":0" : ":") + m +
-        (s < 10 ? ":0" : ":") + s;
+        (m < 10 ? ":0" : ":") + m + (s > 0 ? ((s < 10 ? ":0" : ":") + s) : "");
 
     if (h < 12)
         timestr += " AM";
