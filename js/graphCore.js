@@ -22,6 +22,7 @@ var gOptions = {
 
 var gDerivedTypeVisible = "none";
 var gAutoScale = true;
+var gShowFloater = true;
 
 function initGraphCore(useDiscrete)
 {
@@ -202,12 +203,17 @@ function onCursorMoved(event, time, val, extra_data) {
         return;
     }
 
+    if (!gShowFloater)
+        showFloater(null);
+
     if (GraphIsSeries) {
         showStatus("Index: " + time + " Value: " + val.toFixed(2) + " " + extra_data);
-        showFloater(time, val);
+        if (gShowFloater)
+            showFloater(time, val);
     } else {
         showStatus("Date: " + formatTime(time) + " Value: " + val.toFixed(2));
-        showFloater(time, val);
+        if (gShowFloater)
+            showFloater(time, val);
     }
 }
 
@@ -382,6 +388,12 @@ function showFloater(time, value) {
     fdiv.style.left = Math.floor(xy.x + 65 - w) + "px";
     fdiv.style.top = Math.floor((BigPerfGraph.frontBuffer.height - xy.y) + 15) + "px";
     fdiv.innerHTML = s;
+}
+
+function setShouldShowFloater(show) {
+    gShowFloater = show ? true : false;
+    if (!gShowFloater)
+        showFloater(null);
 }
 
 function showLoadingAnimation(message) {

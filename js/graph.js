@@ -554,6 +554,12 @@ function onToggleAutoScaleClick(ev)
     doAutoScale(autoscale);
 }
 
+function onToggleFloaterClick(ev)
+{
+    var floater = ev.target.checked;
+    setShouldShowFloater(floater)
+}
+
 function onNewRangeClick(ev)
 {
     var which = this.textContent;
@@ -575,6 +581,7 @@ function onNewRangeClick(ev)
         t1 = range[0];
         t2 = range[1];
     } else if (which == "Custom...") {
+      /* TODO */
     } else if (which == "Older" || which == "Newer") {
         t1 = SmallPerfGraph.startTime;
         t2 = SmallPerfGraph.endTime;
@@ -799,10 +806,12 @@ function handleLoad()
     $("#derived_avg_radio").change(onChangeDerived);
     $("#derived_deriv_radio").change(onChangeDerived);
     $("#autoscalecheckbox").change(onToggleAutoScaleClick);
+    $("#showfloatercheckbox").change(onToggleFloaterClick);
 
     // force defaults until we can save/restore
     $("#derived_none_radio")[0].checked = true;
     $("#autoscalecheckbox")[0].checked = true;
+    $("#showfloatercheckbox")[0].checked = true;
 }
 
 window.addEventListener("load", handleLoad, false);
