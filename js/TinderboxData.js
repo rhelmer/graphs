@@ -37,14 +37,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-var getdatacgi_local = "server/getdata-fake.cgi?";
-//var getdatacgi = "getdata.cgi?"
+var getdatacgi_local = "server/getdata.cgi?";
 var getdatacgi = "http://graphs.mozilla.org/getdata.cgi?";
 
 if (document.location.hostname.indexOf("localhost") != -1)
     getdatacgi = getdatacgi_local;
-
-var getdatacgi = "http://graphs.mozilla.org/getdata.cgi?";
 
 function checkErrorReturn(obj) {
     if (!obj || obj.resultcode != 0) {
