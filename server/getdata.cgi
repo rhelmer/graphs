@@ -98,12 +98,13 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
         cur.execute("SELECT id, machine, test, test_type, dataset_extra_data.data, extra_data, branch FROM dataset_extra_data JOIN dataset_info ON dataset_extra_data.dataset_id = dataset_info.id WHERE type = ? AND test_type != ? and (date >= ?) " + s1 +" GROUP BY machine,test,test_type,dataset_extra_data.data, extra_data, branch", (type, "baseline", datelimit))
     else:
         cur.execute("SELECT id, machine, test, test_type, date, extra_data, branch FROM dataset_info WHERE type = ? AND test_type != ? and (date >= ?)" + s1, (type, "baseline", datelimit))
+        
     for row in cur:
         if graphby and graphby == 'bydata':
             results.append( {"id": row[0],
                              "machine": row[1],
                              "test": row[2],
-                             "test_type": row[3],
+                             #"test_type": row[3],
                              "data": row[4],
                              "extra_data": row[5],
                              "branch": row[6]})
@@ -111,7 +112,7 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
             results.append( {"id": row[0],
                              "machine": row[1],
                              "test": row[2],
-                             "test_type": row[3],
+                             #"test_type": row[3],
                              "date": row[4],
                              "extra_data": row[5],
                              "branch": row[6]})

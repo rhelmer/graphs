@@ -400,18 +400,18 @@ function platformFromData(t)
 {
     if ('machine' in t) {
         var m = t.machine;
-        if (/^qm-pxp/.test(m) ||
-            /^qm-mini-xp/.test(m) ||
-            /.*bldxp.*/.test(m))
+        if (m.indexOf('qm-pxp') != -1 ||
+            m.indexOf('qm-mini-xp') != -1 ||
+            m.indexOf('bldxp') != -1)
             return "Windows XP";
-        if (/^qm-mini-vista/.test(m))
+        if (m.indexOf('qm-mini-vista') != -1)
             return "Windows Vista";
-        if (/.*bldlnx.*/.test(m) ||
-            /.*linux.*/.test(m) ||
-            /.*ubuntu.*/.test(m))
+        if (m.indexOf('bldlnx') != -1 ||
+            m.indexOf('linux') != -1 ||
+            m.indexOf('ubuntu') != -1)
             return "Linux";
-        if (/.*xserve.*/.test(m) ||
-            /.*pmac.*/.test(m))
+        if (m.indexOf('xserve') != -1 ||
+            m.indexOf('pmac') != -1)
             return "MacOS X";
     }
 
