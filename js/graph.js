@@ -679,12 +679,33 @@ function initOptions()
 
     var loadFunctions = [];
 
+    //support old link format, adding tests sets to graph
+    var ctr = 1;
+    while ( ("m" + ctr + "tid") in qsdata) {
+        ctr++;
+    }
+    if (ctr > 1) {
+        loadFunctions.push (function() {
+               for (var i=1; i<ctr; i++) {
+                  id = "m" + i + "tid"; 
+                  doAddTest(qsdata[id], true);
+               }
+        });
+    }
+
     if ("show" in qsdata) {
         var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
 
         loadFunctions.push (function() {
                 for (var i = 0; i < ids.length; i++)
                     doAddTest(ids[i], true);
+            });
+    }
+
+    //support old link format, setting selected range
+    if (("spss" in qsdata) && ("spse" in qsdata)) {
+        loadFunctions.push (function() {
+                SmallPerfGraph.setSelection ("range", qsdata["spss"], qsdata["spse"]);
             });
     }
 
