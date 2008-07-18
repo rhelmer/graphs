@@ -57,6 +57,19 @@ function makeBonsaiLink(start, end) {
     return "http://bonsai.mozilla.org/cvsquery.cgi?treeid=default&module=" + module + "&branch=HEAD&branchtype=match&dir=&file=&filetype=match&who=&whotype=match&sortby=Date&hours=2&date=explicit&cvsroot=%2Fcvsroot&mindate=" + Math.floor(start) + "&maxdate=" + Math.ceil(end);
 }
 
+/**
+ * Given a start / end time range, combine that with the global list of 
+ * tests shown to build a CSV dump URL.
+ */
+function makeCsvLink(start, end) {
+    var params = [];
+    params.push('show='+gActiveTests.join(','));
+    if (start && end) {
+        params.push('sel='+parseInt(start)+','+parseInt(end));
+    }
+    return 'server/dumpdata.cgi?' + params.join('&');
+}
+
 function onIncludeOldChanged()
 {
     populateFilters();
@@ -756,7 +769,7 @@ function updateLinks() {
 
     $("#linkanchor").attr("href", loc);
 
-    // update bonsai
+    // update links (bonsai and CSV)
     if (gGraphType == GRAPH_TYPE_VALUE) {
         var start, end;
 
@@ -773,6 +786,7 @@ function updateLinks() {
         }
 
         $("#bonsaianchor").attr("href", makeBonsaiLink(start, end));
+        $("#csvanchor").attr("href", makeCsvLink(start, end));
     }
 }
 

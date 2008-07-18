@@ -43,24 +43,53 @@ def esc(val):
     return val
 
 def dumpData(fo, setid, starttime, endtime):
-    s1 = ""
-    s2 = ""
+    info_s1, info_s2, values_s1, values_s2 = "", "", "", ""
     if starttime:
-        s1 = " AND time >= B." + starttime
+        info_s1   = " AND date >= " + starttime
+        values_s1 = " AND dataset_values.time >= " + starttime
     if endtime:
-        s2 = " AND time <= B." + endtime
+        info_s2   = " AND date <= " + endtime
+        values_s2 = " AND dataset_values.time <= " + endtime
 
     cur = db.cursor()
     setid = ",".join(setid)
     fo.write("dataset,machine,branch,test,date\n")
-    cur.execute("SELECT B.id, B.machine, B.branch, B.test, B.date FROM dataset_info as B WHERE id IN (%s) %s %s ORDER BY id" % (setid, s1, s2,)) 
+    sql = """
+        SELECT 
+            B.id, B.machine, B.branch, B.test, B.date 
+        FROM 
+            dataset_info as B 
+        WHERE 
+            id IN (%s)
+            %s %s
+    """ % (setid, info_s1, info_s2)
+    cur.execute(sql)
     for row in cur:
         fo.write ('%s,%s,%s,%s,%s\n' % (esc(row[0]), esc(row[1]), esc(row[2]), esc(row[3]), esc(row[4])))
+
     fo.write("dataset,time,value,buildid,data\n")
     cur.close()
     cur = db.cursor()
-    #cur.execute("SELECT dataset_id, time, value, branchid, data from ((dataset_values NATURAL JOIN dataset_branchinfo) NATURAL JOIN dataset_extra_data) WHERE dataset_id IN (%s) %s %s ORDER BY dataset_id, time" % (setid, s1, s2,))
-    cur.execute("SELECT dataset_values.dataset_id, dataset_values.time, dataset_values.value, dataset_branchinfo.branchid, dataset_extra_data.data FROM dataset_values LEFT JOIN dataset_branchinfo ON dataset_values.dataset_id = dataset_branchinfo.dataset_id AND dataset_values.time = dataset_branchinfo.time LEFT JOIN dataset_extra_data ON dataset_values.dataset_id = dataset_extra_data.dataset_id AND dataset_values.time = dataset_extra_data.time WHERE dataset_values.dataset_id IN (%s) %s %s ORDER BY dataset_values.dataset_id, dataset_values.time" % (setid, s1, s2))
+    sql = """
+        SELECT 
+            dataset_values.dataset_id, dataset_values.time, dataset_values.value, 
+            dataset_branchinfo.branchid, dataset_extra_data.data 
+        FROM dataset_values 
+        LEFT JOIN 
+            dataset_branchinfo ON 
+                dataset_values.dataset_id = dataset_branchinfo.dataset_id AND 
+                dataset_values.time = dataset_branchinfo.time 
+        LEFT JOIN 
+            dataset_extra_data ON 
+                dataset_values.dataset_id = dataset_extra_data.dataset_id AND 
+                dataset_values.time = dataset_extra_data.time 
+        WHERE 
+            dataset_values.dataset_id IN (%s) 
+            %s %s 
+        ORDER BY 
+            dataset_values.dataset_id, dataset_values.time
+    """ % (setid, values_s1, values_s2)
+    cur.execute(sql)
     for row in cur:
         fo.write ('%s,%s,%s,%s,%s\n' % (esc(row[0]), esc(row[1]), esc(row[2]), esc(row[3]), esc(row[4])))
     cur.close()
@@ -103,6 +132,20 @@ for numField in ["starttime", "endtime"]:
         sys.exit(500)
     globals()[numField] = val
 
+if form.has_key('sel'):
+    val = form.getfirst('sel')
+    if not ',' in val:
+        print "Invalid ?sel parameter"
+        sys.exit(500)
+    vals = val.split(',')
+    if not len( vals ) == 2:
+        print "Invalid ?sel parameter"
+        sys.exit(500)
+    starttime, endtime = vals[0], vals[1]
+
+if form.has_key('show'):
+    setid = form.getfirst('show').split(',')
+
 if not setid:
     print "Content-Type: text/plain\n"
     print "No data set selected\n"
@@ -115,7 +158,7 @@ if doGzip == 1:
 
 dumpData(zfile, setid, starttime, endtime)
 
-sys.stdout.write("Content-Type: text/plain\n")
+sys.stdout.write("Content-Type: text/x-csv\n")
 if doGzip == 1:
     zfile.close()
     sys.stdout.write("Content-Encoding: gzip\n")
