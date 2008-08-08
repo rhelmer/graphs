@@ -140,10 +140,10 @@ cur.close()
 tstart = res[0][0]
 tend = res[0][1]
 if type == "discrete":
-    link_str += (link_format % (float(-1), "graph.html#type=series&", setid,))
+    link_str += (link_format % (testname, float(-1), "graph.html#type=series&", setid,))
 else:
     tstart = 0
-    link_str += (link_format % (float(-1), "graph.html#", setid,))
+    link_str += (link_format % (testname, float(-1), "graph.html#", setid,))
 
 
 #this code auto-adds a set of continuous data for each series of discrete data sets - creating an overview of the data
@@ -190,7 +190,7 @@ if  type == "discrete" :
         cur.close()
         tstart = 0
         tend = res[0][1]
-        link_str += (link_format % (float(avg), "graph.html#", setid,))
+        link_str += (link_format % (testname, float(avg), "graph.html#", setid,))
 
 db.commit()
 print "Inserted."
