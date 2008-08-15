@@ -79,6 +79,9 @@ if (type == "discrete") and (not date):
    print "Bad args, need a valid date"
    sys.exit(500)
 
+if (date is None):
+    date = ''
+
 if (not value) or (not tbox) or (not testname):
     print "Bad args"
     sys.exit(500)
