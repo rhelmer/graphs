@@ -524,8 +524,8 @@ function transformLegacySeriesData(testList)
             tid: t.id,
             platform: platformFromData(t),
             machine: t.machine,
-            branch: t.branch,
-            test: t.test,
+            branch: branchFromData(t),
+            test: testFromData(t),
             date: t.date,
         };
 
