@@ -178,7 +178,9 @@ select {
   color: #3300ff;
 }
 
-.test-platform-macosx {
+.test-platform-macosx,
+.test-platform-macosx104, 
+.test-platform-macosx105 {
   color: red;
 }
 

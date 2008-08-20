@@ -270,7 +270,7 @@ function makeTestDiv(test, opts)
     if (opts == null || typeof(opts) != "object")
         opts = {};
 
-    var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\SA-Za-z0-9-]/g, "");
+    var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\w-]/g, "");
     var html = "";
     html += "<div class='testline' id='testid" + test.tid + "'>";
     html += "<table><tr>";
@@ -412,20 +412,24 @@ function testIdFromElement(el) {
 function platformFromData(t)
 {
     if ('machine' in t) {
-        var m = t.machine;
+        var m = t.machine.toLowerCase();
         if (m.indexOf('qm-pxp') != -1 ||
             m.indexOf('qm-mini-xp') != -1 ||
-            m.indexOf('bldxp') != -1)
+            m.indexOf('bldxp') != -1 ||
+            m.indexOf('winxp') != -1)
             return "Windows XP";
-        if (m.indexOf('qm-mini-vista') != -1)
+        if (m.indexOf('vista') != -1)
             return "Windows Vista";
         if (m.indexOf('bldlnx') != -1 ||
             m.indexOf('linux') != -1 ||
             m.indexOf('ubuntu') != -1)
             return "Linux";
         if (m.indexOf('xserve') != -1 ||
-            m.indexOf('pmac') != -1)
-            return "MacOS X";
+            m.indexOf('pmac') != -1 ||
+	    m.indexOf('tiger') != -1)
+            return "MacOS X 10.4";
+	if (m.indexOf('leopard') != -1)
+            return "MacOS X 10.5";	    
     }
 
     return "Unknown";
