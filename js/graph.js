@@ -325,6 +325,7 @@ function doSeriesDialogAdd() {
 }
 
 function doAddWithDate(evt) {
+    $("#seriesdialog .throbber").show();
     var tid = testIdFromElement(this);
     var dialogOpen = (gSeriesDialogShownForTestId != -1);
     var t = findTestById(tid);
@@ -332,29 +333,29 @@ function doAddWithDate(evt) {
         alert("Couldn't find a test with ID " + tid + " -- what happened?");
         return;
     }
-
-    if (dialogOpen) {
-    }
-
-    var datesel = $("#datesel");
-    datesel.empty();
-    var allDateTests = gSeriesTestList[makeSeriesTestKey(t)];
-
-    // these are sorted by ascending date, but we really want the
-    // newest on top
-    for (var i = allDateTests.length - 1; i >= 0; --i) {
-        var d = allDateTests[i];
-        datesel.append("<option value='" + d.tid + "'>" + formatTime(d.date) + "</option>");
-    }
+    
+    $("#datesel").empty();
+    
+    //Get testid, branch and machine, query server
+    Tinderbox.requestTestList(30, t.branch, t.machine, t.test, function(data) {
+         for (var i = data.length - 1; i >= 0; --i) {
+             //var d = allDateTests[i];
+             var datesel = $("#datesel");
+             d = data[i];
+             datesel.append("<option value='" + d.tid + "'>" + formatTime(d.date) + "</option>");
+         }
+         $("#seriesdialog .throbber").hide();
+    });
+    
     $("#datesel > :first-child").attr("selected", "");
-
+    
     if (dialogOpen) {
         $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
         $("#seriesdialog").animate({ left: evt.pageX, top: evt.pageY }, 'fast');
     } else {
         $("#seriesdialog")[0].style.left = evt.pageX;
         $("#seriesdialog")[0].style.top = evt.pageY;
-        $("#seriesdialog").show('fast');
+        $("#seriesdialog").show();
     }
 
     $("#availabletests #testid" + tid + " td").addClass("dateselshown");
@@ -526,7 +527,7 @@ function transformLegacySeriesData(testList)
 
     for (var i = 0; i < testList.length; i++) {
         var t = testList[i];
-        var key = makeSeriesTestKey(t);
+        var key = makeSeriesTestKey(t); //machine + branch + test = makeSeriesTestKey
 
         var ob = {
             tid: t.id,

@@ -96,9 +96,10 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
     cur = db.cursor()
     if graphby and graphby == 'bydata':
         cur.execute("SELECT id, machine, test, test_type, dataset_extra_data.data, extra_data, branch FROM dataset_extra_data JOIN dataset_info ON dataset_extra_data.dataset_id = dataset_info.id WHERE type = ? AND test_type != ? and (date >= ?) " + s1 +" GROUP BY machine,test,test_type,dataset_extra_data.data, extra_data, branch", (type, "baseline", datelimit))
+    elif type == 'discrete' and not branch and not machine and not testname:
+        cur.execute("SELECT id, machine, test, test_type, MAX(date), extra_data, branch FROM dataset_info WHERE type = ? and test_type != ? and (date >= ?) GROUP BY machine, branch, test" + s1, (type, "baseline", datelimit))
     else:
         cur.execute("SELECT id, machine, test, test_type, date, extra_data, branch FROM dataset_info WHERE type = ? AND test_type != ? and (date >= ?)" + s1, (type, "baseline", datelimit))
-        
     for row in cur:
         if graphby and graphby == 'bydata':
             results.append( {"id": row[0],
