@@ -420,15 +420,19 @@ function platformFromData(t)
             return "Windows XP";
         if (m.indexOf('vista') != -1)
             return "Windows Vista";
+        if (m.indexOf('winnt_5.2') != -1)
+            return "Windows Server 2003";
         if (m.indexOf('bldlnx') != -1 ||
             m.indexOf('linux') != -1 ||
             m.indexOf('ubuntu') != -1)
             return "Linux";
         if (m.indexOf('xserve') != -1 ||
             m.indexOf('pmac') != -1 ||
-	    m.indexOf('tiger') != -1)
+	    m.indexOf('tiger') != -1 ||
+	    m.indexOf('os_x_10.4') != -1)
             return "MacOS X 10.4";
-	if (m.indexOf('leopard') != -1)
+	if (m.indexOf('leopard') != -1 ||
+	    m.indexOf('os_x_10.5') != -1)
             return "MacOS X 10.5";	    
     }
 

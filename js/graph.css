@@ -170,18 +170,26 @@ select {
   color: green;
 }
 
+.test-platform-windows,
 .test-platform-windowsxp {
   color: blue;
 }
 
 .test-platform-windowsvista {
-  color: #3300ff;
+  color: #3300FF;
+}
+
+.test-platform-windowsserver2003 {
+  color: #3333FF;
 }
 
 .test-platform-macosx,
-.test-platform-macosx104, 
-.test-platform-macosx105 {
+.test-platform-macosx104 {
   color: red;
+}
+
+.test-platform-macosx105 {
+  color: #FF3333;
 }
 
 .test-name {
