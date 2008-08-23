@@ -167,6 +167,11 @@ function addTestToGraph(tid, cb) {
                                       Math.min(ds.lastTime, gCurrentLoadRange ? gCurrentLoadRange[1] : ds.lastTime));
                 }
 
+                if (g == BigPerfGraph && SmallPerfGraph.selectionType == 'range') {
+                    // Make sure to zoom in on the big graph if there's a small graph highlight in effect.
+                    g.setTimeRange(SmallPerfGraph.selectionStartTime, SmallPerfGraph.selectionEndTime);
+                }
+
                 g.autoScale();
                 g.redraw();
             }
