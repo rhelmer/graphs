@@ -314,6 +314,7 @@ function doSeriesDialogAdd() {
     if (gSeriesDialogShownForTestId == -1)
         return;
 
+
     var tests = $("#datesel").val();
     for (var i = 0; i < tests.length; i++) {
         doAddTest(tests[i]);
@@ -338,11 +339,12 @@ function doAddWithDate(evt) {
     
     //Get testid, branch and machine, query server
     Tinderbox.requestTestList(30, t.branch, t.machine, t.test, function(data) {
+         transformLegacySeriesData(data);
          for (var i = data.length - 1; i >= 0; --i) {
              //var d = allDateTests[i];
              var datesel = $("#datesel");
              d = data[i];
-             datesel.append("<option value='" + d.tid + "'>" + formatTime(d.date) + "</option>");
+             datesel.append("<option value='" + d.id + "'>" + formatTime(d.date) + "</option>");
          }
          $("#seriesdialog .throbber").hide();
     });
@@ -543,7 +545,10 @@ function transformLegacySeriesData(testList)
     //log(testList.toSource());
 
     gTestList = [];
-    gAllTestsList = [];
+    if(!gAllTestsList) {
+        gAllTestsList = [];
+    }
+        
     gSeriesTestList = {};
 
     var quickList = {};
