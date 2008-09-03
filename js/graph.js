@@ -338,7 +338,7 @@ function doAddWithDate(evt) {
     $("#datesel").empty();
     
     //Get testid, branch and machine, query server
-    Tinderbox.requestTestList(30, t.branch, t.machine, t.test, function(data) {
+    Tinderbox.requestTestList(30, t.branch, t.machine, t.testname, function(data) {
          transformLegacySeriesData(data);
          for (var i = data.length - 1; i >= 0; --i) {
              //var d = allDateTests[i];
@@ -527,6 +527,7 @@ function transformLegacyData(testList)
             machine: t.machine,
             branch: branchFromData(t),
             test: testFromData(t),
+            testname: t.test,
             newest: t.newest,
         };
 
@@ -563,6 +564,7 @@ function transformLegacySeriesData(testList)
             machine: t.machine,
             branch: branchFromData(t),
             test: testFromData(t),
+            testname: t.test,
             date: t.date,
         };
 
