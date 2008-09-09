@@ -95,11 +95,11 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
    
     cur = db.cursor()
     if graphby and graphby == 'bydata':
-        cur.execute("SELECT id, machine, test, test_type, dataset_extra_data.data, extra_data, branch FROM dataset_extra_data JOIN dataset_info ON dataset_extra_data.dataset_id = dataset_info.id WHERE type = ? AND test_type != ? and (date >= ?) " + s1 +" GROUP BY machine,test,test_type,dataset_extra_data.data, extra_data, branch", (type, "baseline", datelimit))
+        cur.execute("SELECT DISTINCT(di.id), di.machine, di.test, di.test_type, dataset_extra_data.data, di.extra_data, di.branch FROM dataset_extra_data JOIN dataset_info di ON dataset_extra_data.dataset_id = dataset_info.id WHERE di.type = ? AND di.test_type != ? and (di.date >= ?) " + s1 + " AND di.id=dbi.dataset_id GROUP BY machine,test,test_type,dataset_extra_data.data, extra_data, branch", (type, "baseline", datelimit))
     elif type == 'discrete' and not branch and not machine and not testname:
-        cur.execute("SELECT id, machine, test, test_type, MAX(date), extra_data, branch FROM dataset_info WHERE type = ? and test_type != ? and (date >= ?) GROUP BY machine, branch, test" + s1, (type, "baseline", datelimit))
+        cur.execute("SELECT DISTINCT(di.id), di.machine, di.test, di.test_type, MAX(di.date), di.extra_data, di.branch, dbi.branchid FROM dataset_info di LEFT JOIN dataset_branchinfo dbi ON di.id=dbi.dataset_id WHERE di.type = ? and di.test_type != ? and (di.date >= ?) GROUP BY di.machine, di.branch, di.test" + s1, (type, "baseline", datelimit))
     else:
-        cur.execute("SELECT id, machine, test, test_type, date, extra_data, branch FROM dataset_info WHERE type = ? AND test_type != ? and (date >= ?)" + s1, (type, "baseline", datelimit))
+        cur.execute("SELECT DISTINCT(di.id), di.machine, di.test, di.test_type, di.date, di.extra_data, di.branch, dbi.branchid FROM dataset_info di LEFT JOIN dataset_branchinfo dbi ON di.id=dbi.dataset_id WHERE di.type = ? AND di.test_type != ? and (di.date >= ?)" + s1, (type, "baseline", datelimit))
     for row in cur:
         if graphby and graphby == 'bydata':
             results.append( {"id": row[0],
@@ -116,7 +116,8 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
                              #"test_type": row[3],
                              "date": row[4],
                              "extra_data": row[5],
-                             "branch": row[6]})
+                             "branch": row[6],
+                             "buildid": row[7]})
 
     cur.close()
     fo.write (json.write( {"resultcode": 0, "results": results} ))

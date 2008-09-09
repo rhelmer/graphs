@@ -283,8 +283,10 @@ function makeTestDiv(test, opts)
     html += "<td class='testmain' width='100%'>";
     html += "<b class='test-name'>" + makeTestNameHtml(test.test) + "</b> on <b class='" + platformclass + "'>" + test.platform + "</b><br>";
     html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span><br>";
-    if (opts.showDate)
+    if (opts.showDate) {
         html += "<span class='test-extra-info'>" + formatTime(test.date) + "</span><br>";
+        html += "<span class='test-extra-info'>Build ID: " + test.buildid + "</span><br>";
+    }
     html += "</td>";
 
     // any trailing buttons/throbbers/etc.
@@ -344,7 +346,7 @@ function doAddWithDate(evt) {
              //var d = allDateTests[i];
              var datesel = $("#datesel");
              d = data[i];
-             datesel.append("<option value='" + d.id + "'>" + formatTime(d.date) + "</option>");
+             datesel.append("<option value='" + d.id + "'>" + formatTime(d.date)  + " (" + d.buildid + ")</option>");
          }
          $("#seriesdialog .throbber").hide();
     });
@@ -529,6 +531,7 @@ function transformLegacyData(testList)
             test: testFromData(t),
             testname: t.test,
             newest: t.newest,
+            buildid: t.buildid,
         };
 
         gTestList.push(ob);
@@ -538,7 +541,7 @@ function transformLegacyData(testList)
 }
 
 function makeSeriesTestKey(t) {
-    return t.machine + t.branch + t.test;
+    return t.machine + branchFromData(t) + testFromData(t);
 }
 
 function transformLegacySeriesData(testList)
@@ -566,6 +569,7 @@ function transformLegacySeriesData(testList)
             test: testFromData(t),
             testname: t.test,
             date: t.date,
+            buildid: t.buildid,
         };
 
         if (key in quickList) {
@@ -574,7 +578,7 @@ function transformLegacySeriesData(testList)
                 quickList[key].newest = t.date * 1000;
             }
         } else {
-            var obcore = { tid: ob.tid, platform: ob.platform, machine: ob.machine, branch: ob.branch, test: ob.test, date: ob.date };
+            var obcore = { tid: ob.tid, platform: ob.platform, machine: ob.machine, branch: ob.branch, testname: ob.testname, test: ob.test, date: ob.date };
 
             gTestList.push(obcore);
             quickList[key] = obcore;
@@ -583,7 +587,7 @@ function transformLegacySeriesData(testList)
         }
 
         gAllTestsList.push(ob);
-        gSeriesTestList[key].push({ tid: t.id, date: t.date });
+        gSeriesTestList[key].push({ tid: t.id, date: t.date, buildid: t.buildid });
     }
 }
 
