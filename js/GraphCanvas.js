@@ -739,7 +739,7 @@ Graph.prototype = {
                         lineTo(Math.round(lastT + scaledOffset) - 0.25, v);
                         lineTo(Math.round(lastT + scaledOffset) - 0.25, zeroY);
                         closePath();
-
+                        
                         fillStyle = fillStyles[values[i][0]];
                         fill();
                     }

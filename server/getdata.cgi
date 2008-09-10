@@ -65,6 +65,20 @@ def doError(errCode):
         errString = "bad test name"
     print "{ resultcode: " + str(errCode) + ", error: '" + errString + "' }"
 
+def doTestInfo(fo, id):
+    cur = db.cursor()
+    row = {}
+    cur.execute("SELECT dataset_info.*, dataset_branchinfo.branchid FROM dataset_info JOIN dataset_branchinfo ON dataset_branchinfo.dataset_id = dataset_info.id WHERE dataset_info.id= ? LIMIT 1", (id,))
+    
+    if cur.rowcount == 1:
+        row = cur.fetchone()
+        testinfo = {"id": row[0],"machine": row[2],"test": row[3],"extra_data": row[5],"branch": row[6], "date":row[7], "buildid":row[8]}
+    else:
+        testinfo = {}
+        
+    fo.write(json.write({"resultcode":0, "test":testinfo}))
+
+
 def doGetList(fo, type, branch, machine, testname):
     results = []
     s1 = ""
@@ -291,7 +305,7 @@ except:
 form = cgi.FieldStorage()
 
 #make sure that we are getting clean data from the user
-for strField in ["type", "machine", "branch", "test", "graphby","extradata","setids"]:
+for strField in ["type", "machine", "branch", "test", "graphby","extradata","setids", "action"]:
     val = form.getfirst(strField)
     if strField == "test":
         strField = "testname"
@@ -315,7 +329,9 @@ zfile = zbuf
 if doGzip == 1:
     zfile = gzip.GzipFile(mode = 'wb', fileobj = zbuf, compresslevel = 5)
 
-if not setid and not getlist and not setids:
+if action == 'testinfo':
+    doTestInfo(zfile, setid)
+elif not setid and not getlist and not setids:
     doListTests(zfile, type, datelimit, branch, machine, testname, graphby)
 elif setids and not getlist:
     doSendAllResults(zfile,setids)
