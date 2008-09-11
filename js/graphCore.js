@@ -132,9 +132,6 @@ function initGraphCore(useDiscrete)
 
     $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged", onSmallGraphSelectionChanged);
     $(BigPerfGraph.eventTarget).bind("graphCursorMoved", onCursorMoved);
-    $("#autoscalecheckbox").click(function() {
-        BigPerfGraph.autoScaleYAxis = this.checked ? true : false;
-    });
 }
 
 //
