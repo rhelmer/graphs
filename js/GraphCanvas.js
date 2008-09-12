@@ -55,7 +55,8 @@ Graph.prototype = {
     endTime: null,
     offsetTime: 0,
     //this offsetTime is used in DiscreteGraphs to draw bar graphs
-
+    zoomed: false,
+    
     borderTop: 1,
     borderLeft: 1,
 
@@ -244,14 +245,44 @@ Graph.prototype = {
                 Array.splice(this.dataSets, i, 1);
                 Array.splice(this.dataSetIndices, i, 1);
                 Array.splice(this.dataSetMinMaxes, i, 1);
-
-                this.dirty = true;
-                return;
             }
         }
+
+        
+        
+        if(this.dataSets.length == 0) {
+            this.selectionType = null;
+            this.selectionStartTime = null;
+            this.selectionEndTime = null;
+        }
+        
+        this.autoScale();
+        this.redraw();
+        this.dirty = true;
+        if(!this.zoomed || this.dataSets.length == 0) {
+           this.resetEndTime(); 
+        }
+        
+    },
+    
+    resetEndTime: function() {
+        var endTime = 0;
+        
+        for each (var dataset in this.dataSets) {
+            if(dataset.lastTime > endTime) {
+                endTime = dataset.lastTime;
+            }
+        }
+        
+        if(endTime == 0) {
+            endTime = null;
+        }
+        
+        this.setTimeRange(0, endTime, true);
     },
 
     clearDataSets: function () {
+        this.zoomed = false;
         this.dataSets = new Array();
         this.dataSetMinMaxes = new Array();
         this.dataSetIndices = new Array();
@@ -259,10 +290,14 @@ Graph.prototype = {
         this.dirty = true;
     },
 
-    setTimeRange: function (start, end) {
+    setTimeRange: function (start, end, reset) {
+        if(!reset) {
+            this.zoomed = true;
+        }
+        
         this.startTime = start;
         this.endTime = end;
-
+        
         this.dirty = true;
     },
 
@@ -684,17 +719,19 @@ Graph.prototype = {
             // them
             var startIdx = this.dataSetIndices[0][0];
             var endIdx = this.dataSetIndices[0][1];
+            
+            for (var i = 0; i < this.dataSetIndices.length; i++) {
+                if(this.dataSetIndices[i][1] > endIdx) {
+                    endIdx = this.dataSetIndices[i][1];
+                }
+            }
+            
 
             // the fill styles we'll use for each graph
             var fillStyles = [];
 
             for (var i = 0; i < this.dataSets.length; i++) {
                 fillStyles.push(colorToRgbString(this.dataSets[i].color));
-
-                if (this.dataSetIndices[i][0] > startIdx)
-                    startIdx = this.dataSetIndices[i][0];
-                if (this.dataSetIndices[i][1] < endIdx)
-                    endIdx = this.dataSetIndices[i][1];
             }
 
             with (ctx) {
@@ -733,15 +770,18 @@ Graph.prototype = {
 
                     for (var i = 0; i < values.length; i++) {
                         var v = values[i][1];
-                        beginPath();
-                        moveTo(Math.round(lastT) + 0.25, zeroY);
-                        lineTo(Math.round(lastT) + 0.25, v);
-                        lineTo(Math.round(lastT + scaledOffset) - 0.25, v);
-                        lineTo(Math.round(lastT + scaledOffset) - 0.25, zeroY);
-                        closePath();
+                        if(v) {
+                            beginPath();
+                            moveTo(Math.round(lastT) + 0.25, zeroY);
+                            lineTo(Math.round(lastT) + 0.25, v);
+                            lineTo(Math.round(lastT + scaledOffset) - 0.25, v);
+                            lineTo(Math.round(lastT + scaledOffset) - 0.25, zeroY);
+                            closePath();
+
+                            fillStyle = fillStyles[values[i][0]];
+                            fill(); 
+                        }
                         
-                        fillStyle = fillStyles[values[i][0]];
-                        fill();
                     }
 
                     lastT += scaledOffset;
