@@ -223,7 +223,8 @@ function doAddTest(id, optSkipAnimation)
 
     gActiveTests.push(id);
     
-    if (t == null) {
+    if (t == null ||
+        (gGraphType == GRAPH_TYPE_SERIES && t.buildid == "")) {
         
         //Test was not initially loaded with first request, need to query the server to get more data
         var html = makeTestLoadingDiv(id);
@@ -322,6 +323,8 @@ function makeTestDiv(test, opts)
 {
     if (opts == null || typeof(opts) != "object")
         opts = {};
+    var buildid = getBuildIDFromSeriesTestList(test);
+
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\w-]/g, "");
     var html = "";
     html += "<div class='testline' id='testid" + test.tid + "'>";
@@ -337,7 +340,7 @@ function makeTestDiv(test, opts)
     html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span><br>";
     if (opts.showDate) {
         html += "<span class='test-extra-info'>" + formatTime(test.date) + "</span><br>";
-        html += "<span class='test-extra-info'>Build ID: " + test.buildid + "</span><br>";
+        html += "<span class='test-extra-info'>Build ID: " + buildid + "</span><br>";
     }
     html += "</td>";
 
@@ -392,7 +395,8 @@ function doAddWithDate(evt) {
     $("#datesel").empty();
     
     //Get testid, branch and machine, query server
-    Tinderbox.requestTestList(30, t.branch, t.machine, t.testname, function(data) {
+    Tinderbox.requestTestList(30, t.branch, t.machine, t.testname, true,
+			      function(data) {
          transformLegacySeriesData(data);
          for (var i = data.length - 1; i >= 0; --i) {
              //var d = allDateTests[i];
@@ -594,6 +598,21 @@ function transformLegacyData(testList)
 
 function makeSeriesTestKey(t) {
     return t.machine + branchFromData(t) + testFromData(t);
+}
+
+function getBuildIDFromSeriesTestList(t) {
+    var key = makeSeriesTestKey(t);
+    if (gSeriesTestList[key]) {
+        for (var i = 0; i < gSeriesTestList[key].length; i++) {
+	    if (t.date == gSeriesTestList[key][i].date) {
+                if (gSeriesTestList[key][i].buildid &&
+		    gSeriesTestList[key][i].buildid != "") {
+		    return gSeriesTestList[key][i].buildid;
+		}
+	    }
+	}
+    }
+    return "undefined";
 }
 
 function transformLegacySeriesData(testList)
@@ -919,7 +938,7 @@ function handleLoad()
     } else if (gGraphType == GRAPH_TYPE_SERIES) {
         $("#bonsaispan").hide();
 
-        Tinderbox.requestTestList(30 /* days */, null, null, null,
+        Tinderbox.requestTestList(30 /* days */, null, null, null, false,
                                     function (tests) {
                                         transformLegacySeriesData(tests);
                                         populateFilters();
