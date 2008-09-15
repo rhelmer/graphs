@@ -38,7 +38,7 @@ var gSeriesTestList = {};
 var gSeriesDialogShownForTestId = -1;
 
 var gActiveTests = [];
-
+var quickList = {};
 var gPostDataLoadFunction = null;
 
 // 2 weeks
@@ -213,41 +213,95 @@ function doAddTest(id, optSkipAnimation)
         $("#activetests #testid" + id).fadeIn(300);
         return;
     }
-
+    
     var t = findTestById(id);
-    if (t == null)
-	return;
-
-    gActiveTests.push(id);
-
+    var color = randomColor();
     var opts = { active: true };
+    
     if (gGraphType == GRAPH_TYPE_SERIES)
         opts.showDate = true;
 
-    var html = makeTestDiv(t, opts);
+    gActiveTests.push(id);
+    
+    if (t == null ||
+        (gGraphType == GRAPH_TYPE_SERIES && t.buildid == "")) {
+        
+        //Test was not initially loaded with first request, need to query the server to get more data
+        var html = makeTestLoadingDiv(id);
+        $("#activetests").append(html);
+        $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
+        
+        $.getJSON(getdatacgi + 'action=testinfo&setid='+id, function(data) {
+            if(data.test.id) {
+                addTestToGraph(id, function(ds) {
+                    transformLegacySeriesData([data.test]);
 
-    $("#activetests").append(html);
-    if (!optSkipAnimation) {
-        $("#activetests #testid" + id).hide();
-        $("#activetests #testid" + id).fadeIn(300);
-    }
+                    var test = findTestById(id);
+                    var html = makeTestDiv(test, opts);
 
-    $("#activetests #testid" + id + " .throbber")[0].setAttribute("loading", "true");
-    $("#activetests #testid" + id + " .removecell").click(
-        function(evt) {
-            var tid = testIdFromElement(this);
-            doRemoveTest(parseInt(tid));
+                    $("#activetests #testid" + id).replaceWith(html);
+                    $("#activetests #testid" + id + " .throbber")[0].removeAttribute("loading");
+                    $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
+                    $("#activetests #testid" + id + " .removecell").click(
+                        function(evt) {
+                            var tid = testIdFromElement(this);
+                            doRemoveTest(parseInt(tid));
+                        }
+                    );
+
+                    ds.color = color;
+                    updateLinks();
+                });
+            } else {
+                $("#activetests #testid" + id).remove();
+            }
+        });
+    } else {
+
+        var html = makeTestDiv(t, opts);
+
+        $("#activetests").append(html);
+        if (!optSkipAnimation) {
+            $("#activetests #testid" + id).hide();
+            $("#activetests #testid" + id).fadeIn(300);
         }
-    );
 
-    var color = randomColor();
-    $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
-    addTestToGraph(id, function(ds) {
-                       $("#activetests #testid" + id + " .throbber")[0].removeAttribute("loading");
-                       ds.color = color;
-                  });
+        $("#activetests #testid" + id + " .throbber")[0].setAttribute("loading", "true");
+        $("#activetests #testid" + id + " .removecell").click(
+            function(evt) {
+                var tid = testIdFromElement(this);
+                doRemoveTest(parseInt(tid));
+            }
+        );
 
-    updateLinks();
+        $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
+        addTestToGraph(id, function(ds) {
+                           $("#activetests #testid" + id + " .throbber")[0].removeAttribute("loading");
+                           ds.color = color;
+                      });
+        updateLinks();
+    }
+}
+
+function makeTestLoadingDiv(id) {
+    var html = "";
+    html += "<div class='testline' id='testid" + id + "'>";
+    html += "<table><tr>";
+
+    // Show the color cell on the left, if this is an active test
+
+    html += "<td class='colorcell'><div style='width: 1em; height: 10px;'></div></td>";
+
+    // The body content of the test entry
+    html += "<td class='testmain' width='100%'>";
+    html += "<b class='test-name'>Loading test " + id + "</b><br>";
+    
+    // any trailing buttons/throbbers/etc.
+    html += "<td style='white-space: nowrap'>";
+    html += "<div class='iconcell'><img src='images/throbber-small.gif'></div><div class='iconcell removecell'></div>";    
+    html += "</td></tr></table></div>";
+
+    return html;
 }
 
 function makeTestNameHtml(tname)
@@ -269,6 +323,7 @@ function makeTestDiv(test, opts)
 {
     if (opts == null || typeof(opts) != "object")
         opts = {};
+    var buildid = getBuildIDFromSeriesTestList(test);
 
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\w-]/g, "");
     var html = "";
@@ -285,7 +340,7 @@ function makeTestDiv(test, opts)
     html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span><br>";
     if (opts.showDate) {
         html += "<span class='test-extra-info'>" + formatTime(test.date) + "</span><br>";
-        html += "<span class='test-extra-info'>Build ID: " + test.buildid + "</span><br>";
+        html += "<span class='test-extra-info'>Build ID: " + buildid + "</span><br>";
     }
     html += "</td>";
 
@@ -340,7 +395,8 @@ function doAddWithDate(evt) {
     $("#datesel").empty();
     
     //Get testid, branch and machine, query server
-    Tinderbox.requestTestList(30, t.branch, t.machine, t.testname, function(data) {
+    Tinderbox.requestTestList(30, t.branch, t.machine, t.testname, true,
+			      function(data) {
          transformLegacySeriesData(data);
          for (var i = data.length - 1; i >= 0; --i) {
              //var d = allDateTests[i];
@@ -544,18 +600,24 @@ function makeSeriesTestKey(t) {
     return t.machine + branchFromData(t) + testFromData(t);
 }
 
+function getBuildIDFromSeriesTestList(t) {
+    var key = makeSeriesTestKey(t);
+    if (gSeriesTestList[key]) {
+        for (var i = 0; i < gSeriesTestList[key].length; i++) {
+	    if (t.date == gSeriesTestList[key][i].date) {
+                if (gSeriesTestList[key][i].buildid &&
+		    gSeriesTestList[key][i].buildid != "") {
+		    return gSeriesTestList[key][i].buildid;
+		}
+	    }
+	}
+    }
+    return "undefined";
+}
+
 function transformLegacySeriesData(testList)
 {
     //log(testList.toSource());
-
-    gTestList = [];
-    if(!gAllTestsList) {
-        gAllTestsList = [];
-    }
-        
-    gSeriesTestList = {};
-
-    var quickList = {};
 
     for (var i = 0; i < testList.length; i++) {
         var t = testList[i];
@@ -751,7 +813,7 @@ function initOptions()
 
     if ("show" in qsdata) {
         var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
-
+ 
         loadFunctions.push (function() {
                 for (var i = 0; i < ids.length; i++)
                     doAddTest(ids[i], true);
@@ -876,7 +938,7 @@ function handleLoad()
     } else if (gGraphType == GRAPH_TYPE_SERIES) {
         $("#bonsaispan").hide();
 
-        Tinderbox.requestTestList(30 /* days */, null, null, null,
+        Tinderbox.requestTestList(30 /* days */, null, null, null, false,
                                     function (tests) {
                                         transformLegacySeriesData(tests);
                                         populateFilters();

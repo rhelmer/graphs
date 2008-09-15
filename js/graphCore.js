@@ -132,6 +132,9 @@ function initGraphCore(useDiscrete)
 
     $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged", onSmallGraphSelectionChanged);
     $(BigPerfGraph.eventTarget).bind("graphCursorMoved", onCursorMoved);
+    $("#autoscalecheckbox").click(function() {
+        BigPerfGraph.autoScaleYAxis = this.checked ? true : false;
+    });
 }
 
 //
@@ -187,14 +190,17 @@ function removeTestFromGraph(tid, cb) {
         return;
 
     var ds = CurrentDataSets[tid];
-
+    delete CurrentDataSets[tid];
+    
+    
     for each (var g in [BigPerfGraph, SmallPerfGraph]) {
         g.removeDataSet(ds);
         g.autoScale();
         g.redraw();
     }
 
-    delete CurrentDataSets[tid];
+    
+    
     syncDerived();
 }
 
@@ -295,6 +301,7 @@ function zoomToTimes(t1, t2, skipAutoScale) {
     {
         SmallPerfGraph.selectionStartTime = null;
         SmallPerfGraph.selectionEndTime = null;
+        BigPerfGraph.zoomed = false;
     } else {
         // make sure that there are at least two points
         // on at least one graph for this

@@ -65,6 +65,20 @@ def doError(errCode):
         errString = "bad test name"
     print "{ resultcode: " + str(errCode) + ", error: '" + errString + "' }"
 
+def doTestInfo(fo, id):
+    cur = db.cursor()
+    row = {}
+    cur.execute("SELECT dataset_info.*, dataset_branchinfo.branchid FROM dataset_info JOIN dataset_branchinfo ON dataset_branchinfo.dataset_id = dataset_info.id WHERE dataset_info.id= ? LIMIT 1", (id,))
+    
+    if cur.rowcount == 1:
+        row = cur.fetchone()
+        testinfo = {"id": row[0],"machine": row[2],"test": row[3],"extra_data": row[5],"branch": row[6], "date":row[7], "buildid":row[8]}
+    else:
+        testinfo = {}
+        
+    fo.write(json.write({"resultcode":0, "test":testinfo}))
+
+
 def doGetList(fo, type, branch, machine, testname):
     results = []
     s1 = ""
@@ -95,12 +109,17 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
    
     cur = db.cursor()
     if graphby and graphby == 'bydata':
-        cur.execute("SELECT DISTINCT(di.id), di.machine, di.test, di.test_type, dataset_extra_data.data, di.extra_data, di.branch FROM dataset_extra_data JOIN dataset_info di ON dataset_extra_data.dataset_id = dataset_info.id WHERE di.type = ? AND di.test_type != ? and (di.date >= ?) " + s1 + " AND di.id=dbi.dataset_id GROUP BY machine,test,test_type,dataset_extra_data.data, extra_data, branch", (type, "baseline", datelimit))
+        cur.execute("SELECT id, machine, test, test_type, dataset_extra_data.data, extra_data, branch FROM dataset_extra_data JOIN dataset_info di ON dataset_extra_data.dataset_id = dataset_info.id WHERE type = ? AND test_type != ? AND (date >= ?) " + s1 + " GROUP BY machine,test,test_type,dataset_extra_data.data, extra_data, branch", (type, "baseline", datelimit))
+    elif type == 'discrete' and graphby and graphby == 'buildid':
+        cur.execute("SELECT DISTINCT(di.id), di.machine, di.test, di.test_type, di.date, di.extra_data, di.branch, dbi.branchid FROM dataset_info di LEFT JOIN dataset_branchinfo dbi ON di.id=dbi.dataset_id WHERE type = ? AND test_type != ? AND (date >= ?)" + s1 + " ORDER BY di.date ASC", (type, "baseline", datelimit))
     elif type == 'discrete' and not branch and not machine and not testname:
-        cur.execute("SELECT DISTINCT(di.id), di.machine, di.test, di.test_type, MAX(di.date), di.extra_data, di.branch, dbi.branchid FROM dataset_info di LEFT JOIN dataset_branchinfo dbi ON di.id=dbi.dataset_id WHERE di.type = ? and di.test_type != ? and (di.date >= ?) GROUP BY di.machine, di.branch, di.test" + s1, (type, "baseline", datelimit))
+        cur.execute("SELECT MAX(id), machine, test, test_type, MAX(date), extra_data, branch FROM dataset_info WHERE type = ? AND test_type != ? AND (date >= ?) "  + s1 + " GROUP BY machine, branch, test", (type, "baseline", datelimit))
     else:
-        cur.execute("SELECT DISTINCT(di.id), di.machine, di.test, di.test_type, di.date, di.extra_data, di.branch, dbi.branchid FROM dataset_info di LEFT JOIN dataset_branchinfo dbi ON di.id=dbi.dataset_id WHERE di.type = ? AND di.test_type != ? and (di.date >= ?)" + s1, (type, "baseline", datelimit))
+        cur.execute("SELECT id, machine, test, test_type, date, extra_data, branch FROM dataset_info WHERE type = ? AND test_type != ? AND (date >= ?)" + s1, (type, "baseline", datelimit))
     for row in cur:
+        buildid = ""
+        if len(row) == 8:
+            buildid = row[7]
         if graphby and graphby == 'bydata':
             results.append( {"id": row[0],
                              "machine": row[1],
@@ -108,7 +127,9 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
                              #"test_type": row[3],
                              "data": row[4],
                              "extra_data": row[5],
-                             "branch": row[6]})
+                             "branch": row[6],
+                             "buildid": buildid})
+
         else:
             results.append( {"id": row[0],
                              "machine": row[1],
@@ -117,7 +138,7 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
                              "date": row[4],
                              "extra_data": row[5],
                              "branch": row[6],
-                             "buildid": row[7]})
+                             "buildid": buildid})
 
     cur.close()
     fo.write (json.write( {"resultcode": 0, "results": results} ))
@@ -291,7 +312,7 @@ except:
 form = cgi.FieldStorage()
 
 #make sure that we are getting clean data from the user
-for strField in ["type", "machine", "branch", "test", "graphby","extradata","setids"]:
+for strField in ["type", "machine", "branch", "test", "graphby","extradata","setids", "action"]:
     val = form.getfirst(strField)
     if strField == "test":
         strField = "testname"
@@ -315,7 +336,9 @@ zfile = zbuf
 if doGzip == 1:
     zfile = gzip.GzipFile(mode = 'wb', fileobj = zbuf, compresslevel = 5)
 
-if not setid and not getlist and not setids:
+if action == 'testinfo':
+    doTestInfo(zfile, setid)
+elif not setid and not getlist and not setids:
     doListTests(zfile, type, datelimit, branch, machine, testname, graphby)
 elif setids and not getlist:
     doSendAllResults(zfile,setids)

@@ -220,7 +220,7 @@ DiscreteTinderboxData.prototype = {
     init: function () {
     },
     
-    requestTestList: function (limitDate, branch, machine, testname, callback) {
+    requestTestList: function (limitDate, branch, machine, testname, getBuildID, callback) {
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
         var limiters = "";
@@ -237,6 +237,9 @@ DiscreteTinderboxData.prototype = {
         if (branch != null) limiters += "&branch=" + branch;
         if (machine != null) limiters += "&machine=" + machine;
         if (testname != null) limiters += "&test=" + testname;
+
+        if (getBuildID) limiters += "&graphby=buildid";
+
         //log("drequestTestList: " + getdatacgi + "type=discrete&datelimit=" + tDate + limiters);
         $.getJSON(getdatacgi + "type=discrete&datelimit=" + tDate + limiters,
             function (obj) {
