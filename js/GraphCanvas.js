@@ -1355,6 +1355,7 @@ Graph.prototype = {
 
             pointTime = this.dataSets[nearestDSIndex].data[nearestPointIndex*2] + this.offsetTime / 2.0;
             pointValue = this.dataSets[nearestDSIndex].data[nearestPointIndex*2 + 1];
+            var displayTime = this.offsetTime != 0 ? nearestPointIndex : pointTime;
         }
 
         this.cursorTime = pointTime;
@@ -1370,7 +1371,7 @@ Graph.prototype = {
           }
         }
 
-        $(this.eventTarget).trigger("graphCursorMoved", [this.cursorTime, this.cursorValue, extra_data]);
+        $(this.eventTarget).trigger("graphCursorMoved", [displayTime, this.cursorValue, extra_data]);
 
         this.redrawOverlayOnly();
     },
