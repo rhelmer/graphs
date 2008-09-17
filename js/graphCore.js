@@ -134,6 +134,8 @@ function initGraphCore(useDiscrete)
     $(BigPerfGraph.eventTarget).bind("graphCursorMoved", onCursorMoved);
     $("#autoscalecheckbox").click(function() {
         BigPerfGraph.autoScaleYAxis = this.checked ? true : false;
+        BigPerfGraph.autoScale();
+        BigPerfGraph.redraw();
     });
 }
 
