@@ -507,7 +507,7 @@ Graph.prototype = {
         var xoffs = this.startTime;
         var yoffs = this.yOffset;
 
-        var xscale = cw / (this.endTime - this.startTime + this.offsetTime);
+        var xscale = cw / (this.endTime - this.startTime);
 
         if (this.endTime == this.startTime) {
             // we have just one point
