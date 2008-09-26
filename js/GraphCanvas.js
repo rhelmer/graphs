@@ -506,7 +506,7 @@ Graph.prototype = {
 
         var xoffs = this.startTime;
         var yoffs = this.yOffset;
-
+        
         var xscale = cw / (this.endTime - this.startTime);
 
         if (this.endTime == this.startTime) {
@@ -854,7 +854,8 @@ Graph.prototype = {
                 lineTo(cw+0.5, v+0.5);
                 stroke();
 
-                v = Math.round((this.cursorTime-this.startTime) * cw/(this.endTime - this.startTime + this.offsetTime));
+                v = Math.round((this.cursorTime-this.startTime ) * cw/(this.endTime - this.startTime));
+
                 beginPath();
                 moveTo(v+0.5,   -0.5);
                 lineTo(v+0.5, ch+0.5);
@@ -1316,12 +1317,14 @@ Graph.prototype = {
         var pos = $(this.frontBuffer).offset();
         pos.left = pos.left + this.borderLeft;
         pos.top = pos.top + this.borderTop;
-        var secondsPerPixel = (this.endTime - this.startTime + this.offsetTime) / this.frontBuffer.width;
+
+        var secondsPerPixel = (this.endTime - this.startTime) / this.frontBuffer.width;
+
         var valuesPerPixel = 1.0 / this.yScale;
 
         var pointTime = (event.pageX - pos.left) * secondsPerPixel + this.startTime;
         var pointValue = (this.frontBuffer.height - (event.pageY - pos.top)) * valuesPerPixel + this.yOffset;
-
+        
         var snapToPoints = (this.cursorType == "snap");
 
         if (snapToPoints && this.dataSets.length > 0) {
@@ -1355,6 +1358,7 @@ Graph.prototype = {
 
             pointTime = this.dataSets[nearestDSIndex].data[nearestPointIndex*2] + this.offsetTime / 2.0;
             pointValue = this.dataSets[nearestDSIndex].data[nearestPointIndex*2 + 1];
+
             var displayTime = this.offsetTime != 0 ? nearestPointIndex : pointTime;
         }
 
