@@ -202,6 +202,26 @@ function findTestById(id) {
     return null;
 }
 
+/*
+    Depending on what data was passed in through the url, we may be searching for a
+    discrete or continuous test.
+*/
+function searchAndAddTest(testname, machine, date, branch) {
+    
+    if(!branch) {
+        branch = '';
+        var action = 'finddiscretetestid';
+    } else {
+        date = '';
+        var action = 'findcontinuoustestid';
+    }
+    
+    $.getJSON(getdatacgi+ 'action='+action+'&test='+testname+'&date='+date+'&machine='+machine+'&branch='+branch, function(data) {
+        doAddTest(data.test.id);
+    });
+}
+
+
 function doAddTest(id, optSkipAnimation)
 {
     if (typeof(id) != "number")
@@ -826,7 +846,9 @@ function initOptions()
                }
         });
     }
-
+    
+    
+    
     if ("show" in qsdata) {
         var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
  
@@ -855,7 +877,13 @@ function initOptions()
         $("#avgcheckbox")[0].checked = true;
         showAverages(true);
     }
-
+    
+    if("testname" in qsdata) {
+        loadFunctions.push(function() {
+            searchAndAddTest(qsdata['testname'], qsdata['machine'] ,qsdata['date'], qsdata['branch']);
+        });
+    }
+    
     if (loadFunctions.length) {
         gPostDataLoadFunction = function () {
             for (var i = 0; i < loadFunctions.length; i++)
@@ -951,6 +979,7 @@ function handleLoad()
                     gPostDataLoadFunction = null;
                 }
             });
+            
     } else if (gGraphType == GRAPH_TYPE_SERIES) {
         $("#bonsaispan").hide();
 

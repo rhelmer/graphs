@@ -253,3 +253,8 @@ select {
   font-style: italic;
   font-size: smaller;
 }
+
+#continous-menu, #discrete-menu {
+    display: none;
+    font-size: 81%;
+}

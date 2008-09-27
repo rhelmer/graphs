@@ -634,7 +634,11 @@ Graph.prototype = {
                     if (endIdx < ((this.dataSets[i].data.length)/2)) endIdx++;
 
                     save();
-                    scale(xscale, -this.yScale);
+                    try {
+                        scale(xscale, -this.yScale);
+                    } catch(e) {
+                        
+                    }
                     translate(0, -ch/this.yScale);
 
                     beginPath();
@@ -1326,6 +1330,7 @@ Graph.prototype = {
         var pointValue = (this.frontBuffer.height - (event.pageY - pos.top)) * valuesPerPixel + this.yOffset;
         
         var snapToPoints = (this.cursorType == "snap");
+        var nearestDSIndex = null;
 
         if (snapToPoints && this.dataSets.length > 0) {
             // find the nearest point to (pointTime, pointValue) in all the datasets
@@ -1361,23 +1366,26 @@ Graph.prototype = {
 
             var displayTime = this.offsetTime != 0 ? nearestPointIndex : pointTime;
         }
+        
+        if(this.dataSets.length > 0) {
+            this.cursorTime = pointTime;
+            this.cursorValue = pointValue;
 
-        this.cursorTime = pointTime;
-        this.cursorValue = pointValue;
-
-        //for adding extra_data variable to the status line 
-        var extra_data = "";
-        for (var i = 0; i < this.dataSets.length; i++) {
-          if (this.dataSets[i].rawdata) {
-            if (Math.floor(this.cursorTime)*2+1 < this.dataSets[i].rawdata.length) {
-              extra_data += this.dataSets[i].rawdata[Math.floor(this.cursorTime)*2+1] + " ";
+            //for adding extra_data variable to the status line 
+            var extra_data = "";
+            for (var i = 0; i < this.dataSets.length; i++) {
+              if (this.dataSets[i].rawdata) {
+                if (Math.floor(this.cursorTime)*2+1 < this.dataSets[i].rawdata.length) {
+                  extra_data += this.dataSets[i].rawdata[Math.floor(this.cursorTime)*2+1] + " ";
+                }
+              }
             }
-          }
+
+            $(this.eventTarget).trigger("graphCursorMoved", [displayTime, this.cursorValue, extra_data, this.dataSets[nearestDSIndex].tid]);
+
+            this.redrawOverlayOnly(); 
         }
-
-        $(this.eventTarget).trigger("graphCursorMoved", [displayTime, this.cursorValue, extra_data]);
-
-        this.redrawOverlayOnly();
+        
     },
 
     cursorMouseOut: function (event) {
