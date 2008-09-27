@@ -63,7 +63,7 @@ TinderboxData.prototype = {
     testData: null,
 
     defaultLoadRange: null,
-    raw: 0,
+    raw: 1,
 
     init: function () {
         // create an element to use as the event target
