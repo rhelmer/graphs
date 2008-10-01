@@ -78,6 +78,31 @@ def doTestInfo(fo, id):
         
     fo.write(json.write({"resultcode":0, "test":testinfo}))
 
+def doFindDiscreteTest(fo, testname, date, machine):
+    cur = db.cursor()
+    row = {}
+    cur.execute("SELECT id FROM dataset_info WHERE test=? AND date=? AND machine=?", (testname,date, machine))
+
+    if cur.rowcount == 1:
+        row = cur.fetchone()
+        test = {"id": row[0]}
+    else:
+        test = {}
+        
+    fo.write(json.write({"resultcode":0, "test":test}))
+    
+def doFindContinuousTest(fo, testname, machine, branch):
+    cur = db.cursor()
+    row = {}
+    cur.execute("SELECT id FROM dataset_info WHERE test=? AND machine=? AND branch=?", (testname,machine, branch))
+
+    if cur.rowcount == 1:
+        row = cur.fetchone()
+        test = {"id": row[0]}
+    else:
+        test = {}
+        
+    fo.write(json.write({"resultcode":0, "test":test}))
 
 def doGetList(fo, type, branch, machine, testname):
     results = []
@@ -141,6 +166,7 @@ def doListTests(fo, type, datelimit, branch, machine, testname, graphby):
                              "buildid": buildid})
 
     cur.close()
+
     fo.write (json.write( {"resultcode": 0, "results": results} ))
 
 
@@ -321,7 +347,7 @@ for strField in ["type", "machine", "branch", "test", "graphby","extradata","set
         sys.exit(500)
     globals()[strField] = val
 
-for numField in ["setid", "raw", "starttime", "endtime", "datelimit", "getlist"]:
+for numField in ["setid", "raw", "starttime", "endtime", "datelimit", "getlist", "date"]:
     val = form.getfirst(numField)
     if not checkNumber(val):
         print "Invalid string arg: ", numField, " '" + val + "'"
@@ -338,6 +364,10 @@ if doGzip == 1:
 
 if action == 'testinfo':
     doTestInfo(zfile, setid)
+elif action == 'finddiscretetestid':
+    doFindDiscreteTest(zfile, testname, date, machine)
+elif action =='findcontinuoustestid':
+    doFindContinuousTest(zfile, testname, machine, branch)
 elif not setid and not getlist and not setids:
     doListTests(zfile, type, datelimit, branch, machine, testname, graphby)
 elif setids and not getlist:

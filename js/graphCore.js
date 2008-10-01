@@ -48,6 +48,8 @@ var gOptions = {
 var gDerivedTypeVisible = "none";
 var gAutoScale = true;
 var gShowFloater = true;
+var mouseoverDate = false;
+var mouseoverTest = false;
 
 function initGraphCore(useDiscrete)
 {
@@ -59,12 +61,32 @@ function initGraphCore(useDiscrete)
         Tinderbox = new DiscreteTinderboxData();
         SmallPerfGraph = new DiscreteGraph("smallgraph");
         BigPerfGraph = new DiscreteGraph("graph");
+        $('#graph').contextMenu('discrete-menu', {
+            bindings: {
+                'view': function(t) {
+                    goToContinuousGraph();
+                }
+            },
+            menuStyle: {
+                    width:'300px'
+            }
+        });
+
     } else {
         Tinderbox = new TinderboxData();
         SmallPerfGraph = new CalendarTimeGraph("smallgraph");
         BigPerfGraph = new CalendarTimeGraph("graph");
-
         BigPerfGraph.drawPoints = true;
+        $('#graph').contextMenu('continous-menu', {
+            bindings: {
+                'view': function(t) {
+                    goToDiscreteGraph();
+                }
+            },
+            menuStyle: {
+                width:'300px'
+            }
+        });
     }
 
     // handle saved options
@@ -134,6 +156,8 @@ function initGraphCore(useDiscrete)
     $(BigPerfGraph.eventTarget).bind("graphCursorMoved", onCursorMoved);
     $("#autoscalecheckbox").click(function() {
         BigPerfGraph.autoScaleYAxis = this.checked ? true : false;
+        BigPerfGraph.autoScale();
+        BigPerfGraph.redraw();
     });
 }
 
@@ -161,7 +185,8 @@ function addTestToGraph(tid, cb) {
 
             CurrentDataSets[tid] = ds;
             syncDerived();
-
+            ds.tid = testid;
+            
             for each (var g in [BigPerfGraph, SmallPerfGraph]) {
                 g.addDataSet(ds);
 
@@ -232,7 +257,7 @@ function onSmallGraphSelectionChanged(event, selectionType, arg1, arg2) {
     }
 }
 
-function onCursorMoved(event, time, val, extra_data) {
+function onCursorMoved(event, time, val, extra_data, tid) {
     if (time == null || val == null) {
         showStatus(null);
         showFloater(null);
@@ -243,13 +268,27 @@ function onCursorMoved(event, time, val, extra_data) {
         showFloater(null);
 
     if (GraphIsSeries) {
+        mouseoverTest = tid;
+        
         showStatus("Index: " + time + " Value: " + val.toFixed(2) + " " + extra_data);
         if (gShowFloater)
             showFloater(time, val);
     } else {
+        mouseoverDate = time;
+        mouseoverTest = tid;
         showStatus("Date: " + formatTime(time) + " Value: " + val.toFixed(2));
         if (gShowFloater)
             showFloater(time, val);
+    }
+    updateContextMenu(tid);
+}
+
+function updateContextMenu(tid) {
+    if(tid) {
+        var test = findTestById(tid);
+        var selector = GraphIsSeries ? "#discrete-menu #view" :"#continous-menu #view";
+        var text = GraphIsSeries ? "View continuous test for "+ test.test + " on "+ test.machine : "View discrete test for "+ test.test + " on "+ test.machine;
+        $(selector).html(text);
     }
 }
 
@@ -601,6 +640,22 @@ function syncDerived(newType)
 
         delete CurrentDerivedDataSets[tid];
     }
+}
+
+function goToDiscreteGraph() {
+    var test = findTestById(mouseoverTest);
+    var testname = test.testname.replace('_avg', '');
+    var url = '#type=series&testname='+testname+'&date='+mouseoverDate+'&machine='+test.machine;
+    window.location.hash = url;
+    window.location.reload();
+}
+
+function goToContinuousGraph() {
+    var test = findTestById(mouseoverTest);
+    var testname = test.testname + '_avg';
+    var url = '#testname='+testname+'&machine='+test.machine+"&branch="+test.branch;
+    window.location.hash = url;
+    window.location.reload();
 }
 
 if (!("log" in window)) {

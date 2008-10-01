@@ -202,6 +202,26 @@ function findTestById(id) {
     return null;
 }
 
+/*
+    Depending on what data was passed in through the url, we may be searching for a
+    discrete or continuous test.
+*/
+function searchAndAddTest(testname, machine, date, branch) {
+    
+    if(!branch) {
+        branch = '';
+        var action = 'finddiscretetestid';
+    } else {
+        date = '';
+        var action = 'findcontinuoustestid';
+    }
+    
+    $.getJSON(getdatacgi+ 'action='+action+'&test='+testname+'&date='+date+'&machine='+machine+'&branch='+branch, function(data) {
+        doAddTest(data.test.id);
+    });
+}
+
+
 function doAddTest(id, optSkipAnimation)
 {
     if (typeof(id) != "number")
@@ -536,28 +556,44 @@ function testFromData(t)
         'startup':                       'Ts',
         'testBulkAdd':                   'Bulk Add',
         'testBulkAdd_avg':               'Bulk Add',
+        'tdhtml':                        'DHTML',
         'tdhtml_avg':                    'DHTML',
+        'tgfx':                          'Tgfx',
         'tgfx_avg':                      'Tgfx',
+        'tjss':                          'Dromaeo',
         'tjss_avg':                      'Dromaeo',
+        'tp':                            'Tp3',
         'tp_avg':                        'Tp3',
+        'tp_js':                         'Tp2',
         'tp_js_avg':                     'Tp2',
+        'tp_js_loadtime':                'Tp2',
         'tp_js_loadtime_avg':            'Tp2',
+        'tp_js_Private Bytes':           'Tp2 (Mem-PB)',
         'tp_js_Private Bytes_avg':       'Tp2 (Mem-PB)',
+        'tp_js_RSS':                     'Tp2 (RSS)',
         'tp_js_RSS_avg':                 'Tp2 (RSS)',
+        'tp_loadtime':                   'Tp3',
         'tp_loadtime_avg':               'Tp3',
+        'tp_Percent Processor Time':     'Tp3 (CPU)',
         'tp_Percent Processor Time_avg': 'Tp3 (CPU)',
         'tp_Private Bytes':              'Tp3 (Mem-PB)',
         'tp_Private Bytes_avg':          'Tp3 (Mem-PB)',
         'tp_RSS':                        'Tp3 (RSS)',
         'tp_RSS_avg':                    'Tp3 (RSS)',
+        'tp_Working Set':                'Tp3 (Mem-WS)',
         'tp_Working Set_avg':            'Tp3 (Mem-WS)',
+        'tp_XRes':                       'Tp3 (XRes)',
         'tp_XRes_avg':                   'Tp3 (XRes)',
         'trace_malloc_allocs':           'Trace Malloc Allocs',
         'trace_malloc_leaks':            'Trace Malloc Leaks',
         'trace_malloc_maxheap':          'Trace Malloc Max Heap',
+        'ts':                            'Ts',
         'ts_avg':                        'Ts',
+        'tsspider':                      'SunSpider',
         'tsspider_avg':                  'SunSpider',
+        'tsvg':                          'Tsvg',
         'tsvg_avg':                      'Tsvg',
+        'twinopen':                      'Txul',
         'twinopen_avg':                  'Txul',
         'xulwinopen':                    'Txul',
     };
@@ -810,7 +846,9 @@ function initOptions()
                }
         });
     }
-
+    
+    
+    
     if ("show" in qsdata) {
         var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
  
@@ -839,7 +877,13 @@ function initOptions()
         $("#avgcheckbox")[0].checked = true;
         showAverages(true);
     }
-
+    
+    if("testname" in qsdata) {
+        loadFunctions.push(function() {
+            searchAndAddTest(qsdata['testname'], qsdata['machine'] ,qsdata['date'], qsdata['branch']);
+        });
+    }
+    
     if (loadFunctions.length) {
         gPostDataLoadFunction = function () {
             for (var i = 0; i < loadFunctions.length; i++)
@@ -935,6 +979,7 @@ function handleLoad()
                     gPostDataLoadFunction = null;
                 }
             });
+            
     } else if (gGraphType == GRAPH_TYPE_SERIES) {
         $("#bonsaispan").hide();
 
