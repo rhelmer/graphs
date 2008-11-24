@@ -43,6 +43,13 @@ function TimeDataSet(data) {
 TimeDataSet.prototype = {
     data: null,
 
+    lastIndex: function(startTime) {
+        if (this.data[this.data.length-2] < startTime) {
+            return (this.data.length/2) - 1;
+        }
+        return 0;
+    },
+
     indicesForTimeRange: function (startTime, endTime) {
         var startIndex = -1;
         var endIndex = -1;
@@ -68,9 +75,13 @@ TimeDataSet.prototype = {
     // if notExactOk is true.  If time is outside of the datasets range,
     // or if an exact match is found and requested, returns -1.
     indexForTime: function (time, notExactOk) {
-        if (time < this.data[0] ||
-            time > this.data[this.data.length - 2])
-            return -1;
+        if (time < this.data[0]) {
+            return 0;
+        }
+        if (time > this.data[this.data.length-2]) {
+            return (this.data.length/2) - 1;
+        }
+
 
         // this will find the first index whose time is nearest
         // to the given time
@@ -148,6 +159,14 @@ TimeValueDataSet.prototype = {
     minMaxValueForTimeRange: function (startTime, endTime) {
         var minValue = Number.POSITIVE_INFINITY;
         var maxValue = Number.NEGATIVE_INFINITY;
+        //use the last data point in the set if we are displaying a time after which there are no points 
+        if (startTime >= this.data[this.data.length-2]) {
+            return [this.data[this.data.length-1], this.data[this.data.length-1]]
+        }
+        //use the first data point in the set if we are displaying a time before which there are no points
+        if (endTime <= this.data[0]) { 
+            return [this.data[1], this.data[1]];
+        }
         for (var i = 0; i < this.data.length/2; i++) {
             var t = this.data[i*2];
             if (t >= startTime && t <= endTime) {

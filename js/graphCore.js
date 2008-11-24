@@ -269,8 +269,6 @@ function onCursorMoved(event, time, val, extra_data, tid) {
 
     if (GraphIsSeries) {
         mouseoverTest = tid;
-        
-        showStatus("Index: " + time + " Value: " + val.toFixed(2) + " " + extra_data);
         if (gShowFloater)
             showFloater(time, val);
     } else {
@@ -443,6 +441,7 @@ function showFloater(time, value) {
     }
 
     var s = "<table class='floater-table'>";
+    s += "<tr><td>Index:</td><td>" + time + "</td></tr>";
     for (var i = 0; i < dstv.length; i++) {
         s += "<tr style='color: " + colorToRgbString(dstv[i].color) + "'>";
         for (var j = 0; j < columns.length; j++) {

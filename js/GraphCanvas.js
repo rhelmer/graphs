@@ -70,6 +70,7 @@ Graph.prototype = {
 
     dataSets: null,
     dataSetIndices: null,
+    dataSetLastIndices: null,
     dataSetMinMaxes: null,
 
     dataSetMinMinVal: 0,
@@ -153,6 +154,7 @@ Graph.prototype = {
         this.dataSets = new Array();
         this.dataSetMinMaxes = new Array();
         this.dataSetIndices = new Array();
+        this.dataSetLastIndices = new Array();
 
         this.markers = new Array();
 
@@ -233,6 +235,7 @@ Graph.prototype = {
         }
 
         this.dataSets.push(ds);
+        this.dataSetLastIndices.push(null);
         this.dataSetIndices.push(null);
         this.dataSetMinMaxes.push(null);
 
@@ -244,6 +247,7 @@ Graph.prototype = {
             if (this.dataSets[i] == ds) {
                 Array.splice(this.dataSets, i, 1);
                 Array.splice(this.dataSetIndices, i, 1);
+                Array.splice(this.dataSetLastIndices, i, 1);
                 Array.splice(this.dataSetMinMaxes, i, 1);
             }
         }
@@ -286,6 +290,7 @@ Graph.prototype = {
         this.dataSets = new Array();
         this.dataSetMinMaxes = new Array();
         this.dataSetIndices = new Array();
+        this.dataSetLastIndices = new Array();
 
         this.dirty = true;
     },
@@ -373,6 +378,7 @@ Graph.prototype = {
     },
 
     recompute: function () {
+        this.dataSetLastIndices = []
         this.dataSetIndices = [];
         this.dataSetMinMaxes = [];
 
@@ -380,6 +386,7 @@ Graph.prototype = {
         var nonRelative = 0;
 
         for (var i = 0; i < this.dataSets.length; i++) {
+            this.dataSetLastIndices.push (this.dataSets[i].lastIndex(this.startTime));
             this.dataSetIndices.push (this.dataSets[i].indicesForTimeRange (this.startTime, this.endTime));
             this.dataSetMinMaxes.push (this.dataSets[i].minMaxValueForTimeRange (this.startTime, this.endTime));
 
@@ -587,6 +594,24 @@ Graph.prototype = {
             for (var i = 0; i < this.dataSets.length; i++) {
                 if (this.dataSetIndices[i] == null) {
                     // there isn't anything in the data set in the given time range
+                    if (this.dataSetLastIndices[i] == null) {
+                        continue;
+                    }
+                    with (ctx) {
+                        save();
+                        scale(xscale, -this.yScale);
+                        translate(0, -ch/this.yScale);
+
+                        beginPath();
+                        lineTo(0, this.dataSets[i].data[this.dataSetLastIndices[i]*2+1]-yoffs)
+                        lineTo(cw/xscale, this.dataSets[i].data[this.dataSetLastIndices[i]*2+1]-yoffs)
+                        // restore before calling stroke() so that we can
+                        // do a line width in absolute pixel size
+                        restore();
+                        lineWidth = 1.0;
+                        strokeStyle = colorToRgbString(this.dataSets[i].color);
+                        stroke();
+                    }
                     continue;
                 }
 
@@ -643,6 +668,7 @@ Graph.prototype = {
 
                     beginPath();
 
+                    lineTo(0, this.dataSets[i].data[0*2+1]-yoffs);
                     for (var j = startIdx; j < endIdx; j++)
                     {
                         var t = this.dataSets[i].data[j*2];
@@ -650,6 +676,7 @@ Graph.prototype = {
 
                         lineTo(t-xoffs, v-yoffs);
                     }
+                    lineTo(cw/xscale, this.dataSets[i].data[(endIdx -1)*2+1]-yoffs)
 
                     // restore before calling stroke() so that we can
                     // do a line width in absolute pixel size
