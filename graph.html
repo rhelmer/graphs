@@ -16,6 +16,7 @@
     <script type="text/javascript" src="jq/jquery.ui-1.0/ui.accordion.js"></script>
     <script type="text/javascript" src="jq/jquery.ui-1.0/ui.resizable.js"></script>
     <script type="text/javascript" src="jq/contextmenu.js"></script>
+    <script type="text/javascript" src="jq/jquery-cookie.js"></script>
     <link rel="stylesheet" type="text/css" href="jq/jquery.ui-1.0/themes/flora/flora.all.css">
 
     <!-- Core -->
@@ -37,9 +38,14 @@
 
   <body>
     <!-- Main contents -->
-
+    <p class="message">
+        Perftastic is being re-written, which may break dependent apps. <a href="https://wiki.mozilla.org/Perfomatic#Rearchitecture">More info</a>
+    
+    <a href="#" class="dontshow">Don't show this again</a>
+    </p>
     <table><tr>
     <td class="leftcolumncell">
+        
 	  <div class="gradbk">
     <div class="sectionheader"><span style="margin: auto" class="rightside smalllink"><img onclick="$('#testsel').slideToggle('fast')" src="images/wand.png"></span><span><div id="charttypeicon" class="iconcell" style="margin-right: 2px;"></div>Available Graphs</span></div>
 

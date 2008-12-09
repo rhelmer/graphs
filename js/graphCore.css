@@ -103,3 +103,14 @@
   color: blue;
   padding: 0px 3px 0px 3px;
 }
+
+.message {
+    margin: 0;
+    padding: 5px;
+    font-size: 91%;
+    background: #F4D701;
+}
+
+.dontshow {
+    float: right;
+}

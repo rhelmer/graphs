@@ -1021,3 +1021,13 @@ function handleLoad()
 }
 
 window.addEventListener("load", handleLoad, false);
+$("document").ready(function() {
+   if($.cookie("hidemessage")) {
+       $(".message").hide();
+   } else {
+       $(".dontshow").click(function() {
+          $(".message").hide();
+          $.cookie('hidemessage', true, {'path':'/', 'expires':90}); 
+       });
+   }
+});
