@@ -49,7 +49,6 @@ CREATE TABLE builds (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
    ref_build_id INT UNSIGNED,
    ref_changeset VARCHAR(255),
-   os_id TINYINT UNSIGNED NOT NULL,
    branch_id SMALLINT UNSIGNED NOT NULL,
    date_added INT UNSIGNED NOT NULL,
 
