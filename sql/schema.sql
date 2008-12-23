@@ -1,90 +1,113 @@
--- MySQL dump 10.9
---
--- Host: localhost    Database: o_graphs
--- ------------------------------------------------------
--- Server version	4.1.20
+DROP TABLE IF EXISTS machines;
+CREATE TABLE machines (
+   id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+   os_id INT UNSIGNED NOT NULL,
+   is_throttling TINYINT UNSIGNED NOT NULL DEFAULT '0',
+   cpu_speed SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+   name VARCHAR(255) NOT NULL,
+   is_active TINYINT UNSIGNED NOT NULL DEFAULT '0',
+   date_added INT UNSIGNED NOT NULL,
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+   PRIMARY KEY (id),
+   UNIQUE KEY (name)
+) ENGINE=InnoDB;
 
---
--- Table structure for table `annotations`
---
+DROP TABLE IF EXISTS os_list;
+CREATE TABLE os_list (
+   id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+   name VARCHAR(255) NOT NULL,
 
-DROP TABLE IF EXISTS `annotations`;
-CREATE TABLE `annotations` (
-  `dataset_id` int(11) default NULL,
-  `time` int(11) default NULL,
-  `value` varchar(255) default NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+   PRIMARY KEY (id),
+   UNIQUE KEY (name)
+) ENGINE=InnoDB;
 
---
--- Table structure for table `dataset_branchinfo`
---
+DROP TABLE IF EXISTS tests;
+CREATE TABLE tests (
+   id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+   name VARCHAR(255) NOT NULL,
+   pretty_name VARCHAR(255),
+   is_chrome TINYINT UNSIGNED NOT NULL DEFAULT '0',
+   is_active TINYINT UNSIGNED NOT NULL DEFAULT '0',
+   pageset_id INT UNSIGNED,
 
-DROP TABLE IF EXISTS `dataset_branchinfo`;
-CREATE TABLE `dataset_branchinfo` (
-  `dataset_id` int(11) default NULL,
-  `time` int(11) default NULL,
-  `branchid` varchar(255) default NULL,
-  KEY `datasets_branchinfo_id_idx` (`dataset_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+   PRIMARY KEY (id),
+   UNIQUE KEY (name),
+   KEY (pageset_id)
+) ENGINE=InnoDB;
 
---
--- Table structure for table `dataset_extra_data`
---
+DROP TABLE IF EXISTS branches;
+CREATE TABLE branches (
+   id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+   name VARCHAR(255) NOT NULL,
 
-DROP TABLE IF EXISTS `dataset_extra_data`;
-CREATE TABLE `dataset_extra_data` (
-  `dataset_id` int(11) default NULL,
-  `time` int(11) default NULL,
-  `data` text,
-  KEY `datasets_extradata_id_idx` (`dataset_id`),
-  KEY `datasets_extra_data_supplemental_idx` (`dataset_id`,`time`,`data`(255))
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+   PRIMARY KEY (id),
+   UNIQUE KEY (name)
+) ENGINE=InnoDB;
 
---
--- Table structure for table `dataset_info`
---
+DROP TABLE IF EXISTS builds;
+CREATE TABLE builds (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   ref_build_id INT UNSIGNED,
+   ref_changeset VARCHAR(255),
+   branch_id SMALLINT UNSIGNED NOT NULL,
+   date_added INT UNSIGNED NOT NULL,
 
-DROP TABLE IF EXISTS `dataset_info`;
-CREATE TABLE `dataset_info` (
-  `id` int(11) NOT NULL auto_increment,
-  `type` varchar(255) default NULL,
-  `machine` varchar(255) default NULL,
-  `test` varchar(255) default NULL,
-  `test_type` varchar(255) default NULL,
-  `extra_data` varchar(255) default NULL,
-  `branch` varchar(255) default NULL,
-  `date` int(11) default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+   PRIMARY KEY (id),
+   KEY (ref_changeset),
+   KEY (ref_build_id),
+   KEY (branch_id, date_added)
+) ENGINE=InnoDB;
 
---
--- Table structure for table `dataset_values`
---
+DROP TABLE IF EXISTS pagesets;
+CREATE TABLE pagesets (
+   id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+   name VARCHAR(255) NOT NULL,
 
-DROP TABLE IF EXISTS `dataset_values`;
-CREATE TABLE `dataset_values` (
-  `dataset_id` int(11) default NULL,
-  `time` int(11) default NULL,
-  `value` float default NULL,
-  KEY `datasets_id_idx` (`dataset_id`),
-  KEY `datasets_time_idx` (`time`),
-  KEY `datasets_time_id_idx` (`dataset_id`,`time`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+   PRIMARY KEY (id),
+   UNIQUE KEY (name)
+) ENGINE=InnoDB;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+DROP TABLE IF EXISTS pages;
+CREATE TABLE pages (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   pageset_id SMALLINT UNSIGNED NOT NULL,
+   name VARCHAR(255) NOT NULL,
 
+   PRIMARY KEY (id),
+   UNIQUE KEY (pageset_id, name)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS test_runs;
+CREATE TABLE test_runs (
+   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+   machine_id SMALLINT UNSIGNED NOT NULL,
+   test_id MEDIUMINT UNSIGNED NOT NULL,
+   build_id INT UNSIGNED NOT NULL,
+   run_number TINYINT UNSIGNED NOT NULL DEFAULT '0',
+   date_run INT UNSIGNED NOT NULL,
+   average FLOAT,
+
+   PRIMARY KEY (id),
+   UNIQUE KEY (machine_id, test_id, build_id, run_number),
+   KEY (machine_id, test_id, date_run)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS test_run_values;
+CREATE TABLE test_run_values (
+   test_run_id INT UNSIGNED NOT NULL,
+   interval_id SMALLINT UNSIGNED NOT NULL,
+   value FLOAT NOT NULL,
+   page_id INT UNSIGNED,
+
+   PRIMARY KEY (test_run_id, interval_id)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS annotations;
+CREATE TABLE annotations (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  test_run_id int UNSIGNED NOT NULL,
+  note text NOT NULL,
+  bug_id INT UNSIGNED NOT NULL,
+  
+  PRIMARY KEY (id)
+) ENGINE=InnoDB;
