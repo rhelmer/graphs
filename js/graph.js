@@ -515,6 +515,8 @@ function platformFromData(t)
 	if (m.indexOf('leopard') != -1 ||
 	    m.indexOf('os_x_10.5') != -1)
             return "MacOS X 10.5";	    
+        if (m.indexOf('n810') != -1)
+            return "Nokia N810";
     }
 
     return "Unknown";
