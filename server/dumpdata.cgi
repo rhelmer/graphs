@@ -52,6 +52,7 @@ def dumpData(fo, setid, starttime, endtime):
         values_s2 = " AND dataset_values.time <= " + endtime
 
     cur = db.cursor()
+    
     setid = ",".join(setid)
     fo.write("dataset,machine,branch,test,date\n")
     sql = """
@@ -145,6 +146,11 @@ if form.has_key('sel'):
 
 if form.has_key('show'):
     setid = form.getfirst('show').split(',')
+    for id in setid:
+        if not checkNumber(id):
+            print "Content-Type: text/plain\n"
+            print "Invalid id in show parameter\n"
+            sys.exit(500)
 
 if not setid:
     print "Content-Type: text/plain\n"
