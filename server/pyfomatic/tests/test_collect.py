@@ -238,7 +238,7 @@ def test_handleRequestValues01():
   s = StringIO.StringIO()
   exitCode = c.handleRequest(fakeForm, fakeCursor, c, s)
   value = s.getvalue()
-  assert value == "Content-type: text/plain\n\nRETURN:test_1:graph.html#runid=6667\nRETURN:test_1:2.00:graph.html#id=45&branchid=3455&machineid=234\n"
+  assert value == """Content-type: text/plain\n\nRETURN:test_1:graph.html#runid=6667\nRETURN:test_1:2.00:graph.html#[{"id":45,"branchid":3455,"machineid":234}]\n"""
   for testTuple, answerTuple in zip(fakeCursor.inserts["test_run_values"],valuesList1a):
     assert testTuple  == answerTuple
   assert fakeCursor.inTransaction == False
@@ -267,7 +267,7 @@ def test_handleRequestAverage01():
   s = StringIO.StringIO()
   exitCode = c.handleRequest(fakeForm, fakeCursor, c, s)
   value = s.getvalue()
-  assert value == "Content-type: text/plain\n\nRETURN:test_1:2.00:graph.html#id=45&branchid=3455&machineid=234\n"
+  assert value == """Content-type: text/plain\n\nRETURN:test_1:2.00:graph.html#[{"id":45,"branchid":3455,"machineid":234}]\n"""
   assert fakeCursor.inTransaction == False
   assert exitCode == None
 
