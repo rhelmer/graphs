@@ -230,7 +230,7 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
       responseList.append("RETURN:%s:graph.html#runid=%d" % (metadata.test_name, metadata.test_run_id))
     else:
       average = averageReader(databaseCursor, databaseModule, inputStream, metadata)
-    responseList.append("""RETURN:%s:%.2f:graph.html#[{"id":%d,"branchid":%d,"machineid":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
+    responseList.append("""RETURN:%s:%.2f:graph.html#tests=[{"id":%d,"branchid":%d,"machineid":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
 
   except Exception, x:
     responseList.append(x)
