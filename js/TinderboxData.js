@@ -37,11 +37,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-var getdatacgi = "server/getdata.cgi?";
+var getdatacgi = "api";
 
 function checkErrorReturn(obj) {
-    if (!obj || obj.resultcode != 0) {
-        alert ("Error: " + (obj ? (obj.error + "(" + obj.resultcode + ")") : "(nil)"));
+    if (!obj || obj.stat != 'ok') {
+        alert ("Error: " + (obj ? (obj.message + "(" + obj.code + ")") : "(nil)"));
         return false;
     }
     return true;
@@ -73,11 +73,10 @@ TinderboxData.prototype = {
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
 
-        $.getJSON(getdatacgi + "type=continuous",
+        $.getJSON(getdatacgi + "/test",
             function (obj) {
                 if (!checkErrorReturn(obj)) return;
-                self.testList = obj.results;
-                //log("default test list" + self.testList);
+                self.testList = obj.tests;
                 $(self.eventTarget).trigger("tinderboxTestListAvailable", [self.testList]);
                   });
     },
@@ -107,7 +106,8 @@ TinderboxData.prototype = {
 
     // arg1 = startTime, arg2 = endTime, arg3 = callback
     // arg1 = callback, arg2/arg3 == null
-    requestDataSetFor: function (testId, arg1, arg2, arg3) {
+    requestDataSetFor: function (test, arg1, arg2, arg3) {
+        var testKey = makeTestKey(test);
         var self = this;
 
         var startTime = arg1;
@@ -126,8 +126,8 @@ TinderboxData.prototype = {
             }
         }
 
-        if (testId in this.testData) {
-            var ds = this.testData[testId];
+        if (testKey in this.testData) {
+            var ds = this.testData[testKey];
             //log ("Can maybe use cached?");
             if ((ds.requestedFirstTime == null && ds.requestedLastTime == null) ||
                 (ds.requestedFirstTime <= startTime &&
@@ -146,9 +146,8 @@ TinderboxData.prototype = {
                 endTime = ds.lastTime;
         }
 
-        var cb = 
-        function (event, aTID, aDS, aStartTime, aEndTime) {
-            if (aTID != testId ||
+        var cb = function (event, test, aDS, aStartTime, aEndTime) {
+            if (makeTestKey(test) != testKey ||
                 aStartTime > startTime ||
                 aEndTime < endTime)
             {
@@ -158,28 +157,32 @@ TinderboxData.prototype = {
             }
 
             $(self.eventTarget).unbind("tinderboxDataSetAvailable", cb);
-            (event.data).call (window, aTID, aDS);
+            (event.data).call (window, test, aDS);
         };
 
         $(self.eventTarget).bind("tinderboxDataSetAvailable", callback, cb);
 
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
 
-        var reqstr = getdatacgi + "setid=" + testId;
+        var reqstr = getdatacgi + "/test/runs?id=" + test.id + "&branchid="+test.branch_id+"&machineid="+test.machine_id;
         if (startTime)
             reqstr += "&starttime=" + startTime;
         if (endTime)
             reqstr += "&endtime=" + endTime;
         //raw data is the extra_data column
-        if (this.raw)
-            reqstr += "&raw=1";
+
         //log (reqstr);
-        $.getJSON(reqstr,
-              function (obj) {
+        $.get(reqstr,
+              function (resp) {
+                if(window.JSON) {
+                    var obj = JSON.parse(resp);
+                } else {
+                    var obj = eval('(' + resp + ')');
+                }
+                  
                 if (!checkErrorReturn(obj)) return;
 
-                var ds = new TimeValueDataSet(obj.results);
-
+                var ds = new TimeValueDataSet(obj.test_runs);
                 //this is the the case of a discrete graph - where the entire test run is always requested
                 //so the start and end points are the first and last entries in the returned data set
                 if  (!startTime && !endTime)  {
@@ -188,7 +191,7 @@ TinderboxData.prototype = {
                 }
                 ds.requestedFirstTime = startTime;
                 ds.requestedLastTime = endTime;
-                self.testData[testId] = ds;
+                self.testData[testKey] = ds;
                 if (obj.annotations)
                     ds.annotations = new TimeStringDataSet(obj.annotations);
                 if (obj.baselines)
@@ -197,9 +200,10 @@ TinderboxData.prototype = {
                     ds.rawdata = obj.rawdata;
                 if (obj.stats)
                     ds.stats = obj.stats;
+              
+                $(self.eventTarget).trigger("tinderboxDataSetAvailable", [test, ds, startTime, endTime]);
 
-                $(self.eventTarget).trigger("tinderboxDataSetAvailable", [testId, ds, startTime, endTime]);
-                  });;
+                  });
 
 // function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
     },

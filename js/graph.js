@@ -160,14 +160,11 @@ function doFilterTests()
 
 function doRemoveTest(id)
 {
-    if (gActiveTests.indexOf(id) == -1) {
-        alert("test was never added? " + id);
-        // test was never added?
-        return;
-    }
+    gActiveTests = gActiveTests.filter(function(k) { 
+        return k.machine_id == id.machine_id && k.test_id == id.test_id && k.branch_id == id.branch_id; 
+    });
 
-    gActiveTests = gActiveTests.filter(function(k) { return k != id; });
-    $("#activetests #testid" + id).remove();
+    $("#activetests #testid-" + makeTestKey(id)).remove();
 
     removeTestFromGraph(id);
     updateLinks();
@@ -186,15 +183,28 @@ function doAddAll()
 {
     var children = $("#availabletests").children();
     for (var i = 0; i < children.length; i++) {
-        var tid = testIdFromElement(children[i]);
+        var tid = testInfoFromElement(children[i]);
         doAddTest(tid, children.length > 3 ? true : false);
     }
 
 }
 
+function findTestByInfo(testInfo) {
+    for (var i = 0; i < gAllTestsList.length; i++) {
+        var test = gAllTestsList[i];
+        if (test.id == testInfo.id && 
+            test.branch_id == testInfo.branch_id && 
+            test.machine_id == testInfo.machine_id) {
+            return gAllTestsList[i];
+        }
+    }
+
+    return null;
+}
+
 function findTestById(id) {
     for (var i = 0; i < gAllTestsList.length; i++) {
-        if (gAllTestsList[i].tid == id) {
+        if (gAllTestsList[i].id == id) {
             return gAllTestsList[i];
         }
     }
@@ -222,26 +232,24 @@ function searchAndAddTest(testname, machine, date, branch) {
 }
 
 
-function doAddTest(id, optSkipAnimation)
+function doAddTest(testInfo, optSkipAnimation)
 {
-    if (typeof(id) != "number")
-        id = parseInt(id);
 
-    if (gActiveTests.indexOf(id) != -1) {
+    if (gActiveTests.indexOf(testInfo.id+""+testInfo.branch_id+""+testInfo.machine_id) != -1) {
         // test already exists, indicate that
-        $("#activetests #testid" + id).hide();
-        $("#activetests #testid" + id).fadeIn(300);
+        $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).hide();
+        $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).fadeIn(300);
         return;
     }
-    
-    var t = findTestById(id);
+
+    var t = findTestByInfo(testInfo);
     var color = randomColor();
     var opts = { active: true };
     
     if (gGraphType == GRAPH_TYPE_SERIES)
         opts.showDate = true;
 
-    gActiveTests.push(id);
+    gActiveTests.push(testInfo.id+""+testInfo.branch_id+""+testInfo.machine_id);
     
     if (t == null ||
         (gGraphType == GRAPH_TYPE_SERIES && t.buildid == "")) {
@@ -264,8 +272,8 @@ function doAddTest(id, optSkipAnimation)
                     $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
                     $("#activetests #testid" + id + " .removecell").click(
                         function(evt) {
-                            var tid = testIdFromElement(this);
-                            doRemoveTest(parseInt(tid));
+                            var tid = testInfoFromElement(this);
+                            doRemoveTest(tid);
                         }
                     );
 
@@ -282,30 +290,30 @@ function doAddTest(id, optSkipAnimation)
 
         $("#activetests").append(html);
         if (!optSkipAnimation) {
-            $("#activetests #testid" + id).hide();
-            $("#activetests #testid" + id).fadeIn(300);
+            $("#activetests #" + t.domId).hide();
+            $("#activetests #" + t.domId).fadeIn(300);
         }
 
-        $("#activetests #testid" + id + " .throbber")[0].setAttribute("loading", "true");
-        $("#activetests #testid" + id + " .removecell").click(
+        $("#activetests #" + t.domId +" .throbber")[0].setAttribute("loading", "true");
+        $("#activetests #" + t.domId+ " .removecell").click(
             function(evt) {
-                var tid = testIdFromElement(this);
-                doRemoveTest(parseInt(tid));
+                var tid = testInfoFromElement(this);
+                doRemoveTest(tid);
             }
         );
 
-        $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
-        addTestToGraph(id, function(ds) {
-                           $("#activetests #testid" + id + " .throbber")[0].removeAttribute("loading");
+        $("#activetests #" + t.domId + " .colorcell")[0].style.background = colorToRgbString(color);
+        addTestToGraph(t, function(ds) {
+                           $("#activetests #" + t.domId + " .throbber")[0].removeAttribute("loading");
                            ds.color = color;
                       });
         updateLinks();
     }
 }
 
-function makeTestLoadingDiv(id) {
+function makeTestLoadingDiv(test) {
     var html = "";
-    html += "<div class='testline' id='testid" + id + "'>";
+    html += "<div class='testline' id='"+ test.domId + "'>";
     html += "<table><tr>";
 
     // Show the color cell on the left, if this is an active test
@@ -339,15 +347,18 @@ function makeTestNameHtml(tname)
         return tname;
 }
 
+function createDomId(test) {
+    return "testid-" + test.id + "-" + test.branch.id +"-" + test.machine.id;
+}
+
 function makeTestDiv(test, opts)
 {
     if (opts == null || typeof(opts) != "object")
         opts = {};
     var buildid = getBuildIDFromSeriesTestList(test);
-
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\w-]/g, "");
     var html = "";
-    html += "<div class='testline' id='testid" + test.tid + "'>";
+    html += "<div class='testline' id='" + test.domId + "'>";
     html += "<table><tr>";
 
     // Show the color cell on the left, if this is an active test
@@ -404,7 +415,7 @@ function doSeriesDialogAdd() {
 
 function doAddWithDate(evt) {
     $("#seriesdialog .throbber").show();
-    var tid = testIdFromElement(this);
+    var tid = testInfoFromElement(this);
     var dialogOpen = (gSeriesDialogShownForTestId != -1);
     var t = findTestById(tid);
     if (t == null) {
@@ -466,13 +477,28 @@ function updateAvailableTests()
 
     //$("#availabletests .testmain").draggable();
     var doAdd = function(evt) {
-        var tid = testIdFromElement(this);
-        doAddTest(tid);
+        var testinfo = testInfoFromElement(this);
+        doAddTest(testinfo);
     };
 
     $("#availabletests .dateaddcell").click(doAddWithDate);
     $("#availabletests .addcell").click(doAdd);
     $("#availabletests #testline").dblclick(doAdd);
+}
+
+function testInfoFromElement(el) {
+    var k;
+    while (el.tagName != "body" &&
+           !(k = el.id.match(/^testid-([\d]+)-([\d]+)-([\d]+)$/)))
+    {
+        el = el.parentNode;
+    }
+
+    if (el.tagName == "body")
+        return -1;
+    
+    var obj = {id:k[1], branch_id:k[2], machine_id:k[3]};
+    return obj;
 }
 
 function testIdFromElement(el) {
@@ -616,17 +642,18 @@ function transformLegacyData(testList)
         t.newest = Date.now();
 
         var ob = {
-            tid: t.id,
-            platform: platformFromData(t),
-            machine: t.machine,
-            branch: branchFromData(t),
-            test: testFromData(t),
-            testname: t.test,
-            newest: t.newest,
-            buildid: t.buildid,
+            id: t.id,
+            platform: t.os.name,
+            machine: t.machine.name,
+            machine_id: t.machine.id,
+            branch: t.branch.name,
+            branch_id: t.branch.id,
+            platform_id: t.os.id,
+            test: t.name,
+            domId: createDomId(t)
         };
 
-        gTestList.push(ob);
+        gTestList[i] = ob;
     }
 
     gAllTestsList = gTestList;
@@ -634,6 +661,10 @@ function transformLegacyData(testList)
 
 function makeSeriesTestKey(t) {
     return t.machine + branchFromData(t) + testFromData(t);
+}
+
+function makeTestKey(test) {
+    return test.id + "-" + test.branch_id +"-" + test.machine_id;
 }
 
 function getBuildIDFromSeriesTestList(t) {
@@ -1003,7 +1034,7 @@ function handleLoad()
         activeClass: "droppable-active",
         hoverClass: "droppable-hover",
         drop: function(ev, arg) {
-            var tid = testIdFromElement(arg.draggable.element);
+            var tid = testInfoFromElement(arg.draggable.element);
             doAddTest(tid);
         }
     });
