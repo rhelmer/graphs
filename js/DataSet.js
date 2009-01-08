@@ -136,7 +136,17 @@ TimeValueDataSet.prototype = {
     title: '',
 
     initWithData: function (data) {
-        this.data = data;
+        var massagedData = [];
+        
+        for(var i=0; i < data.length; i++) {
+            massagedData.push(data[i][2]);
+            massagedData.push(data[i][3]);
+        }
+        
+        data = massagedData;
+        delete massagedData;
+        
+        this.data = massagedData;
 
         this.firstTime = data[0];
         if (data.length > 2)

@@ -25,10 +25,10 @@ INSERT INTO `branches` VALUES (3, 'mozilla-central');
 -- Dumping data for table `builds`
 -- 
 
-INSERT INTO `builds` VALUES (1, 2008100211, '2fdcdd519ee7', 2, 3, 1202033420);
-INSERT INTO `builds` VALUES (2, 2008100212, '2fdcer519ee7', 1, 2, 1202053420);
-INSERT INTO `builds` VALUES (3, 2008110211, '2fecdd519ee7', 2, 3, 1202083420);
-INSERT INTO `builds` VALUES (4, 2008120211, '2feccd519ee7', 3, 1, 1202013420);
+INSERT INTO `builds` VALUES (1, 2008100211, '2fdcdd519ee7', 3, 1202033420);
+INSERT INTO `builds` VALUES (2, 2008100212, '2fdcer519ee7', 2, 1202053420);
+INSERT INTO `builds` VALUES (3, 2008110211, '2fecdd519ee7', 3, 1202083420);
+INSERT INTO `builds` VALUES (4, 2008120211, '2feccd519ee7', 1, 1202013420);
 
 -- 
 -- Dumping data for table `machines`

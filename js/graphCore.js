@@ -167,13 +167,13 @@ function initGraphCore(useDiscrete)
 
 // add the graph given by tid, using the current date range, making the given callback
 // when loading is done
-function addTestToGraph(tid, cb) {
+function addTestToGraph(test, cb) {
 
     // XXX
     var autoExpand = true;
 
     var makeCallback = function (average, title, theCallback) {
-        return function (testid, ds) {
+        return function (test, ds) {
             if (theCallback)
                 theCallback.call(window, ds);
 
@@ -183,11 +183,12 @@ function addTestToGraph(tid, cb) {
                 return;
             }
 
-            CurrentDataSets[tid] = ds;
+            CurrentDataSets[makeTestKey(test)] = ds;
             syncDerived();
-            ds.tid = testid;
+            ds.test = test;
             
             for each (var g in [BigPerfGraph, SmallPerfGraph]) {
+
                 g.addDataSet(ds);
 
                 if (g == SmallPerfGraph || autoExpand) {
@@ -207,15 +208,18 @@ function addTestToGraph(tid, cb) {
     };
 
 
-    Tinderbox.requestDataSetFor(tid, makeCallback(false, "Unknown", cb));
+    Tinderbox.requestDataSetFor(test, makeCallback(false, "Unknown", cb));
 }
 
 function removeTestFromGraph(tid, cb) {
-    if (!(tid in CurrentDataSets))
+    var testKey = makeTestKey(tid);
+    console.log('removing test key ' + testKey);
+    console.log(CurrentDataSets);
+    if (!(testKey in CurrentDataSets))
         return;
 
-    var ds = CurrentDataSets[tid];
-    delete CurrentDataSets[tid];
+    var ds = CurrentDataSets[testKey];
+    delete CurrentDataSets[testKey];
     
     
     for each (var g in [BigPerfGraph, SmallPerfGraph]) {
