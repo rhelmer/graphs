@@ -235,7 +235,7 @@ DiscreteTinderboxData.prototype = {
           tDate -= limitDate * 86400 * 1000;
           //log ("returning test lists greater than this date" + (new Date(tDate)).toGMTString());
           //TODO hack hack hack
-          tDate = Math.floor(tDate/1000)
+          tDate = Math.floor(tDate/1000);
           
         }
         if (branch != null) limiters += "&branch=" + branch;
@@ -245,13 +245,34 @@ DiscreteTinderboxData.prototype = {
         if (getBuildID) limiters += "&graphby=buildid";
 
         //log("drequestTestList: " + getdatacgi + "type=discrete&datelimit=" + tDate + limiters);
-        $.getJSON(getdatacgi + "type=discrete&datelimit=" + tDate + limiters,
+        $.getJSON(getdatacgi + "/test/"+ limiters,
             function (obj) {
                 if (!checkErrorReturn(obj)) return;
-                self.testList = obj.results;
+                self.testList = obj.tests;
                 //log ("testlist: " + self.testList);
                 callback.call(window, self.testList);
                   });
+    },
+    
+    requestTestRuns : function(limitDate, testId, branchId, machineId, callback) {
+        var self = this;
+        var limiters = "id=" + testId + "&branchid=" + branchId + "&machineid=" + machineId;
+        
+        if(limitDate != null) {
+            tDate = new Date().getTime();
+            tDate -= limitDate * 86400 * 1000;
+            tDate = Math.floor(tDate/1000);
+            limiters += "&start="+tDate;
+        }
+        
+        $.get(getdatacgi + "/test/runs?"+limiters, 
+            function(resp) {
+                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                
+                if(!checkErrorReturn(obj)) return;
+                self.testRuns = obj.test_runs;
+                callback.call(window, self.testRuns);
+        });
     },
 
     requestSearchList: function (branch, machine, testname, callback) {

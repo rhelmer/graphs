@@ -40,6 +40,8 @@ var gSeriesDialogShownForTestId = -1;
 var gActiveTests = [];
 var quickList = {};
 var gPostDataLoadFunction = null;
+var displayedTestRunsTest = null;
+var currentTestRuns = null;
 
 // 2 weeks
 var kRecentDate = 14*24*60*60*1000;
@@ -235,7 +237,7 @@ function searchAndAddTest(testname, machine, date, branch) {
 function doAddTest(testInfo, optSkipAnimation)
 {
 
-    if (gActiveTests.indexOf(testInfo.id+""+testInfo.branch_id+""+testInfo.machine_id) != -1) {
+    if (gActiveTests.indexOf(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id) != -1) {
         // test already exists, indicate that
         $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).hide();
         $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).fadeIn(300);
@@ -249,67 +251,68 @@ function doAddTest(testInfo, optSkipAnimation)
     if (gGraphType == GRAPH_TYPE_SERIES)
         opts.showDate = true;
 
-    gActiveTests.push(testInfo.id+""+testInfo.branch_id+""+testInfo.machine_id);
+    gActiveTests.push(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id);
     
-    if (t == null ||
-        (gGraphType == GRAPH_TYPE_SERIES && t.buildid == "")) {
-        
-        //Test was not initially loaded with first request, need to query the server to get more data
-        var html = makeTestLoadingDiv(id);
-        $("#activetests").append(html);
-        $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
-        
-        $.getJSON(getdatacgi + 'action=testinfo&setid='+id, function(data) {
-            if(data.test.id) {
-                addTestToGraph(id, function(ds) {
-                    transformLegacySeriesData([data.test]);
+    
+    var html = makeTestDiv(t, opts);
 
-                    var test = findTestById(id);
-                    var html = makeTestDiv(test, opts);
-
-                    $("#activetests #testid" + id).replaceWith(html);
-                    $("#activetests #testid" + id + " .throbber")[0].removeAttribute("loading");
-                    $("#activetests #testid" + id + " .colorcell")[0].style.background = colorToRgbString(color);
-                    $("#activetests #testid" + id + " .removecell").click(
-                        function(evt) {
-                            var tid = testInfoFromElement(this);
-                            doRemoveTest(tid);
-                        }
-                    );
-
-                    ds.color = color;
-                    updateLinks();
-                });
-            } else {
-                $("#activetests #testid" + id).remove();
-            }
-        });
-    } else {
-
-        var html = makeTestDiv(t, opts);
-
-        $("#activetests").append(html);
-        if (!optSkipAnimation) {
-            $("#activetests #" + t.domId).hide();
-            $("#activetests #" + t.domId).fadeIn(300);
-        }
-
-        $("#activetests #" + t.domId +" .throbber")[0].setAttribute("loading", "true");
-        $("#activetests #" + t.domId+ " .removecell").click(
-            function(evt) {
-                var tid = testInfoFromElement(this);
-                doRemoveTest(tid);
-            }
-        );
-
-        $("#activetests #" + t.domId + " .colorcell")[0].style.background = colorToRgbString(color);
-        addTestToGraph(t, function(ds) {
-                           $("#activetests #" + t.domId + " .throbber")[0].removeAttribute("loading");
-                           ds.color = color;
-                      });
-        updateLinks();
+    $("#activetests").append(html);
+    if (!optSkipAnimation) {
+        $("#activetests #" + t.domId).hide();
+        $("#activetests #" + t.domId).fadeIn(300);
     }
+
+    $("#activetests #" + t.domId +" .throbber")[0].setAttribute("loading", "true");
+    $("#activetests #" + t.domId+ " .removecell").click(
+        function(evt) {
+            var tid = testInfoFromElement(this);
+            doRemoveTest(tid);
+        }
+    );
+
+    $("#activetests #" + t.domId + " .colorcell")[0].style.background = colorToRgbString(color);
+    addTestToGraph(t, function(ds) {
+                       $("#activetests #" + t.domId + " .throbber")[0].removeAttribute("loading");
+                       ds.color = color;
+                  });
+    updateLinks();
+
 }
+
+function doAddTestRun(testRunId, test) {
+    if (gActiveTests.indexOf(test.id+"-"+test.branch_id+"-"+test.machine_id+"-"+testRunId) != -1) {
+        // test already exists, indicate that
+        $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).hide();
+        $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).fadeIn(300);
+        return;
+    }
+
+    gActiveTests.push(test.id+"-"+test.branch_id+"-"+test.machine_id+"-"+testRunId);
+    
+    console.log(gActiveTests);
+    var testRun = false;
+    for(var i=0; i<currentTestRuns.length;i++) {
+        if(currentTestRuns[i][0] == testRunId) {
+            testRun = currentTestRuns[i];
+        }
+    }
+    
+    var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
+    var domId = test.domId + testRunId;
+    $("#activetests").append(html);
+    
+    $("#activetests #" + domId +" .throbber")[0].setAttribute("loading", "true");
+    $("#activetests #" + domId + " .removecell").click(
+        function(evt) {
+            var tid = testInfoFromElement(this);
+            doRemoveTest(tid);
+        }
+    );
+    
+    //Use tinderbox to load the test info
+}
+
+
 
 function makeTestLoadingDiv(test) {
     var html = "";
@@ -351,14 +354,16 @@ function createDomId(test) {
     return "testid-" + test.id + "-" + test.branch.id +"-" + test.machine.id;
 }
 
-function makeTestDiv(test, opts)
+function makeTestDiv(test, opts, testRun)
 {
     if (opts == null || typeof(opts) != "object")
         opts = {};
     var buildid = getBuildIDFromSeriesTestList(test);
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\w-]/g, "");
     var html = "";
-    html += "<div class='testline' id='" + test.domId + "'>";
+    var domId = (testRun == null) ? test.domId : test.domId + testRun[0];
+    
+    html += "<div class='testline' id='" + domId + "'>";
     html += "<table><tr>";
 
     // Show the color cell on the left, if this is an active test
@@ -370,8 +375,8 @@ function makeTestDiv(test, opts)
     html += "<b class='test-name'>" + makeTestNameHtml(test.test) + "</b> on <b class='" + platformclass + "'>" + test.platform + "</b><br>";
     html += "<span class='test-extra-info'><b>" + test.machine + "</b>, <b>" + test.branch + "</b> branch</span><br>";
     if (opts.showDate) {
-        html += "<span class='test-extra-info'>" + formatTime(test.date) + "</span><br>";
-        html += "<span class='test-extra-info'>Build ID: " + buildid + "</span><br>";
+        html += "<span class='test-extra-info'>" + formatTime(testRun[2]) + "</span><br>";
+        html += "<span class='test-extra-info'>Build ID: " + testRun[1][1]+ "</span><br>";
     }
     html += "</td>";
 
@@ -402,10 +407,10 @@ function doSeriesDialogAdd() {
     if (gSeriesDialogShownForTestId == -1)
         return;
 
-
-    var tests = $("#datesel").val();
-    for (var i = 0; i < tests.length; i++) {
-        doAddTest(tests[i]);
+    var testRuns = $("#datesel option:selected");
+    for (var i = 0; i < testRuns.length; i++) {
+        var testRunId = testRuns[i].value;
+        doAddTestRun(testRunId, displayedTestRunsTest);
     }
 
     $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
@@ -417,25 +422,25 @@ function doAddWithDate(evt) {
     $("#seriesdialog .throbber").show();
     var tid = testInfoFromElement(this);
     var dialogOpen = (gSeriesDialogShownForTestId != -1);
-    var t = findTestById(tid);
+    var t = findTestByInfo(tid);
     if (t == null) {
         alert("Couldn't find a test with ID " + tid + " -- what happened?");
         return;
     }
     
     $("#datesel").empty();
-    
-    //Get testid, branch and machine, query server
-    Tinderbox.requestTestList(30, t.branch, t.machine, t.testname, true,
-			      function(data) {
-         transformLegacySeriesData(data);
-         for (var i = data.length - 1; i >= 0; --i) {
-             //var d = allDateTests[i];
-             var datesel = $("#datesel");
-             d = data[i];
-             datesel.append("<option value='" + d.id + "'>" + formatTime(d.date)  + " (" + d.buildid + ")</option>");
-         }
-         $("#seriesdialog .throbber").hide();
+    displayedTestRunsTest = t;    
+    Tinderbox.requestTestRuns(30, t.id, t.branch_id, t.machine_id,
+
+	    function(data) {
+	        currentTestRuns = data;
+            var tests = "";
+            for (var i = data.length - 1; i >= 0; --i) {
+                d = data[i];
+                tests += "<option value='" + d[0] + "'>" + formatTime(d[2])  + " (" + d[1][1] + ")</option>";
+            }
+            $("#datesel").append(tests);
+            $("#seriesdialog .throbber").hide();
     });
     
     $("#datesel > :first-child").attr("selected", "");
@@ -889,6 +894,19 @@ function initOptions()
             });
     }
 
+    //New link format (tests=[{test:ID,branch:ID,machine:ID}])
+    if("tests" in qsdata) {
+        var tests = eval('(' + qsdata['tests'] + ')');
+        
+        loadFunctions.push(function() {
+            for(var i=0; i< tests.length; i++) {
+                var testInfo = tests[i];
+                doAddTest({"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+            }
+        });
+    }
+    
+
     //support old link format, setting selected range
     if (("spss" in qsdata) && ("spse" in qsdata)) {
         loadFunctions.push (function() {
@@ -1016,7 +1034,7 @@ function handleLoad()
 
         Tinderbox.requestTestList(30 /* days */, null, null, null, false,
                                     function (tests) {
-                                        transformLegacySeriesData(tests);
+                                        transformLegacyData(tests);
                                         populateFilters();
                                         doResetFilter();
                                         if (gPostDataLoadFunction) {

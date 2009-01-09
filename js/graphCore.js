@@ -213,8 +213,8 @@ function addTestToGraph(test, cb) {
 
 function removeTestFromGraph(tid, cb) {
     var testKey = makeTestKey(tid);
-    console.log('removing test key ' + testKey);
-    console.log(CurrentDataSets);
+
+    
     if (!(testKey in CurrentDataSets))
         return;
 
