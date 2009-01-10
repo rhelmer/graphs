@@ -163,8 +163,12 @@ TinderboxData.prototype = {
         $(self.eventTarget).bind("tinderboxDataSetAvailable", callback, cb);
 
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
-
-        var reqstr = getdatacgi + "/test/runs?id=" + test.id + "&branchid="+test.branch_id+"&machineid="+test.machine_id;
+        if(gGraphType == GRAPH_TYPE_VALUE) {
+            var reqstr = getdatacgi + "/test/runs?id=" + test.id + "&branchid="+test.branch_id+"&machineid="+test.machine_id;
+        } else {
+            var reqstr = getdatacgi + "/test/runs/values?id=" + test.testRunId;
+        }
+        
         if (startTime)
             reqstr += "&starttime=" + startTime;
         if (endTime)
@@ -174,15 +178,11 @@ TinderboxData.prototype = {
         //log (reqstr);
         $.get(reqstr,
               function (resp) {
-                if(window.JSON) {
-                    var obj = JSON.parse(resp);
-                } else {
-                    var obj = eval('(' + resp + ')');
-                }
-                  
+                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                
                 if (!checkErrorReturn(obj)) return;
-
-                var ds = new TimeValueDataSet(obj.test_runs);
+                
+                var ds = gGraphType == GRAPH_TYPE_VALUE ? new TimeValueDataSet(obj.test_runs) : new TimeValueDataSet(obj.values);
                 //this is the the case of a discrete graph - where the entire test run is always requested
                 //so the start and end points are the first and last entries in the returned data set
                 if  (!startTime && !endTime)  {

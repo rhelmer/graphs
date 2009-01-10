@@ -1,9 +1,10 @@
 <IfModule mod_rewrite.c>
     RewriteEngine on
     RewriteRule ^api/test/?$ server/api.cgi?item=tests [QSA]
+    RewriteRule ^api/test/runs/values/?$ server/api.cgi?item=testrun&id=$1&attribute=values [QSA]
     RewriteRule ^api/test/runs/? server/api.cgi?item=testruns [QSA]
     RewriteRule ^api/test/([0-9]+)/?$ server/api.cgi?item=test&id=$1
     RewriteRule ^api/test/([0-9a-z]+)/runs/([0-9a-z]+)/?$ server/api.cgi?item=testrun&id=$2 [QSA]
-    RewriteRule ^api/test/([0-9a-z]+)/runs/([0-9a-z]+)/values/?$ server/api.cgi?item=testrun&id=$2&attribute=values
+    
     RewriteRule ^api/([a-z]+)/?([0-9a-z]+)/?([a-z]+)/?$ server/api.cgi?item=$1&id=$2&attribute=$3 [L] [QSA]
 </IfModule>

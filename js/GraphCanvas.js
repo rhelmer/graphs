@@ -508,7 +508,6 @@ Graph.prototype = {
         var yoffs = this.yOffset;
         
         var xscale = cw / (this.endTime - this.startTime);
-
         if (this.endTime == this.startTime) {
             // we have just one point
             xoffs -= cw / 2;

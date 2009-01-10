@@ -138,11 +138,19 @@ TimeValueDataSet.prototype = {
     initWithData: function (data) {
         var massagedData = [];
         
-        for(var i=0; i < data.length; i++) {
-            massagedData.push(data[i][2]);
-            massagedData.push(data[i][3]);
+        if(gGraphType == GRAPH_TYPE_VALUE) {
+            for(var i=0; i < data.length; i++) {
+                massagedData.push(data[i][2]);
+                massagedData.push(data[i][3]);
+            }
+        } else {
+            for(var i=0; i < data.length; i++) {
+                massagedData.push(i);
+                massagedData.push(data[i].value);
+            }
         }
         
+        console.log(massagedData);
         data = massagedData;
         delete massagedData;
         

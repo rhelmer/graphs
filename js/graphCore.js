@@ -211,16 +211,16 @@ function addTestToGraph(test, cb) {
     Tinderbox.requestDataSetFor(test, makeCallback(false, "Unknown", cb));
 }
 
+
+
 function removeTestFromGraph(tid, cb) {
     var testKey = makeTestKey(tid);
 
-    
     if (!(testKey in CurrentDataSets))
         return;
 
     var ds = CurrentDataSets[testKey];
     delete CurrentDataSets[testKey];
-    
     
     for each (var g in [BigPerfGraph, SmallPerfGraph]) {
         g.removeDataSet(ds);
@@ -228,8 +228,6 @@ function removeTestFromGraph(tid, cb) {
         g.redraw();
     }
 
-    
-    
     syncDerived();
 }
 

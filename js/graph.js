@@ -282,34 +282,46 @@ function doAddTest(testInfo, optSkipAnimation)
 function doAddTestRun(testRunId, test) {
     if (gActiveTests.indexOf(test.id+"-"+test.branch_id+"-"+test.machine_id+"-"+testRunId) != -1) {
         // test already exists, indicate that
-        $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).hide();
-        $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).fadeIn(300);
+        $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testRunId[0]).hide();
+        $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testRunId[0]).fadeIn(300);
         return;
     }
 
     gActiveTests.push(test.id+"-"+test.branch_id+"-"+test.machine_id+"-"+testRunId);
     
-    console.log(gActiveTests);
     var testRun = false;
     for(var i=0; i<currentTestRuns.length;i++) {
         if(currentTestRuns[i][0] == testRunId) {
             testRun = currentTestRuns[i];
         }
     }
-    
+
+    if(!testRun)
+        return;
+
+    var color = randomColor();
     var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
-    var domId = test.domId + testRunId;
+    var domId = test.domId + "-" + testRunId;
+
     $("#activetests").append(html);
     
-    $("#activetests #" + domId +" .throbber")[0].setAttribute("loading", "true");
+    $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
+    $("#activetests #" + domId + " .throbber")[0].setAttribute("loading", "true");
     $("#activetests #" + domId + " .removecell").click(
         function(evt) {
             var tid = testInfoFromElement(this);
             doRemoveTest(tid);
         }
     );
+    test.testRunId = testRunId;
     
     //Use tinderbox to load the test info
+    addTestToGraph(test, function(ds) {
+                       $("#activetests #" + domId + " .throbber")[0].removeAttribute("loading");
+                       ds.color = color;
+                  });
+    updateLinks();
+    
 }
 
 
@@ -361,7 +373,7 @@ function makeTestDiv(test, opts, testRun)
     var buildid = getBuildIDFromSeriesTestList(test);
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\w-]/g, "");
     var html = "";
-    var domId = (testRun == null) ? test.domId : test.domId + testRun[0];
+    var domId = (testRun == null) ? test.domId : test.domId + "-" + testRun[0];
     
     html += "<div class='testline' id='" + domId + "'>";
     html += "<table><tr>";
@@ -669,7 +681,11 @@ function makeSeriesTestKey(t) {
 }
 
 function makeTestKey(test) {
-    return test.id + "-" + test.branch_id +"-" + test.machine_id;
+    var testKey = test.id + "-" + test.branch_id +"-" + test.machine_id;
+    if(test.testRunId) {
+        testKey += "-"+test.testRunId;
+    }
+    return testKey;
 }
 
 function getBuildIDFromSeriesTestList(t) {
