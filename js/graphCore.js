@@ -211,7 +211,48 @@ function addTestToGraph(test, cb) {
     Tinderbox.requestDataSetFor(test, makeCallback(false, "Unknown", cb));
 }
 
+function addLatestTestRunToGraph(test, cb) {
+    // XXX
+    var autoExpand = true;
 
+    var makeCallback = function (average, title, theCallback) {
+        return function (test, ds) {
+            if (theCallback)
+                theCallback.call(window, ds);
+
+            if (!("firstTime" in ds) || !("lastTime" in ds)) {
+                // got a data set with no data in this time range, or damaged data
+                // better to not graph
+                return;
+            }
+
+            CurrentDataSets[makeTestKey(test)] = ds;
+            syncDerived();
+            ds.test = test;
+            
+            for each (var g in [BigPerfGraph, SmallPerfGraph]) {
+
+                g.addDataSet(ds);
+
+                if (g == SmallPerfGraph || autoExpand) {
+                    g.expandTimeRange(Math.max(ds.firstTime, gCurrentLoadRange ? gCurrentLoadRange[0] : ds.firstTime),
+                                      Math.min(ds.lastTime, gCurrentLoadRange ? gCurrentLoadRange[1] : ds.lastTime));
+                }
+
+                if (g == BigPerfGraph && SmallPerfGraph.selectionType == 'range') {
+                    // Make sure to zoom in on the big graph if there's a small graph highlight in effect.
+                    g.setTimeRange(SmallPerfGraph.selectionStartTime, SmallPerfGraph.selectionEndTime);
+                }
+
+                g.autoScale();
+                g.redraw();
+            }
+        };
+    };
+
+
+    Tinderbox.requestLatestDataSetFor(test, makeCallback(false, "Unknown", cb));
+}
 
 function removeTestFromGraph(tid, cb) {
     var testKey = makeTestKey(tid);

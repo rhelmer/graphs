@@ -33,8 +33,8 @@ def main():
      'test': getTest,
      'testrun':getTestRun,
      'testruns':getTestRuns}
-
-    if options.has_key(item):
+     #wrap all this in exception handling
+    if item in options:
         result = options[item](id, attribute, form)
     
         if result['stat'] == 'ok':
@@ -54,20 +54,30 @@ def getTest(id, attribute, form):
     if(attribute == 'runs'):
         return getTestRuns(id)
     else:
-        sql = """SELECT tests.id, tests.pretty_name AS test_name, machines.name as machine_name, 
-                branches.name AS branch_name, os_list.name AS os_name, MAX(test_runs.date_run) 
-                FROM tests INNER JOIN test_runs ON (tests.id = test_runs.test_id) 
+        sql = """SELECT 
+            tests.id, 
+            tests.pretty_name AS test_name, 
+            machines.name as machine_name, 
+            branches.name AS branch_name, 
+            os_list.name AS os_name,
+            test_runs.date_run
+        FROM 
+            tests INNER JOIN test_runs ON (tests.id = test_runs.test_id) 
                 INNER JOIN machines ON (machines.id = test_runs.machine_id) 
-                INNER JOIN os_list ON (machines.os_id = os_list.id) 
-                INNER JOIN builds ON (test_runs.build_id = builds.id) 
-                INNER JOIN branches on (builds.branch_id = branches.id) 
-                WHERE tests.id = %s
-                GROUP BY tests.id"""
+                    INNER JOIN os_list ON (machines.os_id = os_list.id) 
+                        INNER JOIN builds ON (test_runs.build_id = builds.id) 
+                            INNER JOIN branches on (builds.branch_id = branches.id) 
+        WHERE 
+            tests.id = %s
+        ORDER BY
+            test_runs.date_run DESC
+        LIMIT 1"""
         cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
         cursor.execute(sql, (id))
     
         if cursor.rowcount == 1:
             row = cursor.fetchone()
+            #change column names to the names used here, then we don't need to re-label them
             test = {'id':row['id'], 'name':row['test_name'], 'branch':row['branch_name'], 'os':row['os_name'], 'machine':row['machine_name']}
             result = {'stat':'ok', 'test':test}
         else:
@@ -77,20 +87,26 @@ def getTest(id, attribute, form):
    
 #Get an array of all tests by build and os
 def getTests(id, attribute, form):
-    sql = """SELECT tests.id, tests.pretty_name AS test_name, machines.name as machine_name, 
-            machines.id as machine_id,
-            branches.name AS branch_name, branches.id AS branch_id, os_list.id AS os_id ,
-            os_list.name AS os_name
-            FROM tests INNER JOIN test_runs ON (tests.id = test_runs.test_id) 
-            INNER JOIN machines ON (machines.id = test_runs.machine_id) 
-            INNER JOIN os_list ON (machines.os_id = os_list.id) 
-            INNER JOIN builds ON (test_runs.build_id = builds.id) 
-            INNER JOIN branches on (builds.branch_id = branches.id) 
-            GROUP BY branches.id, machines.id"""
+    sql = """SELECT DISTINCT
+                tests.id, 
+                tests.pretty_name AS test_name, 
+                machines.name as machine_name, 
+                machines.id as machine_id,
+                branches.name AS branch_name, 
+                branches.id AS branch_id, 
+                os_list.id AS os_id ,
+                os_list.name AS os_name
+            FROM 
+                tests INNER JOIN test_runs ON (tests.id = test_runs.test_id) 
+                    INNER JOIN machines ON (machines.id = test_runs.machine_id) 
+                        INNER JOIN os_list ON (machines.os_id = os_list.id) 
+                            INNER JOIN builds ON (test_runs.build_id = builds.id) 
+                                INNER JOIN branches on (builds.branch_id = branches.id) 
+            ORDER BY branches.id, machines.id"""
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql)
     tests = []
-    
+    #fetch row count first, then check for length
     if cursor.rowcount > 0:
         rows = cursor.fetchall()
         
@@ -134,6 +150,8 @@ def getTestRuns(id, attribute, form):
 def getTestRun(id, attribute, form):
     if(attribute == 'values'):
         return getTestRunValues(id)
+    elif(attribute == 'latest'):
+        return getLatestTestRunValues(id)
     else:
         sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id as ref_build_id, builds.ref_changeset as changeset, os_list.name as os
                 FROM test_runs INNER JOIN builds ON (test_runs.build_id = builds.id) INNER JOIN os_list ON (builds.os_id = os_list.id)
@@ -148,6 +166,24 @@ def getTestRun(id, attribute, form):
         else:
             return {'stat':'fail', 'code':'104', 'message':'Test run not found'}
     return result
+
+def getLatestTestRunValues(id):
+    #first get build information
+    sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset, MAX(date_run)
+               FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id) 
+               INNER JOIN branches ON (builds.branch_id = branches.id) 
+               INNER JOIN machines ON (test_runs.machine_id = machines.id)
+               WHERE test_runs.test_id = %s AND machines.id = %s AND branches.id = %s"""
+    
+   #             cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+   # cursor.execute(sql, (id))
+   # 
+   # if cursor.rowcount == 1:
+   #     testRun = cursor.fetchone()
+   #  
+   #  #then get test run values
+
+
 
 def getTestRunValues(id):
     sql = """SELECT test_run_values.*, pages.name as page FROM test_run_values 
@@ -190,7 +226,7 @@ def getAnnotations(test_run_id, returnType='dictionary'):
     
 #Send data. Assume status is a number and data is a dictionary that can be written via json.write
 def sendResponse(status, data):
-    sys.stdout.write("Status: "+str(status)+"\n")
+    sys.stdout.write("Status: "+str(status)+"\n") #should be doing a sprintf on this
     sys.stdout.write("Access-Control: allow <*>\n")
     sys.stdout.write("Content-Type: text/html\n")
     sys.stdout.write("\r\n\r\n")

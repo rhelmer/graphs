@@ -104,6 +104,83 @@ TinderboxData.prototype = {
             return this.testData[testId];
     },
 
+
+    requestLatestDataSetFor: function (test, arg1, arg2, arg3) {
+
+        var self = this;
+
+        var startTime = arg1;
+        var endTime = arg2;
+        var callback = arg3;
+
+        if (arg1 && arg2 == null && arg3 == null) {
+            callback = arg1;
+            if (this.defaultLoadRange) {
+                startTime = this.defaultLoadRange[0];
+                endTime = this.defaultLoadRange[1];
+                //log ("load range using default", startTime, endTime);
+            } else {
+                startTime = null;
+                endTime = null;
+            }
+        }
+    
+        var cb = function (event, test, aDS, aStartTime, aEndTime) {
+            if (makeTestKey(test) != testKey ||
+                aStartTime > startTime ||
+                aEndTime < endTime)
+            {
+                // not useful for us; there's another
+                // outstanding request for our time range, so wait for that
+                return;
+            }
+
+            $(self.eventTarget).unbind("tinderboxDataSetAvailable", cb);
+            (event.data).call (window, test, aDS);
+        };
+
+        $(self.eventTarget).bind("tinderboxDataSetAvailable", callback, cb);
+
+        var reqstr = getdatacgi + "/test/runs/latest?id=" + test.id + "&branchid=" + test.branch_id + "&machineid=" + test.machine_id;
+        
+        if (startTime)
+            reqstr += "&starttime=" + startTime;
+        if (endTime)
+            reqstr += "&endtime=" + endTime;
+        //raw data is the extra_data column
+
+        //log (reqstr);
+        $.get(reqstr,
+              function (resp) {
+                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                
+                if (!checkErrorReturn(obj)) return;
+                
+                var ds = gGraphType == GRAPH_TYPE_VALUE ? new TimeValueDataSet(obj.test_runs) : new TimeValueDataSet(obj.values);
+                //this is the the case of a discrete graph - where the entire test run is always requested
+                //so the start and end points are the first and last entries in the returned data set
+                if  (!startTime && !endTime)  {
+                    startTime = ds.data[0];
+                    endTime = ds.data[ds.data.length -2];
+                }
+                ds.requestedFirstTime = startTime;
+                ds.requestedLastTime = endTime;
+                self.testData[testKey] = ds;
+                if (obj.annotations)
+                    ds.annotations = new TimeStringDataSet(obj.annotations);
+                if (obj.baselines)
+                    ds.baselines = obj.baselines;
+                if (obj.rawdata)
+                    ds.rawdata = obj.rawdata;
+                if (obj.stats)
+                    ds.stats = obj.stats;
+              
+                $(self.eventTarget).trigger("tinderboxDataSetAvailable", [test, ds, startTime, endTime]);
+
+                  });
+    },
+
+
     // arg1 = startTime, arg2 = endTime, arg3 = callback
     // arg1 = callback, arg2/arg3 == null
     requestDataSetFor: function (test, arg1, arg2, arg3) {
