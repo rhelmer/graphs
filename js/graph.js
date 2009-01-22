@@ -236,7 +236,7 @@ function searchAndAddTest(testname, machine, date, branch) {
 
 function doAddTest(testInfo, optSkipAnimation)
 {
-
+    
     if (gActiveTests.indexOf(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id) != -1) {
         // test already exists, indicate that
         $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).hide();
@@ -279,7 +279,32 @@ function doAddTest(testInfo, optSkipAnimation)
 
 }
 
+function addLatestTestRun(testInfo) {
+    var html = makeTestLoadingDiv(testInfo);
+    $("#activetests").append(html);
+    
+    addLatestTestRunToGraph(testInfo, function(ds, testInfo) {
+        
+        var color = randomColor();
+        var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
+        var domId = test.domId + "-" + testRunId;
+
+        $("#activetests").append(html);
+
+        $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
+        $("#activetests #" + domId + " .throbber")[0].setAttribute("loading", "true");
+        $("#activetests #" + domId + " .removecell").click(
+            function(evt) {
+                var tid = testInfoFromElement(this);
+                doRemoveTest(tid);
+            }
+        );
+        test.testRunId = testRunId;
+    });
+}
+
 function doAddTestRun(testRunId, test) {
+    
     if (gActiveTests.indexOf(test.id+"-"+test.branch_id+"-"+test.machine_id+"-"+testRunId) != -1) {
         // test already exists, indicate that
         $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testRunId[0]).hide();
@@ -337,7 +362,7 @@ function makeTestLoadingDiv(test) {
 
     // The body content of the test entry
     html += "<td class='testmain' width='100%'>";
-    html += "<b class='test-name'>Loading test " + id + "</b><br>";
+    html += "<b class='test-name'>Loading latest testrun for  " + test.id + "</b><br>";
     
     // any trailing buttons/throbbers/etc.
     html += "<td style='white-space: nowrap'>";
@@ -370,7 +395,7 @@ function makeTestDiv(test, opts, testRun)
 {
     if (opts == null || typeof(opts) != "object")
         opts = {};
-    var buildid = getBuildIDFromSeriesTestList(test);
+    // var buildid = getBuildIDFromSeriesTestList(test);
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\w-]/g, "");
     var html = "";
     var domId = (testRun == null) ? test.domId : test.domId + "-" + testRun[0];
@@ -493,11 +518,18 @@ function updateAvailableTests()
     }
 
     //$("#availabletests .testmain").draggable();
-    var doAdd = function(evt) {
-        var testinfo = testInfoFromElement(this);
-        doAddTest(testinfo);
-    };
-
+    if (gGraphType == GRAPH_TYPE_VALUE) {
+        var doAdd = function(evt) {
+            var testinfo = testInfoFromElement(this);
+            doAddTest(testinfo);
+        };
+    } else {
+        var doAdd = function(evt) {
+            var testInfo = testInfoFromElement(this);
+            addLatestTestRun(testInfo);
+        }
+    }
+    
     $("#availabletests .dateaddcell").click(doAddWithDate);
     $("#availabletests .addcell").click(doAdd);
     $("#availabletests #testline").dblclick(doAdd);
@@ -533,119 +565,6 @@ function testIdFromElement(el) {
     return parseInt(k[1]);
 }
 
-function platformFromData(t)
-{
-    if ('machine' in t) {
-        var m = t.machine.toLowerCase();
-        if (m.indexOf('qm-pxp') != -1 ||
-            m.indexOf('qm-mini-xp') != -1 ||
-            m.indexOf('bldxp') != -1 ||
-            m.indexOf('winxp') != -1)
-            return "Windows XP";
-        if (m.indexOf('vista') != -1)
-            return "Windows Vista";
-        if (m.indexOf('winnt_5.2') != -1)
-            return "Windows Server 2003";
-        if (m.indexOf('bldlnx') != -1 ||
-            m.indexOf('linux') != -1 ||
-            m.indexOf('ubuntu') != -1)
-            return "Linux";
-        if (m.indexOf('xserve') != -1 ||
-            m.indexOf('pmac') != -1 ||
-	    m.indexOf('tiger') != -1 ||
-	    m.indexOf('os_x_10.4') != -1)
-            return "MacOS X 10.4";
-	if (m.indexOf('leopard') != -1 ||
-	    m.indexOf('os_x_10.5') != -1)
-            return "MacOS X 10.5";	    
-    }
-
-    return "Unknown";
-}
-
-function branchFromData(t)
-{
-    if ("branch" in t)
-        return t.branch;
-
-    if ("extra_data" in t) {
-        var d = t.extra_data;
-        if (/branch=1\.9/.test(d))
-            return "1.9";
-        if (/branch=1\.8/.test(d))
-            return "1.8";
-    }
-
-    if ("machine" in t) {
-        var m = t.machine;
-        if (/-18/.test(m))
-            return "1.8";
-    }
-
-    return "Unknown";
-}
-
-function testFromData(t)
-{
-    var testTranslation = {
-        'codesighs':                     'Codesighs',
-        'codesighs_embed':               'Codesighs (Embed)',
-        'codesize':                      'Codesighs',
-        'codesize_embed':                'Codesighs (Embed)',
-        'dhtml':                         'DHTML',
-        'pageload':                      'Tp',
-        'pageload2':                     'Tp2',
-        'refcnt_leaks':                  'Refcnt Leaks',
-        'startup':                       'Ts',
-        'testBulkAdd':                   'Bulk Add',
-        'testBulkAdd_avg':               'Bulk Add',
-        'tdhtml':                        'DHTML',
-        'tdhtml_avg':                    'DHTML',
-        'tgfx':                          'Tgfx',
-        'tgfx_avg':                      'Tgfx',
-        'tjss':                          'Dromaeo',
-        'tjss_avg':                      'Dromaeo',
-        'tp':                            'Tp3',
-        'tp_avg':                        'Tp3',
-        'tp_js':                         'Tp2',
-        'tp_js_avg':                     'Tp2',
-        'tp_js_loadtime':                'Tp2',
-        'tp_js_loadtime_avg':            'Tp2',
-        'tp_js_Private Bytes':           'Tp2 (Mem-PB)',
-        'tp_js_Private Bytes_avg':       'Tp2 (Mem-PB)',
-        'tp_js_RSS':                     'Tp2 (RSS)',
-        'tp_js_RSS_avg':                 'Tp2 (RSS)',
-        'tp_loadtime':                   'Tp3',
-        'tp_loadtime_avg':               'Tp3',
-        'tp_Percent Processor Time':     'Tp3 (CPU)',
-        'tp_Percent Processor Time_avg': 'Tp3 (CPU)',
-        'tp_Private Bytes':              'Tp3 (Mem-PB)',
-        'tp_Private Bytes_avg':          'Tp3 (Mem-PB)',
-        'tp_RSS':                        'Tp3 (RSS)',
-        'tp_RSS_avg':                    'Tp3 (RSS)',
-        'tp_Working Set':                'Tp3 (Mem-WS)',
-        'tp_Working Set_avg':            'Tp3 (Mem-WS)',
-        'tp_XRes':                       'Tp3 (XRes)',
-        'tp_XRes_avg':                   'Tp3 (XRes)',
-        'trace_malloc_allocs':           'Trace Malloc Allocs',
-        'trace_malloc_leaks':            'Trace Malloc Leaks',
-        'trace_malloc_maxheap':          'Trace Malloc Max Heap',
-        'ts':                            'Ts',
-        'ts_avg':                        'Ts',
-        'tsspider':                      'SunSpider',
-        'tsspider_avg':                  'SunSpider',
-        'tsvg':                          'Tsvg',
-        'tsvg_avg':                      'Tsvg',
-        'twinopen':                      'Txul',
-        'twinopen_avg':                  'Txul',
-        'xulwinopen':                    'Txul',
-    };
-
-    if (t.test in testTranslation)
-        return testTranslation[t.test];
-
-    return t.test;
-}
 
 function transformLegacyData(testList)
 {
@@ -676,9 +595,6 @@ function transformLegacyData(testList)
     gAllTestsList = gTestList;
 }
 
-function makeSeriesTestKey(t) {
-    return t.machine + branchFromData(t) + testFromData(t);
-}
 
 function makeTestKey(test) {
     var testKey = test.id + "-" + test.branch_id +"-" + test.machine_id;
@@ -686,59 +602,6 @@ function makeTestKey(test) {
         testKey += "-"+test.testRunId;
     }
     return testKey;
-}
-
-function getBuildIDFromSeriesTestList(t) {
-    var key = makeSeriesTestKey(t);
-    if (gSeriesTestList[key]) {
-        for (var i = 0; i < gSeriesTestList[key].length; i++) {
-	    if (t.date == gSeriesTestList[key][i].date) {
-                if (gSeriesTestList[key][i].buildid &&
-		    gSeriesTestList[key][i].buildid != "") {
-		    return gSeriesTestList[key][i].buildid;
-		}
-	    }
-	}
-    }
-    return "undefined";
-}
-
-function transformLegacySeriesData(testList)
-{
-    //log(testList.toSource());
-
-    for (var i = 0; i < testList.length; i++) {
-        var t = testList[i];
-        var key = makeSeriesTestKey(t); //machine + branch + test = makeSeriesTestKey
-
-        var ob = {
-            tid: t.id,
-            platform: platformFromData(t),
-            machine: t.machine,
-            branch: branchFromData(t),
-            test: testFromData(t),
-            testname: t.test,
-            date: t.date,
-            buildid: t.buildid,
-        };
-
-        if (key in quickList) {
-            if (quickList[key].newest < (t.date * 1000)) {
-                quickList[key].tid = t.id;
-                quickList[key].newest = t.date * 1000;
-            }
-        } else {
-            var obcore = { tid: ob.tid, platform: ob.platform, machine: ob.machine, branch: ob.branch, testname: ob.testname, test: ob.test, date: ob.date };
-
-            gTestList.push(obcore);
-            quickList[key] = obcore;
-
-            gSeriesTestList[key] = [];
-        }
-
-        gAllTestsList.push(ob);
-        gSeriesTestList[key].push({ tid: t.id, date: t.date, buildid: t.buildid });
-    }
 }
 
 function populateFilters()
