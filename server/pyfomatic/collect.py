@@ -149,6 +149,7 @@ def _updateAverageForTestRun(average, databaseCursor, inputStream, metadata):
 def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
   sum = 0
   for lineNumber, aLine in enumerate(inputStream):
+    aLine = aLine.strip()
     if aLine.upper() in 'END':
       break
     values = [x.strip() for x in aLine.split(',')]
