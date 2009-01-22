@@ -216,9 +216,11 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
 
     inputStream = theForm["filename"].file
     startLine = inputStream.readline()
+    responseList.append('line 1: "%s"' % startLine)
     if startLine.upper() not in 'START':
       raise ImproperFormatException("input stream did not begin with 'START'")
     dataSetType = inputStream.readline().upper()
+    responseList.append('line 2: "%s"' % dataSetType)
     if dataSetType not in ('VALUES', 'AVERAGE'):
       raise ImproperFormatException("data set type was not 'VALUES' or 'AVERAGE'")
 
