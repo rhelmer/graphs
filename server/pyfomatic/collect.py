@@ -44,7 +44,7 @@ class MetaDataFromTalos(object):
   #-----------------------------------------------------------------------------------------------------------------
   def readFromSource (self, dataSource):
     try:
-      dataSource = dataSource.readline()
+      dataSource = dataSource.readline().strip()
     except AttributeError:
       pass
     try:
@@ -193,7 +193,7 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
 
 #-----------------------------------------------------------------------------------------------------------------
 def averageReader(databaseCursor, databaseModule, inputStream, metadata):
-  averageAsString = inputStream.readline()
+  averageAsString = inputStream.readline().strip()
   try:
     average = float(averageAsString)
   except Exception, x:
@@ -215,12 +215,12 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
       raise ImproperFormatException("Cannot find input stream")
 
     inputStream = theForm["filename"].file
-    startLine = inputStream.readline()
-    responseList.append('line 1: "%s"' % startLine)
+    startLine = inputStream.readline().strip()
+    #responseList.append('line 1: "%s"' % startLine)
     if startLine.upper() not in 'START':
       raise ImproperFormatException("input stream did not begin with 'START'")
-    dataSetType = inputStream.readline().upper()
-    responseList.append('line 2: "%s"' % dataSetType)
+    dataSetType = inputStream.readline().strip().upper()
+    #responseList.append('line 2: "%s"' % dataSetType)
     if dataSetType not in ('VALUES', 'AVERAGE'):
       raise ImproperFormatException("data set type was not 'VALUES' or 'AVERAGE'")
 
