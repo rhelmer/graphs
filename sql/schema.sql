@@ -47,7 +47,7 @@ CREATE TABLE branches (
 DROP TABLE IF EXISTS builds;
 CREATE TABLE builds (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-   ref_build_id INT UNSIGNED,
+   ref_build_id BIGINT UNSIGNED,
    ref_changeset VARCHAR(255),
    branch_id SMALLINT UNSIGNED NOT NULL,
    date_added INT UNSIGNED NOT NULL,
