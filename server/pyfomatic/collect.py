@@ -122,8 +122,8 @@ class MetaDataFromTalos(object):
     try:
       databaseCursor.execute("""select max(run_number)
                                 from test_runs
-                                where machine_id = %s and test_id = %s and branch_id = %s""",
-                                (self.machine_id, self.test_id, self.branch_id))
+                                where machine_id = %s and test_id = %s and build_id = %s""",
+                                (self.machine_id, self.test_id, self.build_id))
       self.run_number = databaseCursor.fetchall()[0][0] + 1
     except (self.databaseModule.Error, IndexError), x:
       databaseCursor.connection.rollback()
@@ -187,7 +187,7 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
     try:
       databaseCursor.execute("""insert into test_run_values
                                 (test_run_id,          interval_id, value,     page_id) values
-                                (%s,                  %s,          %s,        %s)""",
+                                (%s,                   %s,          %s,        %s)""",
                                 (metadata.test_run_id, values[0],   values[1], page_id))
     except Exception, x:
       databaseCursor.connection.rollback()

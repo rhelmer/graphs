@@ -72,13 +72,13 @@ metadataTest2 = "machine_1, test_1, branch_1, changeset_1, 13, 1229477017\n"
 
 #-----------------------------------------------------------------------------------------------------------------
 databaseSelectResponsesTest1 = {
-  ("machine_1",): 234,
-  (234,): 1,  #os_id
-  ("test_1",): 45,
-  ("branch_1",): 3455,
-  (3455, 13,"changeset_1"): 2220,
-  (234, 45, 3455): 99,
-  (234, 45, 2220, 100): 6667,
+  ("machine_1",): 234,            #machine_id given machine_name
+  (234,): 1,                      #os_id given machine_id
+  ("test_1",): 45,                #test_id given test_name
+  ("branch_1",): 3455,            #branch_id given branch_name
+  (3455, 13,"changeset_1"): 2220, #build_id given branch_id, ref_build_id, ref_changeset
+  (234, 45, 2220): 99,            #max(run_number) given machine_id, test_id, branch_id
+  (234, 45, 2220, 100): 6667,     #test_run_id given machine_id, test_id, build_id, run_number
   ("page_01",): 1001,
   ("page_02",): 1002,
   ("page_03",): 1003,
