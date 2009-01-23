@@ -116,6 +116,7 @@ class MetaDataFromTalos(object):
       except (self.databaseModule.Error, IndexError), x:
         databaseCursor.connection.rollback()
         raise DatabaseException("Unable to create a build with unique keys: branch_id:'%s', ref_build_id:'%s', ref_changeset:'%s'\n%s" % (self.branch_id, self.ref_build_id, self.ref_changeset, str(x)))
+    databaseCursor.connection.commit()
 
     #create new test_run record
     try:
