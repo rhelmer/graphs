@@ -68,6 +68,7 @@ class FakeForm(dict):
 
 #=================================================================================================================
 metadataTest1 = [ "machine_1", "test_1", "branch_1", "changeset_1", 13, 1229477017]
+metadataTest2 = "machine_1, test_1, branch_1, changeset_1, 13, 1229477017\n"
 
 #-----------------------------------------------------------------------------------------------------------------
 databaseSelectResponsesTest1 = {
@@ -214,6 +215,19 @@ def test_MetaDataFromTalos_2():
   fakeCursor = FakeCursor(databaseSelectResponsesTest2)
   py.test.raises(c.DatabaseException, c.MetaDataFromTalos, fakeCursor, FakeDatabaseModule, metadataTest1)
   assert fakeCursor.inTransaction == False
+
+#-----------------------------------------------------------------------------------------------------------------
+def test_MetaDataFromTalos_3():
+  fakeCursor = FakeCursor(databaseSelectResponsesTest1)
+  metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest2)
+  assert fakeCursor.inTransaction == False
+  assert metadata.machine_id == 234
+  #assert metadata.os_id == 1
+  assert metadata.test_id == 45
+  assert metadata.branch_id == 3455
+  assert metadata.build_id == 2220
+  assert metadata.test_run_id == 6667
+  #assert type(metadata.ref_build_id) == long
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_valuesReader():

@@ -33,7 +33,7 @@ class StringValidator(object):
 #=================================================================================================================
 class MetaDataFromTalos(object):
   fieldNames = ["machine_name",           "test_name",              "branch_name",            "ref_changeset",          "ref_build_id","date_run"]
-  fieldTypes = [StringValidator.validate, StringValidator.validate, StringValidator.validate, StringValidator.validate, int,           int       ]
+  fieldTypes = [StringValidator.validate, StringValidator.validate, StringValidator.validate, StringValidator.validate, long,           long       ]
   nameTypeAssociations = dict(zip(fieldNames, fieldTypes))
   #-----------------------------------------------------------------------------------------------------------------
   def __init__(self, databaseCursor, databaseModule, dataSource):
@@ -61,6 +61,7 @@ class MetaDataFromTalos(object):
         setattr(self, name, convertedValue)
       except Exception, x:
         raise ImproperFormatException(str(x))
+    assert type(self.ref_build_id) == int
   #-----------------------------------------------------------------------------------------------------------------
   def doDatabaseThings (self, databaseCursor):
     # get machine_id
@@ -105,7 +106,14 @@ class MetaDataFromTalos(object):
                                   (self.ref_build_id, self.ref_changeset, self.branch_id, int(time.time())))
         databaseCursor.execute("select id from builds where branch_id = %s and ref_build_id = %s and ref_changeset = %s",
                                (self.branch_id, self.ref_build_id, self.ref_changeset))
-        self.build_id = databaseCursor.fetchall()[0][0]
+        resultSet = databaseCursor.fetchall()
+        print "resultSet:", resultSet
+        row = resultSet[0]
+        print "row:", row
+        column = row[0]
+        print "column:", column
+        self.build_id = column
+        #self.build_id = databaseCursor.fetchall()[0][0]
       except (self.databaseModule.Error, IndexError), x:
         databaseCursor.connection.rollback()
         raise DatabaseException("Unable to create a build with unique keys: branch_id:'%s', ref_build_id:'%s', ref_changeset:'%s'\n%s" % (self.branch_id, self.ref_build_id, self.ref_changeset, str(x)))
@@ -179,7 +187,7 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
     try:
       databaseCursor.execute("""insert into test_run_values
                                 (test_run_id,          interval_id, value,     page_id) values
-                                (%s,                  %s,          %s,        %s""",
+                                (%s,                  %s,          %s,        %s)""",
                                 (metadata.test_run_id, values[0],   values[1], page_id))
     except Exception, x:
       databaseCursor.connection.rollback()
