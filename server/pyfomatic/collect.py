@@ -61,7 +61,6 @@ class MetaDataFromTalos(object):
         setattr(self, name, convertedValue)
       except Exception, x:
         raise ImproperFormatException(str(x))
-    assert type(self.ref_build_id) == int
   #-----------------------------------------------------------------------------------------------------------------
   def doDatabaseThings (self, databaseCursor):
     # get machine_id
@@ -148,10 +147,10 @@ class MetaDataFromTalos(object):
 #-----------------------------------------------------------------------------------------------------------------
 def _updateAverageForTestRun(average, databaseCursor, inputStream, metadata):
   try:
-    databaseCursor.execute("""update test_run set average = %s where id = %s""", (average, metadata.test_run_id))
+    databaseCursor.execute("""update test_runs set average = %s where id = %s""", (average, metadata.test_run_id))
   except Exception, x:
     databaseCursor.connection.rollback()
-    raise DatabaseException("unable to update average 'test_run' for id:%s : %s" % (metadata.test_run_id, str(x)))
+    raise DatabaseException("unable to update average 'test_runs' for id:%s : %s" % (metadata.test_run_id, str(x)))
 
 #-----------------------------------------------------------------------------------------------------------------
 def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
@@ -241,7 +240,7 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
       responseList.append("RETURN:%s:graph.html#runid=%d" % (metadata.test_name, metadata.test_run_id))
     else:
       average = averageReader(databaseCursor, databaseModule, inputStream, metadata)
-    responseList.append("""RETURN:%s:%.2f:graph.html#tests=[{"id":%d,"branchid":%d,"machineid":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
+    responseList.append("""RETURN:%s:%.2f:graph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
 
   except Exception, x:
     responseList.append(x)
