@@ -4,10 +4,24 @@ import sys
 import time
 import re
 
+import traceback
+import cStringIO
+
+#-----------------------------------------------------------------------------------------------------------------
+def getTraceback():
+  exceptionType, exception, tracebackInfo = sys.exc_info()
+  stringStream = cStringIO.StringIO()
+  try:
+    traceback.print_tb(tracebackInfo, None, stringStream)
+    tracebackString = stringStream.getvalue()
+  finally:
+    stringStream.close()
+  return tracebackString
 
 #=================================================================================================================
 class Error(Exception):
-  pass
+  def __init__(self, str):
+    super(Error, self).__init__("%s\n%s" % (str, getTraceback()))
 #=================================================================================================================
 class ImproperFormatException(Error):
   pass
