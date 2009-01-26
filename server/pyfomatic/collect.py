@@ -20,8 +20,7 @@ def getTraceback():
 
 #=================================================================================================================
 class Error(Exception):
-  def __init__(self, str):
-    super(Error, self).__init__("%s\n%s" % (str, getTraceback()))
+  pass
 #=================================================================================================================
 class ImproperFormatException(Error):
   pass
@@ -261,6 +260,7 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
 
   except Exception, x:
     responseList.append(x)
+    responseList.append(getTraceback())
     exitCode = 500
 
   for aResponseLine in responseList:
