@@ -142,6 +142,8 @@ class MetaDataFromTalos(object):
     except (self.databaseModule.Error, IndexError), x:
       databaseCursor.connection.rollback()
       self.run_number = 0
+    except TypeError, x:
+      raise DatabaseException("The database seems to have a null in a run number column")
     try:
       databaseCursor.execute("""insert into test_runs
                                 (machine_id,      test_id,      build_id,      run_number,      date_run) values
@@ -196,7 +198,7 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
             raise DatabaseException("no page_id found for page '%s': %s" % (values[2], str(x)))
       except IndexError:
         page_id = None
-    except ValueError, x:
+    except (ValueError, TypeError), x:
       raise ImproperFormatException("value set #%s has a bad value: %s" % (lineNumber, str(x)))
     try:
       databaseCursor.execute("""insert into test_run_values

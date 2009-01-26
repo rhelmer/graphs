@@ -100,7 +100,7 @@ databaseSelectResponsesTest2 = {
   ("test_1",): 45,
   #("branch_1",): 3455,
   (3455, 13,"changeset_1"): 2220,
-  (234, 45, 3455): 99,
+  (234, 45, 2220): 99,
   (234, 45, 2220, 100): 6667,
   }
 
@@ -179,7 +179,76 @@ fullStream03 = [ "START\n",
                  "10,1.0,page_10\n",
                  "END\n"
               ]
+#-----------------------------------------------------------------------------------------------------------------
 
+fullStream04 = ["START\n",
+      "VALUES\n",
+      "qm-pubuntu-stage01,tsunspider,Firefox,a2018012b3ee,20090115164131,1232835319\n",
+      "0,208,3d-cube.html\n",
+      "1,118,3d-morph.html\n",
+      "2,220,3d-raytrace.html\n",
+      "3,164,access-binary-trees.html\n",
+      "4,238,access-fannkuch.html\n",
+      "5,123,access-nbody.html\n",
+      "6,84,access-nsieve.html\n",
+      "7,48,bitops-3bit-bits-in-byte.html\n",
+      "8,84,bitops-bits-in-byte.html\n",
+      "9,51,bitops-bitwise-and.html\n",
+      "10,110,bitops-nsieve-bits.html\n",
+      "11,132,controlflow-recursive.html\n",
+      "12,131,crypto-aes.html\n",
+      "13,93,crypto-md5.html\n",
+      "14,66,crypto-sha1.html\n",
+      "15,365,date-format-tofte.html\n",
+      "16,315,date-format-xparb.html\n",
+      "17,133,math-cordic.html\n",
+      "18,110,math-partial-sums.html\n",
+      "19,67,math-spectral-norm.html\n",
+      "20,213,regexp-dna.html\n",
+      "21,86,string-base64.html\n",
+      "22,217,string-fasta.html\n",
+      "23,307,string-tagcloud.html\n",
+      "24,382,string-unpack-code.html\n",
+      "25,168,string-validate-input.html\n",
+      "END\n",
+    ]
+
+ #-----------------------------------------------------------------------------------------------------------------
+databaseSelectResponsesTest4 = {
+  ("qm-pubuntu-stage01",): 234,
+  (234,): 1,  #os_id
+  ("tsunspider",): 45,
+  ("Firefox",): 3455,
+  (3455, 20090115164131L,"a2018012b3ee"): 2220,
+  (234, 45, 2220): 99,
+  (234, 45, 2220, 100): 6667,
+  ("3d-cube.html",): 10000,
+  ("3d-morph.html",):10001,
+  ("3d-raytrace.html",):10002,
+  ("access-binary-trees.html",):10003,
+  ("access-fannkuch.html",):10004,
+  ("access-nbody.html",):10005,
+  ("access-nsieve.html",):10006,
+  ("bitops-3bit-bits-in-byte.html",):10007,
+  ("bitops-bits-in-byte.html",):10008,
+  ("bitops-bitwise-and.html",):10009,
+  ("bitops-nsieve-bits.html",):10001,
+  ("controlflow-recursive.html",):10011,
+  ("crypto-aes.html",):10012,
+  ("crypto-md5.html",):100113,
+  ("crypto-sha1.html",):10014,
+  ("date-format-tofte.html",):10015,
+  ("date-format-xparb.html",):10016,
+  ("math-cordic.html",):100017,
+  ("math-partial-sums.html",):10018,
+  ("math-spectral-norm.html",):10019,
+  ("regexp-dna.html",):10020,
+  ("string-base64.html",):10021,
+  ("string-fasta.html",):10022,
+  ("string-tagcloud.html",):10023,
+  ("string-unpack-code.html",):10024,
+  ("string-validate-input.html",):10025,
+  }
 #=================================================================================================================
 
 #-----------------------------------------------------------------------------------------------------------------
@@ -200,6 +269,7 @@ def test_StringValidator():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_MetaDataFromTalos_1():
+  print "test_MetaDataFromTalos_1"
   fakeCursor = FakeCursor(databaseSelectResponsesTest1)
   metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
   assert fakeCursor.inTransaction == False
@@ -212,12 +282,14 @@ def test_MetaDataFromTalos_1():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_MetaDataFromTalos_2():
+  print "test_MetaDataFromTalos_2"
   fakeCursor = FakeCursor(databaseSelectResponsesTest2)
   py.test.raises(c.DatabaseException, c.MetaDataFromTalos, fakeCursor, FakeDatabaseModule, metadataTest1)
   assert fakeCursor.inTransaction == False
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_MetaDataFromTalos_3():
+  print "test_MetaDataFromTalos_3"
   fakeCursor = FakeCursor(databaseSelectResponsesTest1)
   metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest2)
   assert fakeCursor.inTransaction == False
@@ -231,6 +303,7 @@ def test_MetaDataFromTalos_3():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_valuesReader():
+  print "test_valuesReader"
   fakeCursor = FakeCursor(databaseSelectResponsesTest1)
   metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
   average = c.valuesReader(fakeCursor, FakeDatabaseModule, FakeInputStream(valuesList1), metadata)
@@ -239,6 +312,7 @@ def test_valuesReader():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_averageReader():
+  print "test_averageReader"
   fakeCursor = FakeCursor(databaseSelectResponsesTest1)
   metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
   average = c.averageReader(fakeCursor, FakeDatabaseModule, FakeInputStream(averageList1), metadata)
@@ -247,6 +321,7 @@ def test_averageReader():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestValues01():
+  print "test_handleRequestValues01"
   fakeCursor = FakeCursor(databaseSelectResponsesTest1)
   fakeForm = FakeForm(fullStream01)
   s = StringIO.StringIO()
@@ -260,6 +335,7 @@ def test_handleRequestValues01():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestValues02():
+  print "test_handleRequestValues02"
   fakeCursor = FakeCursor(databaseSelectResponsesTest2)
   fakeForm = FakeForm(fullStream01)
   exitCode = c.handleRequest(fakeForm, fakeCursor, c)
@@ -268,6 +344,7 @@ def test_handleRequestValues02():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestValues03():
+  print "test_handleRequestValues03"
   fakeCursor = FakeCursor(databaseSelectResponsesTest1)
   fakeForm = FakeForm(fullStream03)
   exitCode = c.handleRequest(fakeForm, fakeCursor, c)
@@ -276,6 +353,7 @@ def test_handleRequestValues03():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestAverage01():
+  print "test_handleRequestAverage01"
   fakeCursor = FakeCursor(databaseSelectResponsesTest1)
   fakeForm = FakeForm(fullStream02)
   s = StringIO.StringIO()
@@ -287,8 +365,20 @@ def test_handleRequestAverage01():
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestAverage02():
+  print "test_handleRequestAverage02"
   fakeCursor = FakeCursor(databaseSelectResponsesTest2)
   fakeForm = FakeForm(fullStream02)
   exitCode = c.handleRequest(fakeForm, fakeCursor, c)
   assert fakeCursor.inTransaction == False
   assert exitCode == 500
+
+#-----------------------------------------------------------------------------------------------------------------
+def test_handleRequestAverage04():
+  print "test_handleRequestAverage04"
+  fakeCursor = FakeCursor(databaseSelectResponsesTest4)
+  fakeForm = FakeForm(fullStream04)
+  exitCode = c.handleRequest(fakeForm, fakeCursor, c)
+  assert fakeCursor.inTransaction == False
+  #assert exitCode == 500
+
+test_handleRequestAverage04()
