@@ -161,12 +161,17 @@ function doFilterTests()
 }
 
 function doRemoveTest(id)
-{
-    gActiveTests = gActiveTests.filter(function(k) { 
-        return k.machine_id == id.machine_id && k.test_id == id.test_id && k.branch_id == id.branch_id; 
+{   
+    var testKey = makeTestKey(id);
+    console.log(id);
+    console.log(testKey);
+    console.log(gActiveTests);
+    gActiveTests = gActiveTests.filter(function(k) {
+        return k != testKey; 
     });
-
-    $("#activetests #testid-" + makeTestKey(id)).remove();
+    console.log(gActiveTests);
+    
+    $("#activetests #testid-" + testKey).remove();
 
     removeTestFromGraph(id);
     updateLinks();
@@ -236,7 +241,6 @@ function searchAndAddTest(testname, machine, date, branch) {
 
 function doAddTest(testInfo, optSkipAnimation)
 {
-    
     if (gActiveTests.indexOf(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id) != -1) {
         // test already exists, indicate that
         $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id).hide();
@@ -248,12 +252,13 @@ function doAddTest(testInfo, optSkipAnimation)
     var color = randomColor();
     var opts = { active: true };
     
-    if (gGraphType == GRAPH_TYPE_SERIES)
+    if (gGraphType == GRAPH_TYPE_SERIES) {
         opts.showDate = true;
-
-    gActiveTests.push(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id);
-    
-    
+        gActiveTests.push(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id);
+    } else {
+        gActiveTests.push(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id);
+    }
+        
     var html = makeTestDiv(t, opts);
 
     $("#activetests").append(html);
@@ -285,6 +290,12 @@ function addLatestTestRun(testInfo) {
     var loadingDiv = $("#activetests").append(html);
     
     addLatestTestRunToGraph(testInfo, function(ds, testInfo) {
+        if (gActiveTests.indexOf(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id+"-"+testInfo.testRunId) != -1) {
+            // test already exists, indicate that
+            $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testInfo.testRunId).hide();
+            $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testInfo.testRunId).fadeIn(300);
+            return;
+        }
         
         var test = findTestByInfo(testInfo);
         var testRun = testInfo.testRun;
@@ -292,7 +303,8 @@ function addLatestTestRun(testInfo) {
         ds.color = color;
         var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
         var domId = test.domId + "-" + testInfo.testRunId;
-                
+        gActiveTests.push(testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testInfo.testRunId);
+        
         $("#activetests").append(html);
         $("#activetests #"+test.domId).remove();
         $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
@@ -316,7 +328,7 @@ function doAddTestRun(testRunId, test) {
     }
 
     gActiveTests.push(test.id+"-"+test.branch_id+"-"+test.machine_id+"-"+testRunId);
-    
+
     var testRun = false;
     for(var i=0; i<currentTestRuns.length;i++) {
         if(currentTestRuns[i][0] == testRunId) {
@@ -538,9 +550,11 @@ function updateAvailableTests()
 }
 
 function testInfoFromElement(el) {
+    
     var k;
-    while (el.tagName != "body" &&
-           !(k = el.id.match(/^testid-([\d]+)-([\d]+)-([\d]+)$/)))
+    while (el.tagName != "body" && el.id != null &&
+           (!(k=el.id.match(/^testid-([\d]+)-([\d]+)-([\d]+)-([\d]+)$/)) &&
+           !(k = el.id.match(/^testid-([\d]+)-([\d]+)-([\d]+)$/))))
     {
         el = el.parentNode;
     }
@@ -549,6 +563,11 @@ function testInfoFromElement(el) {
         return -1;
     
     var obj = {id:k[1], branch_id:k[2], machine_id:k[3]};
+    
+    if(k[4]) {
+        obj.testRunId = k[4];
+    }
+    
     return obj;
 }
 
