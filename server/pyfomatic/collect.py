@@ -137,7 +137,10 @@ class MetaDataFromTalos(object):
                                 from test_runs
                                 where machine_id = %s and test_id = %s and build_id = %s""",
                                 (self.machine_id, self.test_id, self.build_id))
-      self.run_number = databaseCursor.fetchall()[0][0] + 1
+      result = self.run_number = databaseCursor.fetchall()
+      print """Content-type: text/plain\n\n %s\nfor\nselect max(run_number)\nfrom test_runs\nwhere machine_id = %s and test_id = %s and build_id = %s""" % (result, self.machine_id, self.test_id, self.build_id)
+      #self.run_number = databaseCursor.fetchall()[0][0] + 1
+      self.run_number = result[0][0] + 1
     except (self.databaseModule.Error, IndexError), x:
       databaseCursor.connection.rollback()
       self.run_number = 0
