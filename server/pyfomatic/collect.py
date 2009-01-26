@@ -193,11 +193,11 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
           page_id = None
         else:
           try:
-            databaseCursor.execute("select page_id from pages where page_name = %s", (values[2],))
+            databaseCursor.execute("select id from pages where page_name = %s", (values[2],))
             page_id = databaseCursor.fetchall()[0][0]
           except  (databaseModule.Error, IndexError), x:
             databaseCursor.connection.rollback()
-            raise DatabaseException("no page_id found for page '%s': %s" % (values[2], str(x)))
+            raise DatabaseException("no id found for page '%s': %s" % (values[2], str(x)))
       except IndexError:
         page_id = None
     except (ValueError, TypeError), x:
