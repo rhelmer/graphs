@@ -108,11 +108,12 @@ TinderboxData.prototype = {
     requestLatestDataSetFor: function (test, arg1, arg2, arg3) {
 
         var self = this;
-
         var startTime = arg1;
         var endTime = arg2;
         var callback = arg3;
-
+        var testKey = makeTestKey(test);
+        
+        
         if (arg1 && arg2 == null && arg3 == null) {
             callback = arg1;
             if (this.defaultLoadRange) {
@@ -154,7 +155,11 @@ TinderboxData.prototype = {
               function (resp) {
                 var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
                 
-                if (!checkErrorReturn(obj)) return;
+                if (!checkErrorReturn(obj)) return;    
+                
+                test.testRunId = obj.id;
+                test.testRun = [obj.id,[null,obj.build_id],obj.date_run,[]]
+                testKey = makeTestKey(test);
                 
                 var ds = gGraphType == GRAPH_TYPE_VALUE ? new TimeValueDataSet(obj.test_runs) : new TimeValueDataSet(obj.values);
                 //this is the the case of a discrete graph - where the entire test run is always requested
@@ -174,7 +179,6 @@ TinderboxData.prototype = {
                     ds.rawdata = obj.rawdata;
                 if (obj.stats)
                     ds.stats = obj.stats;
-              
                 $(self.eventTarget).trigger("tinderboxDataSetAvailable", [test, ds, startTime, endTime]);
 
                   });

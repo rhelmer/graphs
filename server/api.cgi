@@ -10,9 +10,12 @@ import gzip
 import minjson as json
 import cStringIO
 import MySQLdb.cursors
-from graphsdb import db
-
-
+try:
+    from graphsdb import db
+except Exception, x:
+    print "Content-type: text/plain\n\n"
+    print "{'stat':'fail', 'code':100,'message':'Could not connect to database'}"
+    sys.exit(500)
 
 def main():
     
@@ -26,7 +29,7 @@ def main():
     attribute = form.getvalue('attribute')
 
     #Dictionary to store the proper http response codes for various error codes returned by api functions
-    errorCodeResponses = {'101':'404', '102':'404', '103':'500', '104':'404', '105':'404'}
+    errorCodeResponses = {'100':'500','101':'404', '102':'404', '103':'500', '104':'404', '105':'404', '106':'404'}
     
     #Dictionary for available endpoints and their respective functions
     options = {'tests': getTests,
@@ -151,7 +154,7 @@ def getTestRun(id, attribute, form):
     if(attribute == 'values'):
         return getTestRunValues(id)
     elif(attribute == 'latest'):
-        return getLatestTestRunValues(id)
+        return getLatestTestRunValues(id, form)
     else:
         sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id as ref_build_id, builds.ref_changeset as changeset, os_list.name as os
                 FROM test_runs INNER JOIN builds ON (test_runs.build_id = builds.id) INNER JOIN os_list ON (builds.os_id = os_list.id)
@@ -167,22 +170,46 @@ def getTestRun(id, attribute, form):
             return {'stat':'fail', 'code':'104', 'message':'Test run not found'}
     return result
 
-def getLatestTestRunValues(id):
+def getLatestTestRunValues(id, form):
     #first get build information
-    sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset, MAX(date_run)
-               FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id) 
-               INNER JOIN branches ON (builds.branch_id = branches.id) 
-               INNER JOIN machines ON (test_runs.machine_id = machines.id)
-               WHERE test_runs.test_id = %s AND machines.id = %s AND branches.id = %s"""
     
-   #             cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-   # cursor.execute(sql, (id))
-   # 
-   # if cursor.rowcount == 1:
-   #     testRun = cursor.fetchone()
-   #  
-   #  #then get test run values
+    machineid = int(form.getvalue('machineid'))
+    branchid = int(form.getvalue('branchid'))
+    
+    sql = """SELECT 
+                test_runs.*, 
+                builds.id as build_id, 
+                builds.ref_build_id, 
+                builds.ref_changeset,
+                date_run
+               FROM 
+                    test_runs INNER JOIN builds ON (builds.id = test_runs.build_id) 
+                        INNER JOIN branches ON (builds.branch_id = branches.id) 
+                                INNER JOIN machines ON (test_runs.machine_id = machines.id)
+               WHERE 
+                    test_runs.test_id = %s 
+                    AND machines.id = %s 
+                    AND branches.id = %s 
+               ORDER BY 
+                    date_run DESC
+               LIMIT 1
+                    """
+    
+              
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql, (id, machineid, branchid))
+   
+    if cursor.rowcount == 1:
+        testRun = cursor.fetchone()
+        values = getTestRunValues(testRun['id'])
+        if values['stat'] == 'ok':
+            result = {'stat':'ok', 'id':testRun['id'], 'date_run':testRun['date_run'], 'build_id':testRun['ref_build_id'], 'values':values['values']}
+        else:
+            result = values
+    else:
+        result = {'stat':'fail', 'code':'106', 'message':'No values found for test '+str(id)}
 
+    return result
 
 
 def getTestRunValues(id):

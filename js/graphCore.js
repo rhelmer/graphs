@@ -217,15 +217,16 @@ function addLatestTestRunToGraph(test, cb) {
 
     var makeCallback = function (average, title, theCallback) {
         return function (test, ds) {
+
             if (theCallback)
-                theCallback.call(window, ds);
+                theCallback.call(window, ds, test);
 
             if (!("firstTime" in ds) || !("lastTime" in ds)) {
                 // got a data set with no data in this time range, or damaged data
                 // better to not graph
                 return;
             }
-
+            
             CurrentDataSets[makeTestKey(test)] = ds;
             syncDerived();
             ds.test = test;

@@ -150,7 +150,6 @@ TimeValueDataSet.prototype = {
             }
         }
         
-        console.log(massagedData);
         data = massagedData;
         delete massagedData;
         

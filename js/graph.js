@@ -280,26 +280,29 @@ function doAddTest(testInfo, optSkipAnimation)
 }
 
 function addLatestTestRun(testInfo) {
-    var html = makeTestLoadingDiv(testInfo);
-    $("#activetests").append(html);
+    var test = findTestByInfo(testInfo);
+    var html = makeTestLoadingDiv(test);
+    var loadingDiv = $("#activetests").append(html);
     
     addLatestTestRunToGraph(testInfo, function(ds, testInfo) {
         
+        var test = findTestByInfo(testInfo);
+        var testRun = testInfo.testRun;
         var color = randomColor();
+        ds.color = color;
         var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
-        var domId = test.domId + "-" + testRunId;
-
+        var domId = test.domId + "-" + testInfo.testRunId;
+                
         $("#activetests").append(html);
-
+        $("#activetests #"+test.domId).remove();
         $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
-        $("#activetests #" + domId + " .throbber")[0].setAttribute("loading", "true");
         $("#activetests #" + domId + " .removecell").click(
             function(evt) {
                 var tid = testInfoFromElement(this);
                 doRemoveTest(tid);
             }
         );
-        test.testRunId = testRunId;
+
     });
 }
 
@@ -323,7 +326,6 @@ function doAddTestRun(testRunId, test) {
 
     if(!testRun)
         return;
-
     var color = randomColor();
     var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
     var domId = test.domId + "-" + testRunId;
