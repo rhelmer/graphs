@@ -118,14 +118,7 @@ class MetaDataFromTalos(object):
                                   (self.ref_build_id, self.ref_changeset, self.branch_id, int(time.time())))
         databaseCursor.execute("select id from builds where branch_id = %s and ref_build_id = %s and ref_changeset = %s",
                                (self.branch_id, self.ref_build_id, self.ref_changeset))
-        resultSet = databaseCursor.fetchall()
-        print "resultSet:", resultSet
-        row = resultSet[0]
-        print "row:", row
-        column = row[0]
-        print "column:", column
-        self.build_id = column
-        #self.build_id = databaseCursor.fetchall()[0][0]
+        self.build_id = databaseCursor.fetchall()[0][0]
       except (self.databaseModule.Error, IndexError), x:
         databaseCursor.connection.rollback()
         raise DatabaseException("Unable to create a build with unique keys: branch_id:'%s', ref_build_id:'%s', ref_changeset:'%s'\n%s" % (self.branch_id, self.ref_build_id, self.ref_changeset, str(x)))
@@ -190,7 +183,7 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
       values[1] = float(values[1])
       maxValue = max(maxValue, values[1])
       sum += values[1]
-      print values[1]
+      #print values[1]
       try:
         if values[2].lower() == 'null':
           page_id = None
@@ -267,10 +260,10 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
     metadata = MetaDataFromTalos(databaseCursor, databaseModule, inputStream)
     if dataSetType == 'VALUES':
       average = valuesReader(databaseCursor, databaseModule, inputStream, metadata)
-      responseList.append("RETURN:%s:graph.html#runid=%d" % (metadata.test_name, metadata.test_run_id))
+      responseList.append("""RETURN\t%s\tgraph.html#type=series&tests=[{"test":%d,"branch":%d,"machine":%d,"testrun":%d}]""" % (metadata.test_name, metadata.test_id, metadata.branch_id, metadata.machine_id, metadata.test_run_id))
     else:
       average = averageReader(databaseCursor, databaseModule, inputStream, metadata)
-    responseList.append("""RETURN:%s:%.2f:graph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
+    responseList.append("""RETURN\t%s\t%.2f\tgraph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
 
   except Exception, x:
     responseList.append(x)
