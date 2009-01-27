@@ -174,6 +174,7 @@ def _updateAverageForTestRun(average, databaseCursor, inputStream, metadata):
 #-----------------------------------------------------------------------------------------------------------------
 def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
   sum = 0
+  maxValue = 0.0
   for lineNumber, aLine in enumerate(inputStream):
     aLine = aLine.strip()
     if aLine.upper() in 'END':
@@ -187,7 +188,9 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
     try:
       values[0] = int(values[0])
       values[1] = float(values[1])
+      maxValue = max(maxValue, values[1])
       sum += values[1]
+      print values[1]
       try:
         if values[2].lower() == 'null':
           page_id = None
@@ -211,7 +214,9 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
       databaseCursor.connection.rollback()
       raise DatabaseException("unable to insert new record into 'test_run_values': %s" % str(x))
   try:
-    average = sum / lineNumber
+    print "######", sum, maxValue, lineNumber
+    sum -= maxValue
+    average = sum / (lineNumber - 1)
   except ZeroDivisionError:
     raise ValueException("No values were found in this dataset")
   _updateAverageForTestRun(average, databaseCursor, inputStream, metadata)
