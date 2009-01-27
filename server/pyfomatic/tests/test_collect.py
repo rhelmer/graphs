@@ -79,6 +79,7 @@ databaseSelectResponsesTest1 = {
   (3455, 13,"changeset_1"): 2220, #build_id given branch_id, ref_build_id, ref_changeset
   (234, 45, 2220): 99,            #max(run_number) given machine_id, test_id, branch_id
   (234, 45, 2220, 100): 6667,     #test_run_id given machine_id, test_id, build_id, run_number
+  (6667, 6667): 2.0,              #average given testrun_id twice
   ("page_01",): 1001,
   ("page_02",): 1002,
   ("page_03",): 1003,
@@ -102,6 +103,7 @@ databaseSelectResponsesTest2 = {
   (3455, 13,"changeset_1"): 2220,
   (234, 45, 2220): 99,
   (234, 45, 2220, 100): 6667,
+  (6667, 6667): 2.0,              #average given testrun_id twice
   }
 
 #-----------------------------------------------------------------------------------------------------------------

@@ -213,12 +213,18 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
     except Exception, x:
       databaseCursor.connection.rollback()
       raise DatabaseException("unable to insert new record into 'test_run_values': %s" % str(x))
+  #try:
+    #sum -= maxValue
+    #average = sum / (lineNumber - 1)
+  #except ZeroDivisionError:
+    #raise ValueException("No values were found in this dataset")
   try:
-    print "######", sum, maxValue, lineNumber
-    sum -= maxValue
-    average = sum / (lineNumber - 1)
-  except ZeroDivisionError:
-    raise ValueException("No values were found in this dataset")
+    databaseCursor.execute("""select avg(value) from test_run_values where test_run_id = %s and value not in (select max(value) where test_run_id = %s)""",
+                              (metadata.test_run_id, metadata.test_run_id))
+    average = databaseCursor.fetchall()[0][0]
+  except Exception, x:
+    databaseCursor.connection.rollback()
+    raise DatabaseException("to determine average from 'test_run_values' for  %s - %s" % (metadata.test_run_id, str(x)))
   _updateAverageForTestRun(average, databaseCursor, inputStream, metadata)
   databaseCursor.connection.commit()
   return average
