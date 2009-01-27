@@ -212,7 +212,7 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
   #except ZeroDivisionError:
     #raise ValueException("No values were found in this dataset")
   try:
-    databaseCursor.execute("""select avg(value) from test_run_values where test_run_id = %s and value not in (select max(value) where test_run_id = %s)""",
+    databaseCursor.execute("""select avg(value) from test_run_values where test_run_id = %s and value not in (select max(value) from test_run_values where test_run_id = %s)""",
                               (metadata.test_run_id, metadata.test_run_id))
     average = databaseCursor.fetchall()[0][0]
   except Exception, x:
