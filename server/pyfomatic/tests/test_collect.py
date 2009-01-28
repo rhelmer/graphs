@@ -107,6 +107,18 @@ databaseSelectResponsesTest2 = {
   }
 
 #-----------------------------------------------------------------------------------------------------------------
+databaseSelectResponsesTest3 = {
+  ("machine_1",): 234,
+  (234,): 1,  #os_id
+  ("test_1",): 45,
+  ("branch_1",): 3455,
+  (3455, 13,"changeset_1"): 2220,
+  (234, 45, 2220): 99,
+  (234, 45, 2220, 100): 6667,
+  #(6667, 6667): 2.0,              #average given testrun_id twice not given
+  }
+
+#-----------------------------------------------------------------------------------------------------------------
 valuesList1 = [ "1, 2.0,page_01",
                 "2, 2.0,page_02",
                 "3, 3.0,page_03",
@@ -181,8 +193,8 @@ fullStream03 = [ "START\n",
                  "10,1.0,page_10\n",
                  "END\n"
               ]
-#-----------------------------------------------------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------------------------------------------
 fullStream04 = ["START\n",
       "VALUES\n",
       "qm-pubuntu-stage01,tsunspider,Firefox,a2018012b3ee,20090115164131,1232835319\n",
@@ -215,7 +227,14 @@ fullStream04 = ["START\n",
       "END\n",
     ]
 
- #-----------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
+fullStream05 = [ "START\n",
+                 "VALUES\n",
+                 "machine_1, test_1, branch_1, changeset_1, 13, 1229477017\n",
+                 "1, 2.0\n",
+                 "END\n"
+              ]
+#-----------------------------------------------------------------------------------------------------------------
 databaseSelectResponsesTest4 = {
   ("qm-pubuntu-stage01",): 234,
   (234,): 1,  #os_id
@@ -265,9 +284,9 @@ def test_StringValidator():
   assert c.StringValidator.validate('fred') == 'fred'
   assert c.StringValidator.validate('fred fred')  == 'fred fred'
   assert c.StringValidator.validate('__fred')  == '__fred'
-  assert c.StringValidator.validate('fred.fred')  == 'fred.fred'
+  assert c.StringValidator.validate('fred.fred+')  == 'fred.fred+'
   assert c.StringValidator.validate('0123456789')  == '0123456789'
-  assert c.StringValidator.validate('1Aa9Zz._()- ')  == '1Aa9Zz._()- '
+  assert c.StringValidator.validate('1Aa9Zz._()-+ ')  == '1Aa9Zz._()-+ '
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_MetaDataFromTalos_1():
@@ -382,5 +401,16 @@ def test_handleRequestAverage04():
   exitCode = c.handleRequest(fakeForm, fakeCursor, c)
   assert fakeCursor.inTransaction == False
   #assert exitCode == 500
+#-----------------------------------------------------------------------------------------------------------------
+#def test_handleRequestAverage05():
+  #"""single value in a VALUE list"""
+  #print "test_handleRequestAverage05"
+  #fakeCursor = FakeCursor(databaseSelectResponsesTest3)
+  #fakeForm = FakeForm(fullStream05)
+  #s = StringIO.StringIO()
+  #exitCode = c.handleRequest(fakeForm, fakeCursor, c, s)
+  #value = s.getvalue()
+  #assert value == """Content-type: text/plain\n\nRETURN\ttest_1\t2.00\tgraph.html#tests=[{"test":45,"branch":3455,"machine":234}]\n"""
+  #assert fakeCursor.inTransaction == False
+  #assert exitCode == None
 
-test_handleRequestAverage04()
