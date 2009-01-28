@@ -30,6 +30,9 @@ class ValueException(Error):
 #=================================================================================================================
 class DatabaseException(Error):
   pass
+#=================================================================================================================
+class DataStreamException(Error):
+  pass
 
 #=================================================================================================================
 class StringValidator(object):
@@ -166,8 +169,6 @@ def _updateAverageForTestRun(average, databaseCursor, inputStream, metadata):
 
 #-----------------------------------------------------------------------------------------------------------------
 def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
-  #sum = 0
-  #maxValue = 0.0
   for lineNumber, aLine in enumerate(inputStream):
     aLine = aLine.strip()
     if aLine.upper() in 'END':
@@ -181,9 +182,6 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
     try:
       values[0] = int(values[0])
       values[1] = float(values[1])
-      #maxValue = max(maxValue, values[1])
-      #sum += values[1]
-      #print values[1]
       try:
         if values[2].lower() == 'null':
           page_id = None
@@ -206,17 +204,12 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
     except Exception, x:
       databaseCursor.connection.rollback()
       raise DatabaseException("unable to insert new record into 'test_run_values': %s" % str(x))
-  #try:
-    #sum -= maxValue
-    #average = sum / (lineNumber - 1)
-  #except ZeroDivisionError:
-    #raise ValueException("No values were found in this dataset")
   try:
     databaseCursor.execute("""select avg(value) from test_run_values where test_run_id = %s and value not in (select max(value) from test_run_values where test_run_id = %s)""",
                               (metadata.test_run_id, metadata.test_run_id))
     average = databaseCursor.fetchall()[0][0]
-    if average is None:
-      average = values[1]
+    #if average is None:
+      #average = values[1]
   except Exception, x:
     databaseCursor.connection.rollback()
     raise DatabaseException("to determine average from 'test_run_values' for  %s - %s" % (metadata.test_run_id, str(x)))
