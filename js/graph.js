@@ -20,8 +20,17 @@
  *
  * Contributor(s):
  *   Vladimir Vukicevic <vladimir@pobox.com>
+ *   Ryan Doherty <rdoherty@mozilla.com>
  *
  * ***** END LICENSE BLOCK ***** */
+
+/**
+    Core Concepts:
+    
+        gGraphType : Can be GRAPH_TYPE_VALUE (average data for a test over time) OR GRAPH_TYPE_SERIES (an individual test run with multiple values)
+        Tinderbox : Object used to fetch info from graph server using callbacks
+**/
+
 
 // Just the single value for each result; reports value over time
 var GRAPH_TYPE_VALUE = 0;
@@ -52,6 +61,192 @@ if (!("now" in Date)) {
         return (new Date()).getTime();
     }
 }
+
+window.addEventListener("load", handleLoad, false);
+
+
+/**
+    Handles setting up graphs, adding event listeners and loading tests
+**/
+function handleLoad()
+{
+    initOptions();
+
+    if (gGraphType == GRAPH_TYPE_SERIES) {
+        $("#charttypeicon").addClass("barcharticon");
+        $("#chartlinkicon").addClass("barchartlinkicon");
+
+        $("#graphoptionsbox").hide();
+        $(".clicky-ranges")[0].style.visibility = "hidden";
+    } else {
+        $("#charttypeicon").addClass("linecharticon");
+        $("#chartlinkicon").addClass("linechartlinkicon");
+    }
+
+    initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
+
+    $("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
+
+    $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged",
+                                       function (ev, selType, arg1, arg2) {
+                                           updateLinks();
+                                       });
+
+    $(BigPerfGraph.eventTarget).bind("graphSelectionChanged",
+                                     function (ev, selType, arg1, arg2) {
+                                         updateLinks();
+                                     });
+
+    if (gGraphType == GRAPH_TYPE_VALUE) {
+        Tinderbox.requestTestList(
+            function (tests) {
+                transformLegacyData(tests);
+                populateFilters();
+                doResetFilter();
+                if (gPostDataLoadFunction) {
+                    gPostDataLoadFunction.call(window);
+                    gPostDataLoadFunction = null;
+                }
+            });
+            
+    } else if (gGraphType == GRAPH_TYPE_SERIES) {
+        $("#bonsaispan").hide();
+
+        Tinderbox.requestTestList(30 /* days */, null, null, null, false,
+                                    function (tests) {
+                                        transformLegacyData(tests);
+                                        populateFilters();
+                                        doResetFilter();
+                                        if (gPostDataLoadFunction) {
+                                            gPostDataLoadFunction.call(window);
+                                            gPostDataLoadFunction = null;
+                                        }
+                                    });
+    } else {
+        alert("Unsupported graph type");
+        return;
+    }
+
+    $("#activetests").droppable({
+        accept: ".testline",
+        activeClass: "droppable-active",
+        hoverClass: "droppable-hover",
+        drop: function(ev, arg) {
+            var tid = testInfoFromElement(arg.draggable.element);
+            doAddTest(tid);
+        }
+    });
+
+    // wrap the range-spans
+    $(".clicky-ranges span").click(onNewRangeClick);
+
+    $("input[name=derived_type]").change(onChangeDerived);
+    $("#showfloatercheckbox").change(onToggleFloaterClick);
+
+    // force defaults until we can save/restore
+    $("#derived_none_radio")[0].checked = true;
+    $("#autoscalecheckbox")[0].checked = true;
+    $("#showfloatercheckbox")[0].checked = true;
+}
+
+function initOptions()
+{
+    if (!document.location.hash)
+	return;
+
+    var qsdata = {};
+    var hasharray = document.location.hash.substring(1).split("&");
+    for each (var s in hasharray) {
+        var q = s.split("=");
+        qsdata[q[0]] = q[1];
+    }
+
+    if (qsdata["type"] == "value") {
+	gGraphType = GRAPH_TYPE_VALUE;
+    } else if (qsdata["type"] == "series") {
+	gGraphType = GRAPH_TYPE_SERIES;
+    } else if (qsdata["type"] == "series-value") {
+	gGraphType = GRAPH_TYPE_SERIES_VALUE;
+    }
+
+    var loadFunctions = [];
+
+    //support old link format, adding tests sets to graph
+    var ctr = 1;
+    while ( ("m" + ctr + "tid") in qsdata) {
+        ctr++;
+    }
+    if (ctr > 1) {
+        loadFunctions.push (function() {
+               for (var i=1; i<ctr; i++) {
+                  id = "m" + i + "tid"; 
+                  doAddTest(qsdata[id], true);
+               }
+        });
+    }
+    
+    
+    
+    if ("show" in qsdata) {
+        var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
+ 
+        loadFunctions.push (function() {
+                for (var i = 0; i < ids.length; i++)
+                    doAddTest(ids[i], true);
+            });
+    }
+
+    //New link format (tests=[{test:ID,branch:ID,machine:ID}])
+    if("tests" in qsdata) {
+        var tests = eval('(' + qsdata['tests'] + ')');
+        
+        loadFunctions.push(function() {
+            for(var i=0; i< tests.length; i++) {
+                var testInfo = tests[i];
+                if(gGraphType == GRAPH_TYPE_VALUE) {
+                    doAddTest({"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+                } else {
+                    doAddTestRun(testInfo.testrun, {"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+                }
+            }
+        });
+    }
+    
+
+    //support old link format, setting selected range
+    if (("spss" in qsdata) && ("spse" in qsdata)) {
+        loadFunctions.push (function() {
+                SmallPerfGraph.setSelection ("range", qsdata["spss"], qsdata["spse"]);
+            });
+    }
+
+    if ("sel" in qsdata) {
+        var range = qsdata["sel"].split(",").map(function (k) { return parseInt(k); });
+
+        loadFunctions.push (function() {
+                SmallPerfGraph.setSelection ("range", range[0], range[1]);
+            });
+    }
+
+    if ("avg" in qsdata) {
+        $("#avgcheckbox")[0].checked = true;
+        showAverages(true);
+    }
+    
+    if("testname" in qsdata) {
+        loadFunctions.push(function() {
+            searchAndAddTest(qsdata['testname'], qsdata['machine'] ,qsdata['date'], qsdata['branch']);
+        });
+    }
+    
+    if (loadFunctions.length) {
+        gPostDataLoadFunction = function () {
+            for (var i = 0; i < loadFunctions.length; i++)
+                loadFunctions[i]();
+        };
+    }
+}
+
 
 function makeBonsaiLink(start, end) {
     // hardcode module, oh well.
@@ -780,110 +975,18 @@ function onNewRangeClick(ev)
     zoomToTimes(t1, t2, skipAutoScale);
 }
 
-function initOptions()
-{
-    if (!document.location.hash)
-	return;
 
-    var qsdata = {};
-    var hasharray = document.location.hash.substring(1).split("&");
-    for each (var s in hasharray) {
-        var q = s.split("=");
-        qsdata[q[0]] = q[1];
-    }
-
-    if (qsdata["type"] == "value") {
-	gGraphType = GRAPH_TYPE_VALUE;
-    } else if (qsdata["type"] == "series") {
-	gGraphType = GRAPH_TYPE_SERIES;
-    } else if (qsdata["type"] == "series-value") {
-	gGraphType = GRAPH_TYPE_SERIES_VALUE;
-    }
-
-    var loadFunctions = [];
-
-    //support old link format, adding tests sets to graph
-    var ctr = 1;
-    while ( ("m" + ctr + "tid") in qsdata) {
-        ctr++;
-    }
-    if (ctr > 1) {
-        loadFunctions.push (function() {
-               for (var i=1; i<ctr; i++) {
-                  id = "m" + i + "tid"; 
-                  doAddTest(qsdata[id], true);
-               }
-        });
-    }
-    
-    
-    
-    if ("show" in qsdata) {
-        var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
- 
-        loadFunctions.push (function() {
-                for (var i = 0; i < ids.length; i++)
-                    doAddTest(ids[i], true);
-            });
-    }
-
-    //New link format (tests=[{test:ID,branch:ID,machine:ID}])
-    if("tests" in qsdata) {
-        var tests = eval('(' + qsdata['tests'] + ')');
-        
-        loadFunctions.push(function() {
-            for(var i=0; i< tests.length; i++) {
-                var testInfo = tests[i];
-                if(gGraphType == GRAPH_TYPE_VALUE) {
-                    doAddTest({"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
-                } else {
-                    doAddTestRun(testInfo.testrun, {"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
-                }
-            }
-        });
-    }
-    
-
-    //support old link format, setting selected range
-    if (("spss" in qsdata) && ("spse" in qsdata)) {
-        loadFunctions.push (function() {
-                SmallPerfGraph.setSelection ("range", qsdata["spss"], qsdata["spse"]);
-            });
-    }
-
-    if ("sel" in qsdata) {
-        var range = qsdata["sel"].split(",").map(function (k) { return parseInt(k); });
-
-        loadFunctions.push (function() {
-                SmallPerfGraph.setSelection ("range", range[0], range[1]);
-            });
-    }
-
-    if ("avg" in qsdata) {
-        $("#avgcheckbox")[0].checked = true;
-        showAverages(true);
-    }
-    
-    if("testname" in qsdata) {
-        loadFunctions.push(function() {
-            searchAndAddTest(qsdata['testname'], qsdata['machine'] ,qsdata['date'], qsdata['branch']);
-        });
-    }
-    
-    if (loadFunctions.length) {
-        gPostDataLoadFunction = function () {
-            for (var i = 0; i < loadFunctions.length; i++)
-                loadFunctions[i]();
-        };
-    }
-}
-
+/**
+    Creates links to the displayed graphs. Needed because this is an AJAX app. 
+    See https://wiki.mozilla.org/Perfomatic:SendingData#Return_Values for the defined format
+**/
 function updateLinks() {
-    var loc = document.location.toString();
-    if (loc.indexOf("#") == -1) {
-        loc += "#";
+    var url = document.location.toString();
+    var loc = '';
+    if (url.indexOf("#") == -1) {
+        url += "#";
     } else {
-        loc = loc.substring(0, loc.indexOf("#")) + "#";
+        url = url.substring(0, url.indexOf("#")) + "#";
     }
 
     if (gGraphType == GRAPH_TYPE_SERIES) {
@@ -916,8 +1019,9 @@ function updateLinks() {
         loc += "&sel=";
         loc += Math.floor(SmallPerfGraph.selectionStartTime) + "," + Math.ceil(SmallPerfGraph.selectionEndTime);
     }
-
-    $("#linkanchor").attr("href", loc);
+    
+    document.location.hash = loc;
+    $("#linkanchor").attr("href", url+loc);
 
     // update links (bonsai and CSV)
     if (gGraphType == GRAPH_TYPE_VALUE) {
@@ -940,85 +1044,6 @@ function updateLinks() {
     }
 }
 
-function handleLoad()
-{
-    initOptions();
 
-    if (gGraphType == GRAPH_TYPE_SERIES) {
-        $("#charttypeicon").addClass("barcharticon");
-        $("#chartlinkicon").addClass("barchartlinkicon");
 
-        $("#graphoptionsbox").hide();
-        $(".clicky-ranges")[0].style.visibility = "hidden";
-    } else {
-        $("#charttypeicon").addClass("linecharticon");
-        $("#chartlinkicon").addClass("linechartlinkicon");
-    }
 
-    initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
-
-    $("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
-
-    $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged",
-                                       function (ev, selType, arg1, arg2) {
-                                           updateLinks();
-                                       });
-
-    $(BigPerfGraph.eventTarget).bind("graphSelectionChanged",
-                                     function (ev, selType, arg1, arg2) {
-                                         updateLinks();
-                                     });
-
-    if (gGraphType == GRAPH_TYPE_VALUE) {
-        Tinderbox.requestTestList(
-            function (tests) {
-                transformLegacyData(tests);
-                populateFilters();
-                doResetFilter();
-                if (gPostDataLoadFunction) {
-                    gPostDataLoadFunction.call(window);
-                    gPostDataLoadFunction = null;
-                }
-            });
-            
-    } else if (gGraphType == GRAPH_TYPE_SERIES) {
-        $("#bonsaispan").hide();
-
-        Tinderbox.requestTestList(30 /* days */, null, null, null, false,
-                                    function (tests) {
-                                        transformLegacyData(tests);
-                                        populateFilters();
-                                        doResetFilter();
-                                        if (gPostDataLoadFunction) {
-                                            gPostDataLoadFunction.call(window);
-                                            gPostDataLoadFunction = null;
-                                        }
-                                    });
-    } else {
-        alert("Unsupported graph type");
-        return;
-    }
-
-    $("#activetests").droppable({
-        accept: ".testline",
-        activeClass: "droppable-active",
-        hoverClass: "droppable-hover",
-        drop: function(ev, arg) {
-            var tid = testInfoFromElement(arg.draggable.element);
-            doAddTest(tid);
-        }
-    });
-
-    // wrap the range-spans
-    $(".clicky-ranges span").click(onNewRangeClick);
-
-    $("input[name=derived_type]").change(onChangeDerived);
-    $("#showfloatercheckbox").change(onToggleFloaterClick);
-
-    // force defaults until we can save/restore
-    $("#derived_none_radio")[0].checked = true;
-    $("#autoscalecheckbox")[0].checked = true;
-    $("#showfloatercheckbox")[0].checked = true;
-}
-
-window.addEventListener("load", handleLoad, false);
