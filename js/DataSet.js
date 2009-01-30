@@ -36,7 +36,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-function TimeDataSet(data) {
+function TimeDataSet(data, massage) {
+    console.log('TimeData constructor');
     this.data = data;
 }
 
@@ -111,7 +112,7 @@ TimeDataSet.prototype = {
     }
 };
 
-function TimeValueDataSet(data, color) {
+function TimeValueDataSet(data, color, massage) {
     if (data)
         this.initWithData(data);
 
@@ -131,29 +132,34 @@ TimeValueDataSet.prototype = {
     lastTime: 0,
     data: null,    // array: [time0, value0, time1, value1, ...]
     relativeTo: null,
-
+    
     color: "black",
     title: '',
 
     initWithData: function (data) {
-        var massagedData = [];
-        
-        if(gGraphType == GRAPH_TYPE_VALUE) {
-            for(var i=0; i < data.length; i++) {
-                massagedData.push(data[i][2]);
-                massagedData.push(data[i][3]);
+        if(data[0].length > 2) {
+            var massagedData = [];
+
+            if(gGraphType == GRAPH_TYPE_VALUE) {
+                for(var i=0; i < data.length; i++) {
+                    massagedData.push(data[i][2]);
+                    massagedData.push(data[i][3]);
+                }
+            } else {
+                for(var i=0; i < data.length; i++) {
+                    massagedData.push(i);
+                    massagedData.push(data[i].value);
+                }
             }
+
+            data = massagedData;
+            delete massagedData;
+
+            this.data = massagedData;
         } else {
-            for(var i=0; i < data.length; i++) {
-                massagedData.push(i);
-                massagedData.push(data[i].value);
-            }
+            this.data = data;
         }
         
-        data = massagedData;
-        delete massagedData;
-        
-        this.data = massagedData;
 
         this.firstTime = data[0];
         if (data.length > 2)
@@ -227,7 +233,6 @@ TimeValueDataSet.prototype = {
                 count1++;
             }
         }
-
         if (count0 > 0) {
             newdata.push(time0 + avginterval/2);
             newdata.push(val0 / count0);

@@ -625,13 +625,14 @@ Graph.prototype = {
                     //log ("ds start end", this.startTime, this.endTime, "timediff:", (this.endTime - this.startTime + this.offsetTime));
                     var startIdx = this.dataSetIndices[i][0];
                     var endIdx = this.dataSetIndices[i][1];
-
+                    
                     // start one before and go one after if we can,
                     // so that the plot doesn't have a hole at the start
                     // and end
                     if (startIdx > 0) startIdx--;
                     if (endIdx < ((this.dataSets[i].data.length)/2)) endIdx++;
-
+                    
+                    
                     save();
                     try {
                         scale(xscale, -this.yScale);
@@ -642,11 +643,11 @@ Graph.prototype = {
 
                     beginPath();
 
+
                     for (var j = startIdx; j < endIdx; j++)
                     {
                         var t = this.dataSets[i].data[j*2];
                         var v = this.dataSets[i].data[j*2+1];
-
                         lineTo(t-xoffs, v-yoffs);
                     }
 

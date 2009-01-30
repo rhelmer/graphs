@@ -668,7 +668,7 @@ function syncDerived(newType)
             newds = CurrentDataSets[tid].createDerivative();
         else if (newType == "derivativePercent")
             newds = CurrentDataSets[tid].createDerivative(true);
-
+        
         CurrentDerivedDataSets[tid] = newds;
 
         SmallPerfGraph.addDataSet(newds);
