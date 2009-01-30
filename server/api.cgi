@@ -156,8 +156,8 @@ def getTestRun(id, attribute, form):
     elif(attribute == 'latest'):
         return getLatestTestRunValues(id, form)
     else:
-        sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id as ref_build_id, builds.ref_changeset as changeset, os_list.name as os
-                FROM test_runs INNER JOIN builds ON (test_runs.build_id = builds.id) INNER JOIN os_list ON (builds.os_id = os_list.id)
+        sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id as ref_build_id, builds.ref_changeset as changeset                                                                                  
+                FROM test_runs INNER JOIN builds ON (test_runs.build_id = builds.id)
                 WHERE test_runs.id = %s"""
         cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
         cursor.execute(sql, (id))
@@ -165,7 +165,7 @@ def getTestRun(id, attribute, form):
         if cursor.rowcount == 1:
             testRun = cursor.fetchone()
             annotations = getAnnotations(id, 'dictionary')
-            result = {'stat':'ok', 'testrun':{'id':testRun['id'], 'build':{'id':testRun['build_id'], 'build_id':testRun['ref_build_id'], 'changeset':testRun['changeset'], 'os':testRun['os']}, 'date_run':testRun['date_run'], 'average':testRun['average'], 'annotations':annotations}}
+            result = {'stat':'ok', 'testrun':{'id':testRun['id'], 'build':{'id':testRun['build_id'], 'build_id':testRun['ref_build_id'], 'changeset':testRun['changeset']}, 'date_run':testRun['date_run'], 'average':testRun['average'], 'annotations':annotations}}
         else:
             return {'stat':'fail', 'code':'104', 'message':'Test run not found'}
     return result

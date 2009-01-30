@@ -288,6 +288,17 @@ TinderboxData.prototype = {
 
 // function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
     },
+    
+    
+    getTestRunInfo: function(testRunId, cb) {
+        $.get('/api/test/runs/info?id='+testRunId, 
+            function(resp) {
+                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                  if (!checkErrorReturn(obj)) return;
+
+                  cb(obj.testrun);
+            });
+    },
 
     clearValueDataSets: function () {
         //log ("clearvalueDatasets");

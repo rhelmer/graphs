@@ -41,7 +41,7 @@ var gActiveTests = [];
 var quickList = {};
 var gPostDataLoadFunction = null;
 var displayedTestRunsTest = null;
-var currentTestRuns = null;
+var currentTestRuns = [];
 
 // 2 weeks
 var kRecentDate = 14*24*60*60*1000;
@@ -163,13 +163,10 @@ function doFilterTests()
 function doRemoveTest(id)
 {   
     var testKey = makeTestKey(id);
-    console.log(id);
-    console.log(testKey);
-    console.log(gActiveTests);
     gActiveTests = gActiveTests.filter(function(k) {
         return k != testKey; 
     });
-    console.log(gActiveTests);
+
     
     $("#activetests #testid-" + testKey).remove();
 
@@ -314,7 +311,7 @@ function addLatestTestRun(testInfo) {
                 doRemoveTest(tid);
             }
         );
-
+        updateLinks();
     });
 }
 
@@ -336,31 +333,67 @@ function doAddTestRun(testRunId, test) {
         }
     }
 
-    if(!testRun)
-        return;
-    var color = randomColor();
-    var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
-    var domId = test.domId + "-" + testRunId;
+    if(testRun) {
+        var color = randomColor();
+        var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
+        var domId = test.domId + "-" + testRunId;
 
-    $("#activetests").append(html);
-    
-    $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
-    $("#activetests #" + domId + " .throbber")[0].setAttribute("loading", "true");
-    $("#activetests #" + domId + " .removecell").click(
-        function(evt) {
-            var tid = testInfoFromElement(this);
-            doRemoveTest(tid);
-        }
-    );
-    test.testRunId = testRunId;
-    
-    //Use tinderbox to load the test info
-    addTestToGraph(test, function(ds) {
-                       $("#activetests #" + domId + " .throbber")[0].removeAttribute("loading");
-                       ds.color = color;
-                  });
-    updateLinks();
-    
+        $("#activetests").append(html);
+
+        $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
+        $("#activetests #" + domId + " .throbber")[0].setAttribute("loading", "true");
+        $("#activetests #" + domId + " .removecell").click(
+            function(evt) {
+                var tid = testInfoFromElement(this);
+                doRemoveTest(tid);
+            }
+        );
+        test.testRunId = testRunId;
+
+        //Use tinderbox to load the test info
+        addTestToGraph(test, function(ds) {
+                           $("#activetests #" + domId + " .throbber")[0].removeAttribute("loading");
+                           ds.color = color;
+                      });
+        updateLinks();
+    } else {
+        //we are loading a test run we know nothing about except its id
+        test.testRunId = testRun;
+        var test = findTestByInfo(test)
+        var html = makeTestLoadingDiv(test);
+        var loadingDiv = $("#activetests").append(html);
+        
+        Tinderbox.getTestRunInfo(testRunId, function(testRun) {
+            console.log(testRun);
+            $("#activetests #"+test.domId).remove();
+            var testRunArray = [testRun.id, [null, testRun.build.build_id], testRun.date_run]
+            var color = randomColor();
+            var html = makeTestDiv(test, {"showDate":true, "active":true}, testRunArray);
+            var domId = test.domId + "-" + testRun.id;
+            console.log(domId);
+            $("#activetests").append(html);
+            $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
+            $("#activetests #" + domId + " .throbber")[0].setAttribute("loading", "true");
+            $("#activetests #" + domId + " .removecell").click(
+                function(evt) {
+                    var tid = testInfoFromElement(this);
+                    doRemoveTest(tid);
+                }
+            );
+            test.testRunId = testRunId;
+
+            //Use tinderbox to load the test info
+            addTestToGraph(test, function(ds) {
+                               $("#activetests #" + domId + " .throbber")[0].removeAttribute("loading");
+                               ds.color = color;
+                          });
+            updateLinks();
+            
+            
+            
+            
+        });   
+    }
 }
 
 
@@ -801,7 +834,11 @@ function initOptions()
         loadFunctions.push(function() {
             for(var i=0; i< tests.length; i++) {
                 var testInfo = tests[i];
-                doAddTest({"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+                if(gGraphType == GRAPH_TYPE_VALUE) {
+                    doAddTest({"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+                } else {
+                    doAddTestRun(testInfo.testrun, {"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+                }
             }
         });
     }
@@ -854,8 +891,23 @@ function updateLinks() {
     }
 
     if (gActiveTests.length > 0) {
-        loc += "show=";
-        loc += gActiveTests.join(",");
+        if (gGraphType == GRAPH_TYPE_SERIES) {
+            loc += "tests=";
+            var tests = [];
+            for (var i=0; i < gActiveTests.length; i++) {
+                var test = gActiveTests[i].split('-');
+                tests.push({"test":test[0], "branch":test[1], "machine":test[2], "testrun":test[3]});
+            }
+            loc += JSON.stringify(tests);
+        } else {
+            loc += "tests=";
+            var tests = [];
+            for (var i=0; i < gActiveTests.length; i++) {
+                var test = gActiveTests[i].split('-');
+                tests.push({"test":test[0], "branch":test[1], "machine":test[2]});
+            }
+            loc += JSON.stringify(tests);
+        }
     }
 
     if (SmallPerfGraph.selectionStartTime != null &&
