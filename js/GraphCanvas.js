@@ -294,8 +294,13 @@ Graph.prototype = {
         if(!reset) {
             this.zoomed = true;
         }
+
+        if(start == 0) {
+            this.startTime = null;
+        } else {
+            this.startTime = start;
+        }
         
-        this.startTime = start;
         this.endTime = end;
         
         this.dirty = true;

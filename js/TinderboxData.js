@@ -215,7 +215,7 @@ TinderboxData.prototype = {
                  ds.requestedLastTime >= endTime))
             {
                 //log ("Using cached ds");
-                callback.call (window, testId, ds);
+                callback.call (window, test, ds);
                 return;
             }
 
