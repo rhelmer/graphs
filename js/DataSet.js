@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 function TimeDataSet(data, massage) {
-    console.log('TimeData constructor');
+
     this.data = data;
 }
 
@@ -137,7 +137,8 @@ TimeValueDataSet.prototype = {
     title: '',
 
     initWithData: function (data) {
-        if(data[0].length > 2) {
+
+        if(data[0].length > 2 ||data[0].value) {
             var massagedData = [];
 
             if(gGraphType == GRAPH_TYPE_VALUE) {

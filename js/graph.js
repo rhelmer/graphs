@@ -559,7 +559,7 @@ function doAddTestRun(testRunId, test) {
         var loadingDiv = $("#activetests").append(html);
         
         Tinderbox.getTestRunInfo(testRunId, function(testRun) {
-            console.log(testRun);
+
             $("#activetests #"+test.domId).remove();
             var testRunArray = [testRun.id, [null, testRun.build.build_id], testRun.date_run]
             var color = randomColor();
