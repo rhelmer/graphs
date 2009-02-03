@@ -565,7 +565,7 @@ function doAddTestRun(testRunId, test) {
             var color = randomColor();
             var html = makeTestDiv(test, {"showDate":true, "active":true}, testRunArray);
             var domId = test.domId + "-" + testRun.id;
-            console.log(domId);
+
             $("#activetests").append(html);
             $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
             $("#activetests #" + domId + " .throbber")[0].setAttribute("loading", "true");
