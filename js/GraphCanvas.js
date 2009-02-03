@@ -278,7 +278,7 @@ Graph.prototype = {
             endTime = null;
         }
         
-        this.setTimeRange(0, endTime, true);
+        this.setTimeRange(null, endTime, true);
     },
 
     clearDataSets: function () {
@@ -294,10 +294,10 @@ Graph.prototype = {
         if(!reset) {
             this.zoomed = true;
         }
-
+        
         if(start == 0) {
             this.startTime = null;
-        } else {
+        } else if(start != null) {
             this.startTime = start;
         }
         
@@ -511,6 +511,10 @@ Graph.prototype = {
 
         var xoffs = this.startTime;
         var yoffs = this.yOffset;
+        
+        if(xoffs == null) {
+            xoffs = 0;
+        }
         
         var xscale = cw / (this.endTime - this.startTime);
         if (this.endTime == this.startTime) {
