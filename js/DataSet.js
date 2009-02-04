@@ -137,7 +137,7 @@ TimeValueDataSet.prototype = {
     title: '',
 
     initWithData: function (data) {
-
+        //If we are dealing with the new data format, we need to massage the data into a format that is used everywhere else
         if(data[0].length > 2 ||data[0].value) {
             var massagedData = [];
 
@@ -147,9 +147,14 @@ TimeValueDataSet.prototype = {
                     massagedData.push(data[i][3]);
                 }
             } else {
+                this.rawdata = [];
                 for(var i=0; i < data.length; i++) {
                     massagedData.push(i);
                     massagedData.push(data[i].value);
+                    if(data[i].page) {
+                        this.rawdata.push(i);
+                        this.rawdata.push(data[i].page);
+                    }
                 }
             }
 
