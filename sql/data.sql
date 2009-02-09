@@ -3,19 +3,36 @@ insert into os_list values (NULL,"WINNT 6.0");
 insert into os_list values (NULL,"MacOSX Darwin 8.8.1");
 insert into os_list values (NULL,"MacOSX Darwin 9.2.2");
 insert into os_list values (NULL,"Ubuntu 7.10");
+insert into os_list values (NULL,"CentOS release 5 (Final)");
+insert into os_list values (NULL,"MacOSX 10.5.2");
+insert into os_list values (NULL,"WINNT 5.2");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox3.0");
 insert into branches values (NULL,"Firefox3.1");
 insert into branches values (NULL,"TraceMonkey");
 insert into branches values (NULL,"Fennec");
+insert into branches values (NULL,"MozillaTest");
 
--- osid,cpuspeed,isthrottling,name,isactive,dateadded
-insert into machines values (NULL,1,"1.63",0,"qm-pxp-stage01",1,unix_timestamp());
-insert into machines values (NULL,2,"1.63",0,"qm-pvista-stage01",1,unix_timestamp());
-insert into machines values (NULL,3,"1.63",0,"qm-ptiger-stage01",1,unix_timestamp());
-insert into machines values (NULL,4,"1.63",0,"qm-pleopard-stage01",1,unix_timestamp());
-insert into machines values (NULL,5,"1.63",0,"qm-pubuntu-stage01",1,unix_timestamp());
+-- osid,isthrottling,cpuspeed,name,isactive,dateadded
+insert into machines values (NULL,1,0,"1.63","qm-pxp-stage01",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.63","qm-pvista-stage01",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.63","qm-ptiger-stage01",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.63","qm-pleopard-stage01",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.63","qm-pubuntu-stage01",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.1",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_mozilla-central",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_mozilla-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_tracemonkey",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-1.9.1",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_tracemonkey",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central_tracemonkey",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-central_leak_test",1,unix_timestamp());
 
 insert into pagesets values (NULL,"Tp December, 2006 (393 pages)");
 insert into pagesets values (NULL,"Tp November, 2000 (40 pages)");
@@ -48,3 +65,9 @@ insert into tests values (NULL,"tsvg_nochrome","SVG NoChrome",0,1,5);
 insert into tests values (NULL,"tjss","Dromaeo",1,1,6);
 insert into tests values (NULL,"tsspider","SunSpider",1,1,7);
 insert into tests values (NULL,"tsspider_nochrome","SunSpider NoChrome",0,1,7);
+insert into tests values (NULL,"refcnt_leaks","Refcnt Leaks",0,1,NULL);
+insert into tests values (NULL,"trace_malloc_leaks","Trace Malloc Leaks",0,1,NULL);
+insert into tests values (NULL,"trace_malloc_maxheap","Trace Malloc MaxHeap",0,1,NULL);
+insert into tests values (NULL,"trace_malloc_allocs","Trace Malloc Allocs",0,1,NULL);
+insert into tests values (NULL,"codesighs","Codesighs",0,1,NULL);
+insert into tests values (NULL,"codesighs_embed","Codesighs (embed)",0,1,NULL);
