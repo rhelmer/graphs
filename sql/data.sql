@@ -118,6 +118,18 @@ insert into machines values (NULL,9,0,NULL,"maemo-n810-03",1,unix_timestamp());
 insert into machines values (NULL,9,0,NULL,"maemo-n810-04",1,unix_timestamp());
 insert into machines values (NULL,9,0,NULL,"maemo-n810-05",1,unix_timestamp());
 insert into machines values (NULL,9,0,NULL,"maemo-n810-06",1,unix_timestamp());
+-- pool talos
+insert into machines values (NULL,1,0,"1.83","qm-pxp-slave01",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","qm-pxp-slave02",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.83","qm-pvista-slave01",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.83","qm-pvista-slave02",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.83","qm-ptiger-slave01",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.83","qm-ptiger-slave02",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-slave01",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-slave02",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-plinux-slave01",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-plinux-slave02",1,unix_timestamp());
+
 -- builders
 insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.1",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.1_leak_test",1,unix_timestamp());
