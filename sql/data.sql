@@ -165,10 +165,10 @@ insert into tests values (NULL,"tp_%cpu_nochrome","Tp3 NoChrome (%CPU)",0,1,NULL
 insert into tests values (NULL,"tp_memset","Tp3 (Memset)",1,1,NULL);
 insert into tests values (NULL,"tp_memset_nochrome","Tp3 NoChrome (Memset)",0,1,NULL);
 insert into tests values (NULL,"tp_fast","Tp3 Fast Cycle",1,1,2);
-insert into tests values (NULL,"tp_pbytes_fast","Tp3 Fast Cycle (Private Bytes)",1,1,NULL);
-insert into tests values (NULL,"tp_rss_fast","Tp3 Fast Cycle (RSS)",1,1,NULL);
-insert into tests values (NULL,"tp_%cpu_fast","Tp3 Fast Cycle (%CPU)",1,1,NULL);
-insert into tests values (NULL,"tp_memset_fast","Tp3 Fast Cycle (Memset)",1,1,NULL);
+insert into tests values (NULL,"tp_fast_pbytes","Tp3 Fast Cycle (Private Bytes)",1,1,NULL);
+insert into tests values (NULL,"tp_fast_rss","Tp3 Fast Cycle (RSS)",1,1,NULL);
+insert into tests values (NULL,"tp_fast_%cpu","Tp3 Fast Cycle (%CPU)",1,1,NULL);
+insert into tests values (NULL,"tp_fast_memset","Tp3 Fast Cycle (Memset)",1,1,NULL);
 insert into tests values (NULL,"ts","Ts",1,1,NULL);
 insert into tests values (NULL,"twinopen","Txul",1,1,NULL);
 insert into tests values (NULL,"tdhtml","DHTML",1,1,3);
