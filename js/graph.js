@@ -1024,12 +1024,12 @@ function handleLoad()
 
 window.addEventListener("load", handleLoad, false);
 $("document").ready(function() {
-   if($.cookie("hidemessage")) {
+   if($.cookie("hidetrymessage")) {
        $(".message").hide();
    } else {
        $(".dontshow").click(function() {
           $(".message").hide();
-          $.cookie('hidemessage', true, {'path':'/', 'expires':90}); 
+          $.cookie('hidetrymessage', true, {'path':'/', 'expires':90}); 
        });
    }
 });
