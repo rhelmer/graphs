@@ -121,8 +121,12 @@ insert into machines values (NULL,9,0,NULL,"maemo-n810-06",1,unix_timestamp());
 -- pool talos
 insert into machines values (NULL,1,0,"1.83","qm-pxp-slave01",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","qm-pxp-slave02",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","qm-pxp-slave03",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","qm-pxp-slave04",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","qm-pvista-slave01",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","qm-pvista-slave02",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.83","qm-pvista-slave03",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.83","qm-pvista-slave04",1,unix_timestamp());
 insert into machines values (NULL,3,0,"1.83","qm-ptiger-slave01",1,unix_timestamp());
 insert into machines values (NULL,3,0,"1.83","qm-ptiger-slave02",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.83","qm-pleopard-slave01",1,unix_timestamp());
