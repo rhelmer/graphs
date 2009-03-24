@@ -23,6 +23,17 @@ insert into machines values (NULL,2,0,"1.63","qm-pvista-stage01",1,unix_timestam
 insert into machines values (NULL,3,0,"1.63","qm-ptiger-stage01",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.63","qm-pleopard-stage01",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.63","qm-pubuntu-stage01",1,unix_timestamp());
+-- try talos
+insert into machines values (NULL,1,0,"1.83","qm-pxp-try01",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","qm-pxp-try02",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.83","qm-pvista-try01",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.83","qm-pvista-try02",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.83","qm-ptiger-try01",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.83","qm-ptiger-try02",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try01",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try02",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try01",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try02",1,unix_timestamp());
 -- 1.9.0 talos
 insert into machines values (NULL,1,0,"1.63","qm-mini-xp01",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.63","qm-mini-xp02",1,unix_timestamp());
