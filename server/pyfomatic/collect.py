@@ -208,8 +208,8 @@ def valuesReader(databaseCursor, databaseModule, inputStream, metadata):
     databaseCursor.execute("""select avg(value) from test_run_values where test_run_id = %s and value not in (select max(value) from test_run_values where test_run_id = %s)""",
                               (metadata.test_run_id, metadata.test_run_id))
     average = databaseCursor.fetchall()[0][0]
-    #if average is None:
-      #average = values[1]
+    if average is None:
+      average = values[1]
   except Exception, x:
     databaseCursor.connection.rollback()
     raise DatabaseException("to determine average from 'test_run_values' for  %s - %s" % (metadata.test_run_id, str(x)))
