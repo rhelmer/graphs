@@ -201,3 +201,7 @@ insert into tests values (NULL,"trace_malloc_maxheap","Trace Malloc MaxHeap",0,1
 insert into tests values (NULL,"trace_malloc_allocs","Trace Malloc Allocs",0,1,NULL);
 insert into tests values (NULL,"codesighs","Codesighs",0,1,NULL);
 insert into tests values (NULL,"codesighs_embed","Codesighs (embed)",0,1,NULL);
+insert into tests values (NULL,"tp_shutdown","Tp3 Shutdown",1,1,1);
+insert into tests values (NULL,"tp_shutdown_nochrome","Tp3 NoChrome Shutdown",0,1,1);
+insert into tests values (NULL,"tp_fast_shutdown","Tp3 Fast Cycle Shutdown",1,1,2);
+insert into tests values (NULL,"ts_shutdown","Ts Shutdown",1,1,NULL);
