@@ -911,7 +911,7 @@ function onNewRangeClick(ev)
     if (dss.length == 0)
         return;
 
-    $("#activetests .testline").each(function (k,v) { activeIds.push(testIdFromElement(v)); });
+    $("#activetests .testline").each(function (k,v) { activeIds.push(testInfoFromElement(v)); });
 
     var range = dataSetsRange(dss);
     var tnow = Date.now() / 1000;
