@@ -132,7 +132,7 @@ def getTestRuns(id, attribute, form):
             FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id) 
             INNER JOIN branches ON (builds.branch_id = branches.id) 
             INNER JOIN machines ON (test_runs.machine_id = machines.id)
-            WHERE test_runs.test_id = %s AND machines.id = %s AND branches.id = %s AND date_run > (UNIX_TIMESTAMP() - 60*60*24*7*4) ORDER BY date_run ASC"""
+            WHERE test_runs.test_id = %s AND machines.id = %s AND branches.id = %s  ORDER BY date_run ASC"""
     
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql, (id, machineid, branchid))

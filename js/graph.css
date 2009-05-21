@@ -6,6 +6,10 @@ select {
   min-width: 10em;
 }
 
+p {
+    margin: 0.1em;
+}
+
 .testline {
   margin: 5px;
 }

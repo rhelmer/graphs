@@ -301,7 +301,8 @@ function onSmallGraphSelectionChanged(event, selectionType, arg1, arg2) {
     }
 }
 
-function onCursorMoved(event, time, val, extra_data, tid) {
+function onCursorMoved(event, time, val, extra_data, test) {
+
     if (time == null || val == null) {
         showStatus(null);
         showFloater(null);
@@ -319,17 +320,16 @@ function onCursorMoved(event, time, val, extra_data, tid) {
             showFloater(time, val);
     } else {
         mouseoverDate = time;
-        mouseoverTest = tid;
+        mouseoverTest = test;
         showStatus("Date: " + formatTime(time) + " Value: " + val.toFixed(2));
         if (gShowFloater)
             showFloater(time, val);
     }
-    updateContextMenu(tid);
+    updateContextMenu(test);
 }
 
-function updateContextMenu(tid) {
-    if(tid) {
-        var test = findTestById(tid);
+function updateContextMenu(test) {
+    if(test) {
         var selector = GraphIsSeries ? "#discrete-menu #view" :"#continous-menu #view";
         var text = GraphIsSeries ? "View continuous test for "+ test.test + " on "+ test.machine : "View discrete test for "+ test.test + " on "+ test.machine;
         $(selector).html(text);
@@ -687,11 +687,10 @@ function syncDerived(newType)
 }
 
 function goToDiscreteGraph() {
-    var test = findTestById(mouseoverTest);
-    var testname = test.testname.replace('_avg', '');
-    var url = '#type=series&testname='+testname+'&date='+mouseoverDate+'&machine='+test.machine;
+    console.log(mouseoverTest);
+    var url = '#type=series&test={"id":'+mouseoverTest.id+'"branch":'+mouseoverTest.branch_id+'"machine":'+mouseoverTest.machine_id+"}";
     window.location.hash = url;
-    window.location.reload();
+    //window.location.reload();
 }
 
 function goToContinuousGraph() {

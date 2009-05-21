@@ -1390,7 +1390,7 @@ Graph.prototype = {
               }
             }
 
-            $(this.eventTarget).trigger("graphCursorMoved", [displayTime, this.cursorValue, extra_data, this.dataSets[nearestDSIndex].tid]);
+            $(this.eventTarget).trigger("graphCursorMoved", [displayTime, this.cursorValue, extra_data, this.dataSets[nearestDSIndex].test]);
 
             this.redrawOverlayOnly(); 
         }
