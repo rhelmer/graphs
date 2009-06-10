@@ -739,22 +739,24 @@ function doAddWithDate(evt) {
 
 function updateAvailableTests()
 {
+    $("#availabletests").empty();
+    $("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
     var tests = filterTestListForSelections();
 
-    $("#availabletests").empty();
-
+    
     // if we're a selector for SERIES tests,
     // then add the date selector flag to get it to appear
     var opts = {};
     if (gGraphType == GRAPH_TYPE_SERIES)
         opts.dateSelector = true;
 
+    var newTests = '';
     for (var i = 0; i < tests.length; i++) {
-        var el = $(makeTestDiv(tests[i], opts))
-            .draggable({ helper: 'clone', dragPrevention: '.iconcell' });
-        $("#availabletests").append(el);
+        newTests += makeTestDiv(tests[i], opts);
     }
-
+    
+    document.getElementById("availabletests").innerHTML = newTests;
+    
     if (tests.length == 0) {
         $("#availabletests").append("<div class='testline'><i>No tests matched.</i></div>");
     }
