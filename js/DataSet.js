@@ -135,16 +135,19 @@ TimeValueDataSet.prototype = {
     
     color: "black",
     title: '',
-
+    extra_data: [],
+    
     initWithData: function (data) {
+
         //If we are dealing with the new data format, we need to massage the data into a format that is used everywhere else
         if(data[0].length > 2 ||data[0].value) {
             var massagedData = [];
-
+            
             if(gGraphType == GRAPH_TYPE_VALUE) {
                 for(var i=0; i < data.length; i++) {
                     massagedData.push(data[i][2]);
                     massagedData.push(data[i][3]);
+                    this.extra_data[i] = data[i][1][2];
                 }
             } else {
                 this.rawdata = [];

@@ -304,7 +304,7 @@ function onSmallGraphSelectionChanged(event, selectionType, arg1, arg2) {
 function onCursorMoved(event, time, val, extra_data, test) {
 
     if (time == null || val == null) {
-        showStatus(null);
+        //showStatus(null);
         showFloater(null);
         return;
     }
@@ -321,7 +321,7 @@ function onCursorMoved(event, time, val, extra_data, test) {
     } else {
         mouseoverDate = time;
         mouseoverTest = test;
-        showStatus("Date: " + formatTime(time) + " Value: " + val.toFixed(2));
+        showStatus("Date: " + formatTime(time) + " Value: " + val.toFixed(2) + " Changeset: " + extra_data);
         if (gShowFloater)
             showFloater(time, val);
     }
@@ -687,7 +687,6 @@ function syncDerived(newType)
 }
 
 function goToDiscreteGraph() {
-    console.log(mouseoverTest);
     var url = '#type=series&test={"id":'+mouseoverTest.id+'"branch":'+mouseoverTest.branch_id+'"machine":'+mouseoverTest.machine_id+"}";
     window.location.hash = url;
     //window.location.reload();

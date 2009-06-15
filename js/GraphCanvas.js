@@ -1381,14 +1381,7 @@ Graph.prototype = {
             this.cursorValue = pointValue;
 
             //for adding extra_data variable to the status line 
-            var extra_data = "";
-            for (var i = 0; i < this.dataSets.length; i++) {
-              if (this.dataSets[i].rawdata) {
-                if (Math.floor(this.cursorTime)*2+1 < this.dataSets[i].rawdata.length) {
-                  extra_data += this.dataSets[i].rawdata[Math.floor(this.cursorTime)*2+1] + " ";
-                }
-              }
-            }
+            var extra_data = this.dataSets[nearestDSIndex].extra_data[nearestPointIndex];
 
             $(this.eventTarget).trigger("graphCursorMoved", [displayTime, this.cursorValue, extra_data, this.dataSets[nearestDSIndex].test]);
 
