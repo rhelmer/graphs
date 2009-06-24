@@ -127,16 +127,6 @@ function handleLoad()
         return;
     }
 
-    $("#activetests").droppable({
-        accept: ".testline",
-        activeClass: "droppable-active",
-        hoverClass: "droppable-hover",
-        drop: function(ev, arg) {
-            var tid = testInfoFromElement(arg.draggable.element);
-            doAddTest(tid);
-        }
-    });
-
     // wrap the range-spans
     $(".clicky-ranges span").click(onNewRangeClick);
 
@@ -750,12 +740,12 @@ function updateAvailableTests()
     if (gGraphType == GRAPH_TYPE_SERIES)
         opts.dateSelector = true;
 
-    var newTests = '';
+    var newTests = [];
     for (var i = 0; i < tests.length; i++) {
-        newTests += makeTestDiv(tests[i], opts);
+        newTests[i] = makeTestDiv(tests[i], opts);
     }
     
-    document.getElementById("availabletests").innerHTML = newTests;
+    document.getElementById("availabletests").innerHTML = newTests.join("");
     
     if (tests.length == 0) {
         $("#availabletests").append("<div class='testline'><i>No tests matched.</i></div>");
