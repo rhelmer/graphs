@@ -73,8 +73,9 @@ TinderboxData.prototype = {
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
 
-        $.getJSON(getdatacgi + "/test",
-            function (obj) {
+        $.get(getdatacgi + "/test",
+            function (resp) {
+                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
                 if (!checkErrorReturn(obj)) return;
                 self.testList = obj.tests;
                 $(self.eventTarget).trigger("tinderboxTestListAvailable", [self.testList]);

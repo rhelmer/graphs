@@ -85,7 +85,7 @@ function handleLoad()
 
     initGraphCore(gGraphType == GRAPH_TYPE_SERIES);
 
-    $("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
+    //$("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
 
     $(SmallPerfGraph.eventTarget).bind("graphSelectionChanged",
                                        function (ev, selType, arg1, arg2) {
@@ -102,7 +102,7 @@ function handleLoad()
             function (tests) {
                 transformLegacyData(tests);
                 populateFilters();
-                doResetFilter();
+                doResetFilter(null, false);
                 if (gPostDataLoadFunction) {
                     gPostDataLoadFunction.call(window);
                     gPostDataLoadFunction = null;
@@ -116,7 +116,7 @@ function handleLoad()
                                     function (tests) {
                                         transformLegacyData(tests);
                                         populateFilters();
-                                        doResetFilter();
+                                        doResetFilter(null, false);
                                         if (gPostDataLoadFunction) {
                                             gPostDataLoadFunction.call(window);
                                             gPostDataLoadFunction = null;
@@ -327,7 +327,7 @@ function findTestForSelections()
     return test;
 }
 
-function doResetFilter(skipIncludeOld)
+function doResetFilter(skipIncludeOld, updateAvailableTests)
 {
     $("#testplatform")[0].value = "All";
     $("#testmachine")[0].value = "All";
@@ -336,8 +336,8 @@ function doResetFilter(skipIncludeOld)
 
     if (!skipIncludeOld)
         $("#testincludeold")[0].checked = false;
-
-    updateAvailableTests();
+    if(updateAvailableTests)
+        updateAvailableTests();
 }
 
 function doFilterTests()
@@ -870,9 +870,11 @@ function populateFilters()
                        $("#test" + s).empty();
                        uniques[s] = uniques[s].sort();
                        $("#test" + s).append("<option>All</option>");
+                       var options = [];
                        for (var k = 0; k < uniques[s].length; k++) {
-                           $("#test" + s).append("<option>" + uniques[s][k] + "</option>");
+                           options.push("<option>" + uniques[s][k] + "</option>");
                        }
+                       $("#test" + s).append(options.join(""));
                    });
 }
 
