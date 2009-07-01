@@ -178,6 +178,14 @@ function initOptions()
     
     
     if ("show" in qsdata) {
+        if(window.location.toString().indexOf('graphs.mozilla.org') != -1) {
+            window.location = 'http://graphs-old.mozilla.org'+document.location.hash;
+        }
+        
+        if(window.location.toString().indexOf('graphs-stage.mozilla.org') != -1) {
+            window.location = 'http://graphs-stage-old.mozilla.org'+document.location.hash;
+        }
+        
         var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
  
         loadFunctions.push (function() {
