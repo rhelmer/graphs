@@ -175,6 +175,15 @@ function initOptions()
         });
     }
     
+    if("spst" in qsdata) {
+        if(window.location.toString().indexOf('graphs.mozilla.org') != -1) {
+            window.location = 'http://graphs-old.mozilla.org'+document.location.hash;
+        }
+        
+        if(window.location.toString().indexOf('graphs-stage.mozilla.org') != -1) {
+            window.location = 'http://graphs-stage-old.mozilla.org'+document.location.hash;
+        }
+    }
     
     
     if ("show" in qsdata) {
