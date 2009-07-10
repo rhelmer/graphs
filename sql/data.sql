@@ -15,6 +15,7 @@ insert into branches values (NULL,"TraceMonkey");
 insert into branches values (NULL,"Fennec");
 insert into branches values (NULL,"MozillaTest");
 insert into branches values (NULL,"Mobile");
+insert into branches values (NULL,"Places");
 
 -- osid,isthrottling,cpuspeed,name,isactive,dateadded
 -- stage talos
