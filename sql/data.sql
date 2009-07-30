@@ -347,3 +347,6 @@ insert into tests values (NULL,"tp4_shutdown","Tp4 Shutdown",1,1,8);
 insert into tests values (NULL,"tp4_shutdown_nochrome","Tp4 NoChrome Shutdown",0,1,8);
 insert into tests values (NULL,"tp_fast_shutdown","Tp3 Fast Cycle Shutdown",1,1,2);
 insert into tests values (NULL,"ts_shutdown","Ts Shutdown",1,1,NULL);
+insert into tests values (NULL,"ts_places_generated_min","Ts Shutdown, MIN Dirty Profile",1,1,NULL);
+insert into tests values (NULL,"ts_places_generated_med","Ts Shutdown, MED Dirty Profile",1,1,NULL);
+insert into tests values (NULL,"ts_places_generated_max","Ts Shutdown, MAX Dirty Profile",1,1,NULL);
