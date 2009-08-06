@@ -25,6 +25,22 @@ insert into machines values (NULL,2,0,"1.63","qm-pvista-stage01",1,unix_timestam
 insert into machines values (NULL,3,0,"1.63","qm-ptiger-stage01",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.63","qm-pleopard-stage01",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.63","qm-pubuntu-stage01",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.63","talos-rev1-xp01",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.63","talos-rev1-xp02",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.63","talos-rev1-xp03",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.63","talos-rev1-xp04",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.63","talos-rev1-vista01",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.63","talos-rev1-vista02",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.63","talos-rev1-vista03",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.63","talos-rev1-vista04",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.63","talos-rev1-tiger01",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.63","talos-rev1-tiger02",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.63","talos-rev1-tiger03",1,unix_timestamp());
+insert into machines values (NULL,3,0,"1.63","talos-rev1-tiger04",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.63","talos-rev1-linux01",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.63","talos-rev1-linux02",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.63","talos-rev1-linux03",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.63","talos-rev1-linux04",1,unix_timestamp());
 -- try talos
 insert into machines values (NULL,1,0,"1.83","qm-pxp-try01",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","qm-pxp-try02",1,unix_timestamp());
