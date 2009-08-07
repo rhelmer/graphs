@@ -107,6 +107,7 @@ function handleLoad()
                     gPostDataLoadFunction.call(window);
                     gPostDataLoadFunction = null;
                 }
+                $("#throbber").hide();
             });
             
     } else if (gGraphType == GRAPH_TYPE_SERIES) {
@@ -121,6 +122,7 @@ function handleLoad()
                                             gPostDataLoadFunction.call(window);
                                             gPostDataLoadFunction = null;
                                         }
+                                        $("#throbber").hide();
                                     });
     } else {
         alert("Unsupported graph type");
