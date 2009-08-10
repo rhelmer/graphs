@@ -11,6 +11,7 @@ insert into os_list values (NULL,"Linux embed");
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox3.0");
 insert into branches values (NULL,"Firefox3.5");
+insert into branches values (NULL,"Firefox3.6");
 insert into branches values (NULL,"TraceMonkey");
 insert into branches values (NULL,"Fennec");
 insert into branches values (NULL,"MozillaTest");
