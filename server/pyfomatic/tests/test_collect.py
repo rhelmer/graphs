@@ -286,7 +286,7 @@ def test_StringValidator():
   assert c.StringValidator.validate('__fred')  == '__fred'
   assert c.StringValidator.validate('fred.fred+')  == 'fred.fred+'
   assert c.StringValidator.validate('0123456789')  == '0123456789'
-  assert c.StringValidator.validate('1Aa9Zz._()-+ ')  == '1Aa9Zz._()-+ '
+  assert c.StringValidator.validate('1Aa9Zz._()%-+ ')  == '1Aa9Zz._()%-+ '
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_MetaDataFromTalos_1():

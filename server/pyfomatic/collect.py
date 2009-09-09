@@ -36,7 +36,7 @@ class DataStreamException(Error):
 
 #=================================================================================================================
 class StringValidator(object):
-  reString = re.compile('^[0-9A-Za-z._()\-+ ]*$')
+  reString = re.compile('^[0-9A-Za-z.%_()\-+ ]*$')
   @staticmethod
   def validate(aString):
     """"""
