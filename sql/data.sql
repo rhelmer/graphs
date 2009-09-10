@@ -205,6 +205,11 @@ insert into machines values (NULL,1,0,"1.83","talos-rev2-xp17",1,unix_timestamp(
 insert into machines values (NULL,1,0,"1.83","talos-rev2-xp18",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","talos-rev2-xp19",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","talos-rev2-xp20",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","talos-rev2-xp21",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","talos-rev2-xp22",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","talos-rev2-xp23",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","talos-rev2-xp24",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","talos-rev2-xp25",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","talos-rev2-vista01",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","talos-rev2-vista02",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","talos-rev2-vista03",1,unix_timestamp());
