@@ -6,7 +6,7 @@ insert into os_list values (NULL,"Ubuntu 7.10");
 insert into os_list values (NULL,"CentOS release 5 (Final)");
 insert into os_list values (NULL,"MacOSX 10.5.2");
 insert into os_list values (NULL,"WINNT 5.2");
-insert into os_list values (NULL,"Linux embed");
+insert into os_list values (NULL,"Nokia n810");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox3.0");
@@ -15,9 +15,11 @@ insert into branches values (NULL,"Firefox3.6");
 insert into branches values (NULL,"TraceMonkey");
 insert into branches values (NULL,"Fennec");
 insert into branches values (NULL,"MozillaTest");
-insert into branches values (NULL,"Mobile");
 insert into branches values (NULL,"Places");
 insert into branches values (NULL,"Electrolysis");
+insert into branches values (NULL,"mobile");
+insert into branches values (NULL,"mobile-tracemonkey");
+insert into branches values (NULL,"mobile-1.9.2");
 
 -- osid,isthrottling,cpuspeed,name,isactive,dateadded
 -- stage talos
@@ -163,13 +165,6 @@ insert into machines values (NULL,3,0,"1.83","qm-pmac-trunk09",1,unix_timestamp(
 insert into machines values (NULL,5,0,"1.83","qm-ubuntu-try01",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","qm-pxp-try01",1,unix_timestamp());
 insert into machines values (NULL,3,0,"1.83","qm-ptiger-try01",1,unix_timestamp());
--- mobile talos
-insert into machines values (NULL,9,0,NULL,"maemo-n810-01",1,unix_timestamp());
-insert into machines values (NULL,9,0,NULL,"maemo-n810-02",1,unix_timestamp());
-insert into machines values (NULL,9,0,NULL,"maemo-n810-03",1,unix_timestamp());
-insert into machines values (NULL,9,0,NULL,"maemo-n810-04",1,unix_timestamp());
-insert into machines values (NULL,9,0,NULL,"maemo-n810-05",1,unix_timestamp());
-insert into machines values (NULL,9,0,NULL,"maemo-n810-06",1,unix_timestamp());
 -- pool talos
 insert into machines values (NULL,1,0,"1.83","qm-pxp-slave01",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","qm-pxp-slave02",1,unix_timestamp());
@@ -322,6 +317,48 @@ insert into machines values (NULL,8,0,NULL,"WINNT_5.2_places",1,unix_timestamp()
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_places_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis_leak_test",1,unix_timestamp());
+
+--mobile
+insert into machines values (NULL,9,0,NULL,"maemo-n810-01",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-02",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-03",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-04",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-05",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-06",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-07",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-08",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-09",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-10",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-11",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-12",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-13",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-14",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-15",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-16",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-17",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-18",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-19",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-20",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-21",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-22",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-23",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-24",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-25",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-26",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-27",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-28",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-29",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-30",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-31",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-32",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-33",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-34",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-35",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-36",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-37",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-38",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-39",1,unix_timestamp());
+insert into machines values (NULL,9,0,NULL,"maemo-n810-40",1,unix_timestamp());
 
 insert into pagesets values (NULL,"Tp December, 2006 (393 pages)");
 insert into pagesets values (NULL,"Tp November, 2000 (40 pages)");
