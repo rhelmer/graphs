@@ -54,6 +54,9 @@ insert into machines values (NULL,1,0,"1.83","qm-pxp-try04",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","qm-pxp-try05",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","qm-pxp-try06",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","qm-pxp-try07",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","qm-pxp-try08",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","qm-pxp-try09",1,unix_timestamp());
+insert into machines values (NULL,1,0,"1.83","qm-pxp-try10",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","qm-pvista-try01",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","qm-pvista-try02",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","qm-pvista-try03",1,unix_timestamp());
@@ -63,6 +66,8 @@ insert into machines values (NULL,2,0,"1.83","qm-pvista-try06",1,unix_timestamp(
 insert into machines values (NULL,2,0,"1.83","qm-pvista-try07",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","qm-pvista-try08",1,unix_timestamp());
 insert into machines values (NULL,2,0,"1.83","qm-pvista-try09",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.83","qm-pvista-try10",1,unix_timestamp());
+insert into machines values (NULL,2,0,"1.83","qm-pvista-try11",1,unix_timestamp());
 insert into machines values (NULL,3,0,"1.83","qm-ptiger-try01",1,unix_timestamp());
 insert into machines values (NULL,3,0,"1.83","qm-ptiger-try02",1,unix_timestamp());
 insert into machines values (NULL,3,0,"1.83","qm-ptiger-try03",1,unix_timestamp());
@@ -76,6 +81,10 @@ insert into machines values (NULL,4,0,"1.83","qm-pleopard-try04",1,unix_timestam
 insert into machines values (NULL,4,0,"1.83","qm-pleopard-try05",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.83","qm-pleopard-try06",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.83","qm-pleopard-try07",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try08",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try09",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try10",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try11",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try01",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try02",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try03",1,unix_timestamp());
@@ -85,6 +94,8 @@ insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try06",1,unix_timestamp
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try07",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try08",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try09",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try10",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try11",1,unix_timestamp());
 -- 1.9.0 talos
 insert into machines values (NULL,1,0,"1.63","qm-mini-xp01",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.63","qm-mini-xp02",1,unix_timestamp());
