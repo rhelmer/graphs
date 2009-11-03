@@ -44,6 +44,7 @@ insert into machines values (NULL,5,0,"1.63","talos-rev1-linux01",1,unix_timesta
 insert into machines values (NULL,5,0,"1.63","talos-rev1-linux02",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.63","talos-rev1-linux03",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.63","talos-rev1-linux04",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.63","talos-rev1-linux05",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.63","talos-rev1-leopard01",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.63","talos-rev1-leopard02",1,unix_timestamp());
 -- try talos
