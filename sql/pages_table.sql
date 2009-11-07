@@ -945,3 +945,7 @@ insert into pages values (NULL,7,"string-fasta.html");
 insert into pages values (NULL,7,"string-tagcloud.html");
 insert into pages values (NULL,7,"string-unpack-code.html");
 insert into pages values (NULL,7,"string-validate-input.html");
+
+-- "svg opacity"
+insert into pages values (NULL,9,"small-group-opacity-2500.svg");
+insert into pages values (NULL,9,"big-optimizable-group-opacity-2500.svg");
