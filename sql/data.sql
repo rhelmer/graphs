@@ -389,6 +389,7 @@ insert into pagesets values (NULL,"Dromaeo");
 insert into pagesets values (NULL,"SunSpider");
 insert into pagesets values (NULL, "Tp February, 2009 (100 pages)");
 insert into pagesets values (NULL, "SVG Opacity");
+insert into pagesets values (NULL, "V8");
 
 -- name,prettyname,ischrome,isactive,pagesetid
 insert into tests values (NULL,"tp_nochrome","Tp3 NoChrome",0,1,1);
@@ -451,3 +452,5 @@ insert into tests values (NULL,"tsvg_opacity","SVG, Opacity",1,1,9);
 insert into tests values (NULL,"tsvg_opacity_nochrome","SVG, Opacity NoChrome",1,1,9);
 insert into tests values (NULL,"tpan","FennecBench Pan",1,1,NULL);
 insert into tests values (NULL,"tzoom","FennecBench Zoom",1,1,NULL);
+insert into tests values (NULL,"v8","V8",1,1,10);
+insert into tests values (NULL,"v8_nochrome","V8 NoChrome",1,1,10);
