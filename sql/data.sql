@@ -449,3 +449,5 @@ insert into tests values (NULL,"ts_places_generated_med_shutdown","Ts Shutdown, 
 insert into tests values (NULL,"ts_places_generated_max_shutdown","Ts Shutdown, MAX Dirty Profile",1,1,NULL);
 insert into tests values (NULL,"tsvg_opacity","SVG, Opacity",1,1,9);
 insert into tests values (NULL,"tsvg_opacity_nochrome","SVG, Opacity NoChrome",1,1,9);
+insert into tests values (NULL,"tpan","FennecBench Pan",1,1,NULL);
+insert into tests values (NULL,"tzoom","FennecBench Zoom",1,1,NULL);
