@@ -86,6 +86,11 @@ insert into machines values (NULL,4,0,"1.83","qm-pleopard-try08",1,unix_timestam
 insert into machines values (NULL,4,0,"1.83","qm-pleopard-try09",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.83","qm-pleopard-try10",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.83","qm-pleopard-try11",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try12",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try13",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try14",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try15",1,unix_timestamp());
+insert into machines values (NULL,4,0,"1.83","qm-pleopard-try16",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try01",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try02",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try03",1,unix_timestamp());
@@ -97,6 +102,11 @@ insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try08",1,unix_timestamp
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try09",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try10",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try11",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try12",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try13",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try14",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try15",1,unix_timestamp());
+insert into machines values (NULL,5,0,"1.83","qm-pubuntu-try16",1,unix_timestamp());
 -- 1.9.0 talos
 insert into machines values (NULL,1,0,"1.63","qm-mini-xp01",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.63","qm-mini-xp02",1,unix_timestamp());
@@ -408,6 +418,8 @@ insert into tests values (NULL,"tp4_pbytes", "Tp4 (Private Bytes)",1,1,NULL);
 insert into tests values (NULL,"tp4_pbytes_nochrome","Tp4 NoChrome (Private Bytes)",0,1,NULL);
 insert into tests values (NULL,"tp4_rss","Tp4 (RSS)",1,1,NULL);
 insert into tests values (NULL,"tp4_rss_nochrome","Tp4 NoChrome (RSS)",0,1,NULL);
+insert into tests values (NULL,"tp4_xres","Tp4 (XRes)",1,1,NULL);
+insert into tests values (NULL,"tp4_xres_nochrome","Tp4 NoChrome (XRes)",0,1,NULL);
 insert into tests values (NULL,"tp4_%cpu","Tp4 (%CPU)",1,1,NULL);
 insert into tests values (NULL,"tp4_%cpu_nochrome","Tp4 NoChrome (%CPU)",0,1,NULL);
 insert into tests values (NULL,"tp4_memset","Tp4 (Memset)",1,1,NULL);
