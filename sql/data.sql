@@ -7,6 +7,7 @@ insert into os_list values (NULL,"CentOS release 5 (Final)");
 insert into os_list values (NULL,"MacOSX 10.5.2");
 insert into os_list values (NULL,"WINNT 5.2");
 insert into os_list values (NULL,"Nokia n810");
+insert into os_list values (NULL, "Ubuntu 9.04 (x64)");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox3.0");
@@ -47,6 +48,7 @@ insert into machines values (NULL,5,0,"1.63","talos-rev1-linux04",1,unix_timesta
 insert into machines values (NULL,5,0,"1.63","talos-rev1-linux05",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.63","talos-rev1-leopard01",1,unix_timestamp());
 insert into machines values (NULL,4,0,"1.63","talos-rev1-leopard02",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6401",1,unix_timestamp());
 -- try talos
 insert into machines values (NULL,1,0,"1.83","qm-pxp-try01",1,unix_timestamp());
 insert into machines values (NULL,1,0,"1.83","qm-pxp-try02",1,unix_timestamp());
