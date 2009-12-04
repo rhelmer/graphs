@@ -8,6 +8,7 @@ insert into os_list values (NULL,"MacOSX 10.5.2");
 insert into os_list values (NULL,"WINNT 5.2");
 insert into os_list values (NULL,"Nokia n810");
 insert into os_list values (NULL, "Ubuntu 9.04 (x64)");
+insert into os_list values (NULL, "Windows Mobile Professional 6");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox3.0");
@@ -431,6 +432,8 @@ insert into machines values (NULL,9,0,NULL,"maemo-n810-77",1,unix_timestamp());
 insert into machines values (NULL,9,0,NULL,"maemo-n810-78",1,unix_timestamp());
 insert into machines values (NULL,9,0,NULL,"maemo-n810-79",1,unix_timestamp());
 insert into machines values (NULL,9,0,NULL,"maemo-n810-80",1,unix_timestamp());
+insert into machines values (NULL,11,0,NULL,"winmo-touchpro-01",1,unix_timestamp());
+insert into machines values (NULL,11,0,NULL,"winmo-touchpro-02",1,unix_timestamp());
 
 insert into pagesets values (NULL,"Tp December, 2006 (393 pages)");
 insert into pagesets values (NULL,"Tp November, 2000 (40 pages)");
