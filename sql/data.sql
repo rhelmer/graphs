@@ -318,7 +318,20 @@ insert into machines values (NULL,5,0,"1.83","talos-rev2-linux17",1,unix_timesta
 insert into machines values (NULL,5,0,"1.83","talos-rev2-linux18",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","talos-rev2-linux19",1,unix_timestamp());
 insert into machines values (NULL,5,0,"1.83","talos-rev2-linux20",1,unix_timestamp());
-
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6402",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6403",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6404",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6405",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6406",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6407",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6408",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6409",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6410",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6411",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6412",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6413",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6414",1,unix_timestamp());
+insert into machines values (NULL,10,0,"1.83","talos-rev2-x6415",1,unix_timestamp());
 
 -- builders
 insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.1",1,unix_timestamp());
