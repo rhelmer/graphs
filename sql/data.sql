@@ -19,9 +19,11 @@ insert into branches values (NULL,"Fennec");
 insert into branches values (NULL,"MozillaTest");
 insert into branches values (NULL,"Places");
 insert into branches values (NULL,"Electrolysis");
+insert into branches values (NULL,"Lorentz");
 insert into branches values (NULL,"mobile");
 insert into branches values (NULL,"mobile-tracemonkey");
 insert into branches values (NULL,"mobile-1.9.2");
+insert into branches values (NULL,"mobile-lorentz");
 
 -- osid,isthrottling,cpuspeed,name,isactive,dateadded
 -- stage talos
@@ -344,6 +346,8 @@ insert into machines values (NULL,6,0,NULL,"Linux_places",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_places_leak_test",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_electrolysis",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_electrolysis_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"Linux_lorentz",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"Linux_lorentz_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-1.9.1",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-1.9.1_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_tracemonkey",1,unix_timestamp());
@@ -355,6 +359,8 @@ insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_electrolysis_leak_test",
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central_tracemonkey",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"OS_X_10.5.2_lorentz",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"OS_X_10.5.2_lorentz_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-1.9.1_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-central_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_tracemonkey",1,unix_timestamp());
@@ -363,6 +369,8 @@ insert into machines values (NULL,8,0,NULL,"WINNT_5.2_places",1,unix_timestamp()
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_places_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_lorentz",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_lorentz_leak_test",1,unix_timestamp());
 
 --mobile
 insert into machines values (NULL,9,0,NULL,"maemo-n810-01",1,unix_timestamp());
