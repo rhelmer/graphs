@@ -19,7 +19,7 @@ insert into branches values (NULL,"Fennec");
 insert into branches values (NULL,"MozillaTest");
 insert into branches values (NULL,"Places");
 insert into branches values (NULL,"Electrolysis");
-insert into branches values (NULL,"Lorentz");
+insert into branches values (NULL,"Firefox-Lorentz");
 insert into branches values (NULL,"mobile");
 insert into branches values (NULL,"mobile-tracemonkey");
 insert into branches values (NULL,"mobile-1.9.2");
