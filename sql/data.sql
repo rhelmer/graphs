@@ -9,7 +9,7 @@ insert into os_list values (NULL,"WINNT 5.2");
 insert into os_list values (NULL,"Nokia n810");
 insert into os_list values (NULL, "Ubuntu 9.04 (x64)");
 insert into os_list values (NULL, "Windows Mobile Professional 6");
-insert into os_list values (NULL, "WINNT 7.0");
+insert into os_list values (NULL, "WINNT 6.1");
 insert into os_list values (NULL, "MacOSX Darwin 9.8.0");
 insert into os_list values (NULL, "Fedora 12 - Constantine");
 insert into os_list values (NULL, "Fedora 12 x64 - Constantine");
