@@ -206,21 +206,26 @@ function initOptions()
     }
 
     //New link format (tests=[{test:ID,branch:ID,machine:ID}])
-    if("tests" in qsdata) {
-        var tests = eval('(' + qsdata['tests'] + ')');
-        
-        loadFunctions.push(function() {
-            for(var i=0; i< tests.length; i++) {
-                var testInfo = tests[i];
-                if(gGraphType == GRAPH_TYPE_VALUE) {
-                    doAddTest({"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
-                } else {
-                    doAddTestRun(testInfo.testrun, {"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+    if ("tests" in qsdata) {
+        var tests;
+        // Allow graph choices to load even if we've been given invalid JSON
+        try {
+            tests = JSON.parse(qsdata['tests']);
+        } catch(e) {}
+
+        if (tests) {
+            loadFunctions.push(function() {
+                for (var i = 0; i < tests.length; i++) {
+                    var testInfo = tests[i];
+                    if (gGraphType == GRAPH_TYPE_VALUE)
+                        doAddTest({"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+                    else
+                        doAddTestRun(testInfo.testrun, {"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
                 }
-            }
-        });
+            });
+        }
     }
-    
+
 
     //support old link format, setting selected range
     if (("spss" in qsdata) && ("spse" in qsdata)) {
