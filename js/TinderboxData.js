@@ -75,7 +75,7 @@ TinderboxData.prototype = {
 
         $.get(getdatacgi + "/test",
             function (resp) {
-                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                var obj = JSON.parse(resp);
                 if (!checkErrorReturn(obj)) return;
                 self.testList = obj.tests;
                 $(self.eventTarget).trigger("tinderboxTestListAvailable", [self.testList]);
@@ -154,7 +154,7 @@ TinderboxData.prototype = {
         //log (reqstr);
         $.get(reqstr,
               function (resp) {
-                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                var obj = JSON.parse(resp);
                 
                 if (!checkErrorReturn(obj)) return;    
                 
@@ -260,7 +260,7 @@ TinderboxData.prototype = {
         //log (reqstr);
         $.get(reqstr,
               function (resp) {
-                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                var obj = JSON.parse(resp);
                 
                 if (!checkErrorReturn(obj)) return;
                 
@@ -294,7 +294,7 @@ TinderboxData.prototype = {
     getTestRunInfo: function(testRunId, cb) {
         $.get('/api/test/runs/info?id='+testRunId, 
             function(resp) {
-                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                var obj = JSON.parse(resp);
                   if (!checkErrorReturn(obj)) return;
 
                   cb(obj.testrun);
@@ -360,7 +360,7 @@ DiscreteTinderboxData.prototype = {
         
         $.get(getdatacgi + "/test/runs?"+limiters, 
             function(resp) {
-                var obj = (window.JSON) ? JSON.parse(resp) : eval('(' + resp + ')');
+                var obj = JSON.parse(resp);
                 
                 if(!checkErrorReturn(obj)) return;
                 self.testRuns = obj.test_runs;

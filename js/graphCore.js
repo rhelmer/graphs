@@ -349,7 +349,7 @@ function loadOptions() {
 
         if ("graphOptions" in store) {
             var s = (store["graphOptions"]).toString();
-            var tmp = eval(s);
+            var tmp = JSON.parse(s);
             // don't clobber newly defined options
             for (var opt in tmp)
                 gOptions[opt] = tmp[opt];
@@ -367,7 +367,7 @@ function saveOptions() {
 
     try {
         var store = globalStorage[document.domain];
-        store["graphOptions"] = uneval(gOptions);
+        store["graphOptions"] = JSON.stringify(gOptions);
     } catch (ex) {
     }
 }
