@@ -377,7 +377,7 @@ elif not getlist:
 else:
     doGetList(zfile, type, branch, machine, testname)
 
-sys.stdout.write("Access-Control: allow <*>\n")
+sys.stdout.write("Access-Control-Allow-Origin: *\n")
 sys.stdout.write("Content-Type: text/plain\n")
 if doGzip == 1:
     zfile.close()

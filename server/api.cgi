@@ -56,7 +56,7 @@ def main():
 #Send data. Assume status is a number and data is a dictionary that can be written via json.write
 def sendResponse(status, data):
     sys.stdout.write("Status: "+str(status)+"\n") #should be doing a sprintf on this
-    sys.stdout.write("Access-Control: allow <*>\n")
+    sys.stdout.write("Access-Control-Allow-Origin: *\n")
     sys.stdout.write("Content-Type: text/html\n")
     sys.stdout.write("\r\n\r\n")
     print json.write(data)
