@@ -30,6 +30,8 @@ insert into branches values (NULL,"mobile");
 insert into branches values (NULL,"mobile-tracemonkey");
 insert into branches values (NULL,"mobile-1.9.2");
 insert into branches values (NULL,"mobile-lorentz");
+insert into branches values (NULL,"mobile-electrolysis");
+insert into branches values (NULL,"mobile-places");
 
 -- osid,isthrottling,cpuspeed,name,isactive,dateadded
 -- stage talos
