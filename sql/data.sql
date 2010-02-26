@@ -15,6 +15,7 @@ insert into os_list values (NULL, "Fedora 12 - Constantine");
 insert into os_list values (NULL, "Fedora 12 x64 - Constantine");
 insert into os_list values (NULL, "Nokia n900");
 insert into os_list values (NULL, "MacOSX 10.6.2");
+insert into os_list values (NULL, "CentOS (x86_64) release 5 (Final)");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox3.0");
@@ -583,6 +584,20 @@ insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis",1,unix_times
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_firefox-lorentz",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_firefox-lorentz_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.1",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.2",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.2_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-central",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_tracemonkey",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_tracemonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_places",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_places_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_electrolysis",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_electrolysis_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_firefox-lorentz",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_firefox-lorentz_leak_test",1,unix_timestamp());
 
 --mobile
 insert into machines values (NULL,9,0,NULL,"maemo-n810-01",1,unix_timestamp());
