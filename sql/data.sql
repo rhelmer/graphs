@@ -596,8 +596,8 @@ insert into machines values (NULL,18,0,NULL,"Linux_x86-64_places",1,unix_timesta
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_places_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_electrolysis",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_electrolysis_leak_test",1,unix_timestamp());
-insert into machines values (NULL,18,0,NULL,"Linux_x86-64_firefox-lorentz",1,unix_timestamp());
-insert into machines values (NULL,18,0,NULL,"Linux_x86-64_firefox-lorentz_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_lorentz",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_lorentz_leak_test",1,unix_timestamp());
 
 --mobile
 insert into machines values (NULL,9,0,NULL,"maemo-n810-01",1,unix_timestamp());
