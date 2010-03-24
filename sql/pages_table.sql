@@ -959,3 +959,11 @@ insert into pages values (NULL,10,"earley-boyer.html");
 insert into pages values (NULL,10,"regexp.html");
 insert into pages values (NULL,10,"splay.html");
 
+-- "tscroll"
+insert into pages values (NULL, 11, "tiled.html");
+insert into pages values (NULL, 11, "tiled-fixed.html");
+insert into pages values (NULL, 11, "tiled-downscale.html");
+insert into pages values (NULL, 11, "tiled-fixed-downscale.html");
+insert into pages values (NULL, 11, "iframe.svg");
+insert into pages values (NULL, 11, "reader.htm");
+
