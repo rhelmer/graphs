@@ -13,8 +13,11 @@ import api
 tests = api.getTests(None, None, None)
 
 if(tests["stat"] == 'ok'):
-    cacheFile = file(filename, "w")
-    cacheFile.write(json.write(tests["tests"]))
+    result = {'stat':'ok', 'tests':tests["tests"], "from":"cache"}
+    tempname = "%s.tmp.%i" % (filename, os.getpid())
+    cacheFile = open(tempname, "w")
+    cacheFile.write(json.write(result))
     cacheFile.close()
+    os.rename(tempname, filename)
 else:
     print "Failed to get test data"

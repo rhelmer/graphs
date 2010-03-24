@@ -4,44 +4,38 @@ import minjson as json
 
 #Get an array of all tests by build and os
 def getTests(id, attribute, form):
-    try:
-        cachedTests = open("tmp/tests.json").read()
-        tests = json.read(cachedTests)
-        result = {'stat':'ok', 'tests':tests, "from":"cache"}
-    except IOError:
-        #something went wrong fetching the cache file (doesn't exist, etc). read from db instead
-        sql = """SELECT DISTINCT
-                    tests.id, 
-                    tests.pretty_name AS test_name, 
-                    machines.name as machine_name, 
-                    machines.id as machine_id,
-                    branches.name AS branch_name, 
-                    branches.id AS branch_id, 
-                    os_list.id AS os_id ,
-                    os_list.name AS os_name
-                FROM 
-                    tests INNER JOIN test_runs ON (tests.id = test_runs.test_id) 
-                        INNER JOIN machines ON (machines.id = test_runs.machine_id) 
-                            INNER JOIN os_list ON (machines.os_id = os_list.id) 
-                                INNER JOIN builds ON (test_runs.build_id = builds.id) 
-                                    INNER JOIN branches on (builds.branch_id = branches.id) 
-                ORDER BY branches.id, machines.id"""
-        cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-        cursor.execute(sql)
-        tests = []
-        #fetch row count first, then check for length
-        if cursor.rowcount > 0:
-            rows = cursor.fetchall()
-        
-            for row in rows:
-                tests.append({'id':row['id'], 'name':row['test_name'], 'branch':{'name':row['branch_name'], 'id':row['branch_id']}, 'os':{'name':row['os_name'], 'id':row['os_id']}, 'machine':{'name':row['machine_name'], 'id':row['machine_id']}})
-        
-            result = {'stat':'ok', "from":"db", 'tests':tests}
-        else:
-            #if we don't find any tests, we have a problem
-            result = {'stat':'fail', 'code':'103', 'message':'No tests found'}
+    sql = """SELECT DISTINCT
+                tests.id,
+                tests.pretty_name AS test_name,
+                machines.name as machine_name,
+                machines.id as machine_id,
+                branches.name AS branch_name,
+                branches.id AS branch_id,
+                os_list.id AS os_id ,
+                os_list.name AS os_name
+            FROM
+                tests INNER JOIN test_runs ON (tests.id = test_runs.test_id)
+                    INNER JOIN machines ON (machines.id = test_runs.machine_id)
+                        INNER JOIN os_list ON (machines.os_id = os_list.id)
+                            INNER JOIN builds ON (test_runs.build_id = builds.id)
+                                INNER JOIN branches on (builds.branch_id = branches.id)
+            ORDER BY branches.id, machines.id"""
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql)
+    tests = []
+    #fetch row count first, then check for length
+    if cursor.rowcount > 0:
+        rows = cursor.fetchall()
+
+        for row in rows:
+            tests.append({'id':row['id'], 'name':row['test_name'], 'branch':{'name':row['branch_name'], 'id':row['branch_id']}, 'os':{'name':row['os_name'], 'id':row['os_id']}, 'machine':{'name':row['machine_name'], 'id':row['machine_id']}})
+
+        result = {'stat':'ok', "from":"db", 'tests':tests}
+    else:
+        #if we don't find any tests, we have a problem
+        result = {'stat':'fail', 'code':'103', 'message':'No tests found'}
     return result
-        
+
 #Get a list of test runs for a test id and branch and os with annotations
 def getTestRuns(id, attribute, form):
     

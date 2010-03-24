@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-import cgitb; cgitb.enable()
+# Uncomment this for debugging
+# import cgitb; cgitb.enable()
+
 import os
 import sys
 import cgi
@@ -53,6 +55,13 @@ def main():
                 reqtime = time.strptime(os.environ['HTTP_IF_MODIFIED_SINCE'], '%a, %d %b %Y %H:%M:%S %Z')
             if reqtime and lastmod and lastmod <= reqtime:
                 status = 304
+            elif lastmod:
+                try:
+                    sendRawResponse(status, "tmp/tests.json", lastmod)
+                except SystemExit:
+                    raise
+                except:
+                    result = options[item](id, attribute, form)
             else:
                 result = options[item](id, attribute, form)
         else:
@@ -61,24 +70,51 @@ def main():
         if result and result['stat'] != 'ok':
             status = errorCodeResponses[result['code']]
 
-        sendResponse(status, result, lastmod)
+        sendJsonResponse(status, result, lastmod)
     else:
-        sendResponse(404, {'stat':'fail', 'code':'100', 'message':'Endpoint not found'}, None)
+        sendJsonResponse(404, {'stat':'fail', 'code':'100', 'message':'Endpoint not found'}, None)
 
 
-    
-#Send data. Assume status is a number and data is a dictionary that can be written via json.write
-def sendResponse(status, data, lastmod):
+
+def sendJsonResponse(status, data, lastmod):
+    """Send data. Assume status is a number and data is a dictionary that can
+    be written via json.write."""
     sys.stdout.write("Status: "+str(status)+"\n") #should be doing a sprintf on this
     sys.stdout.write("Access-Control-Allow-Origin: *\n")
     if lastmod and status != 304:
         sys.stdout.write("Last-Modified: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", lastmod) + "\n")
     if data:
         sys.stdout.write("Content-Type: text/html\n")
+        data = json.write(data)
+        sys.stdout.write("Content-Length: %i\n" % len(data))
         sys.stdout.write("\r\n\r\n")
-        print json.write(data)
+        sys.stdout.write(data)
     else:
         sys.stdout.write("\r\n\r\n")
+    sys.exit(0)
+
+def sendRawResponse(status, filename, lastmod):
+    """Send data.  Assume status is a number and filename is the name of a file
+    containing the body of the response."""
+    sys.stdout.write("Status: "+str(status)+"\n") #should be doing a sprintf on this
+    sys.stdout.write("Access-Control-Allow-Origin: *\n")
+    if lastmod and status != 304:
+        sys.stdout.write("Last-Modified: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", lastmod) + "\n")
+
+    fp = open(filename)
+    fp.seek(0, 2)
+    size = fp.tell()
+    fp.seek(0)
+
+    sys.stdout.write("Content-Type: text/html\n")
+    sys.stdout.write("Content-Length: %i\n" % size)
+    sys.stdout.write("\r\n\r\n")
+    while True:
+        chunk = fp.read(4096)
+        if not chunk:
+            break
+        sys.stdout.write(chunk)
+
     sys.exit(0)
 
 #get this thing started
