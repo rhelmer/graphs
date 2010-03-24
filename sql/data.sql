@@ -815,3 +815,4 @@ insert into tests values (NULL,"tpan","FennecBench Pan",1,1,NULL);
 insert into tests values (NULL,"tzoom","FennecBench Zoom",1,1,NULL);
 insert into tests values (NULL,"v8","V8",1,1,10);
 insert into tests values (NULL,"v8_nochrome","V8 NoChrome",1,1,10);
+insert into tests values (NULL,"tscroll","tscroll",1,1,11);
