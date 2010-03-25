@@ -730,8 +730,6 @@ insert into machines values (NULL,16,0,0.5,"n900-047",1,unix_timestamp());
 insert into machines values (NULL,16,0,0.5,"n900-048",1,unix_timestamp());
 insert into machines values (NULL,16,0,0.5,"n900-049",1,unix_timestamp());
 insert into machines values (NULL,16,0,0.5,"n900-050",1,unix_timestamp());
-insert into machines values (NULL,11,0,NULL,"winmo-touchpro-01",1,unix_timestamp());
-insert into machines values (NULL,11,0,NULL,"winmo-touchpro-02",1,unix_timestamp());
 
 insert into pagesets values (NULL,"Tp December, 2006 (393 pages)");
 insert into pagesets values (NULL,"Tp November, 2000 (40 pages)");
