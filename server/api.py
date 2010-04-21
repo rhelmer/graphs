@@ -65,10 +65,12 @@ def getTestRuns(id, attribute, form):
     return result
 
 def getTestRun(id, attribute, form):
-    if(attribute == 'values'):
+    if attribute == 'values':
         return getTestRunValues(id)
-    elif(attribute == 'latest'):
+    elif attribute == 'latest':
         return getLatestTestRunValues(id, form)
+    elif attribute == 'revisions':
+        return getRevisionValues(form)
     else:
         sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id as ref_build_id, builds.ref_changeset as changeset                                                                                  
                 FROM test_runs INNER JOIN builds ON (test_runs.build_id = builds.id)
@@ -204,3 +206,39 @@ def getTest(id, attribute, form):
 
         return result
 
+def getRevisionValues(form):
+    """Returns a set of values for a given revision"""
+    revisions = form.getlist('revision')
+    result = {'stat': 'ok',
+              'revisions': {},
+              }
+
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    for rev in revisions:
+        testRuns = result['revisions'].setdefault(rev, {})
+        sql = """SELECT
+                    test_runs.*,
+                    tests.name as test_name,
+                    tests.pretty_name,
+                    builds.id as build_id,
+                    builds.ref_build_id,
+                    builds.ref_changeset,
+                    os_list.name AS os_name
+                FROM
+                    test_runs INNER JOIN builds ON (builds.id = test_runs.build_id)
+                        INNER JOIN tests ON (test_runs.test_id = tests.id)
+                            INNER JOIN machines ON (machines.id = test_runs.machine_id)
+                                INNER JOIN os_list ON (machines.os_id = os_list.id)
+                WHERE
+                    builds.ref_changeset = %s
+                """
+
+        cursor.execute(sql, (rev,))
+        for row in cursor:
+            testData = testRuns.setdefault(row['test_name'],
+                    {'name': row['pretty_name'], 'id': row['test_id'], 'test_runs': {}})
+            platformRuns = testData['test_runs'].setdefault(row['os_name'], []).append(
+                [row['id'], row['ref_build_id'], row['date_run'], row['average']],
+                )
+
+    return result
