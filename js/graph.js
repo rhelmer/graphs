@@ -206,6 +206,7 @@ function initOptions()
     }
 
     //New link format (tests=[{test:ID,branch:ID,machine:ID}])
+    //New, short link format (tests=[[testID, branchID, machineID], ...]
     if ("tests" in qsdata) {
         var tests;
         // Allow graph choices to load even if we've been given invalid JSON
@@ -217,10 +218,20 @@ function initOptions()
             loadFunctions.push(function() {
                 for (var i = 0; i < tests.length; i++) {
                     var testInfo = tests[i];
+                    if ('test' in testInfo) {
+                        var testID = testInfo.test;
+                        var branchID = testInfo.branch;
+                        var machineID = testInfo.machine;
+                    } else {
+                        var testID = testInfo[0];
+                        var branchID = testInfo[1];
+                        var machineID = testInfo[2];
+                    }
+
                     if (gGraphType == GRAPH_TYPE_VALUE)
-                        doAddTest({"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+                        doAddTest({"id":testID, "branch_id":branchID, "machine_id":machineID});
                     else
-                        doAddTestRun(testInfo.testrun, {"id":testInfo.test, "branch_id":testInfo.branch, "machine_id":testInfo.machine});
+                        doAddTestRun(testInfo.testrun, {"id":testID, "branch_id":branchID, "machine_id":machineID});
                 }
             });
         }
@@ -1025,7 +1036,7 @@ function updateLinks() {
             var tests = [];
             for (var i=0; i < gActiveTests.length; i++) {
                 var test = gActiveTests[i].split('-');
-                tests.push({"test":test[0], "branch":test[1], "machine":test[2]});
+                tests.push([parseInt(test[0]), parseInt(test[1]), parseInt(test[2])]);
             }
             loc += JSON.stringify(tests);
         }
