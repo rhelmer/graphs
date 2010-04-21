@@ -3,6 +3,7 @@
     RewriteRule ^api/test/?$ server/api.cgi?item=tests [QSA]
     RewriteRule ^api/test/runs/info/?$ server/api.cgi?item=testrun [QSA]
     RewriteRule ^api/test/runs/values/?$ server/api.cgi?item=testrun&attribute=values [QSA]
+    RewriteRule ^api/test/runs/revisions/?$ server/api.cgi?item=testrun&attribute=revisions [QSA]
     RewriteRule ^api/test/runs/latest/?$ server/api.cgi?item=testrun&id=$1&attribute=latest [QSA]
     RewriteRule ^api/test/runs/? server/api.cgi?item=testruns [QSA]
     RewriteRule ^api/test/([0-9]+)/?$ server/api.cgi?item=test&id=$1
