@@ -584,6 +584,9 @@ insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis",1,unix_times
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_lorentz",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_lorentz_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central_tracemonkey",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.1",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.1_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.2",1,unix_timestamp());
