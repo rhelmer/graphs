@@ -80,35 +80,35 @@ def sendJsonResponse(status, data, lastmod):
     """Send data. Assume status is a number and data is a dictionary that can
     be written via json.write."""
     sys.stdout.write("Status: "+str(status)+"\n") #should be doing a sprintf on this
-    sys.stdout.write("Access-Control-Allow-Origin: *\n")
+    sys.stdout.write("Access-Control-Allow-Origin: *\r\n")
     if lastmod and status != 304:
-        sys.stdout.write("Last-Modified: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", lastmod) + "\n")
+        sys.stdout.write("Last-Modified: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", lastmod) + "\r\n")
     if data:
-        sys.stdout.write("Content-Type: text/html\n")
+        sys.stdout.write("Content-Type: text/html\r\n")
         data = json.write(data)
-        sys.stdout.write("Content-Length: %i\n" % len(data))
-        sys.stdout.write("\r\n\r\n")
+        sys.stdout.write("Content-Length: %i\r\n" % len(data))
+        sys.stdout.write("\r\n")
         sys.stdout.write(data)
     else:
-        sys.stdout.write("\r\n\r\n")
+        sys.stdout.write("\r\n")
     sys.exit(0)
 
 def sendRawResponse(status, filename, lastmod):
     """Send data.  Assume status is a number and filename is the name of a file
     containing the body of the response."""
-    sys.stdout.write("Status: "+str(status)+"\n") #should be doing a sprintf on this
-    sys.stdout.write("Access-Control-Allow-Origin: *\n")
+    sys.stdout.write("Status: "+str(status)+"\r\n") #should be doing a sprintf on this
+    sys.stdout.write("Access-Control-Allow-Origin: *\r\n")
     if lastmod and status != 304:
-        sys.stdout.write("Last-Modified: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", lastmod) + "\n")
+        sys.stdout.write("Last-Modified: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", lastmod) + "\r\n")
 
     fp = open(filename)
     fp.seek(0, 2)
     size = fp.tell()
     fp.seek(0)
 
-    sys.stdout.write("Content-Type: text/html\n")
-    sys.stdout.write("Content-Length: %i\n" % size)
-    sys.stdout.write("\r\n\r\n")
+    sys.stdout.write("Content-Type: text/html\r\n")
+    sys.stdout.write("Content-Length: %i\r\n" % size)
+    sys.stdout.write("\r\n")
     while True:
         chunk = fp.read(4096)
         if not chunk:
