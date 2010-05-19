@@ -27,6 +27,7 @@ insert into branches values (NULL,"MozillaTest");
 insert into branches values (NULL,"Places");
 insert into branches values (NULL,"Electrolysis");
 insert into branches values (NULL,"Firefox-Lorentz");
+insert into branches values (NULL,"Tryserver");
 insert into branches values (NULL,"mobile");
 insert into branches values (NULL,"mobile-tracemonkey");
 insert into branches values (NULL,"mobile-1.9.2");
@@ -661,6 +662,8 @@ insert into machines values (NULL,6,0,NULL,"Linux_electrolysis",1,unix_timestamp
 insert into machines values (NULL,6,0,NULL,"Linux_electrolysis_leak_test",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_lorentz",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_lorentz_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_tryserver",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_tryserver_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-1.9.1",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-1.9.1_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_tracemonkey",1,unix_timestamp());
@@ -674,6 +677,8 @@ insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central_leak_tes
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central_tracemonkey",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_lorentz",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_lorentz_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_tryserver",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_tryserver_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-1.9.1_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-central_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_tracemonkey",1,unix_timestamp());
@@ -684,9 +689,13 @@ insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis",1,unix_times
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_electrolysis_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_lorentz",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_lorentz_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_tryserver",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_tryserver_leak_test",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central_leak_test",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central_tracemonkey",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_tryserver",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_tryserver_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.1",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.1_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.2",1,unix_timestamp());
@@ -701,6 +710,8 @@ insert into machines values (NULL,18,0,NULL,"Linux_x86-64_electrolysis",1,unix_t
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_electrolysis_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_lorentz",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_lorentz_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_tryserver",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_tryserver_leak_test",1,unix_timestamp());
 
 --mobile
 insert into machines values (NULL,9,0,NULL,"maemo-n810-01",1,unix_timestamp());
