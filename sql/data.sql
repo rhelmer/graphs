@@ -879,6 +879,8 @@ insert into tests values (NULL,"tp4_%cpu","Tp4 (%CPU)",1,1,NULL);
 insert into tests values (NULL,"tp4_%cpu_nochrome","Tp4 NoChrome (%CPU)",0,1,NULL);
 insert into tests values (NULL,"tp4_memset","Tp4 (Memset)",1,1,NULL);
 insert into tests values (NULL,"tp4_memset_nochrome","Tp4 NoChrome (Memset)",0,1,NULL);
+insert into tests values (NULL,"tp4_modlistbytes","Tp4 (Modified Page List Bytes)",1,1,NULL);
+insert into tests values (NULL,"tp4_modlistbytes_nochrome","Tp4 NoChrome (Modified Page List Bytes)",0,1,NULL);
 insert into tests values (NULL,"tp_fast","Tp3 Fast Cycle",1,1,2);
 insert into tests values (NULL,"tp_fast_pbytes","Tp3 Fast Cycle (Private Bytes)",1,1,NULL);
 insert into tests values (NULL,"tp_fast_rss","Tp3 Fast Cycle (RSS)",1,1,NULL);
