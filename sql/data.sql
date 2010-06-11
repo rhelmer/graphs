@@ -16,6 +16,7 @@ insert into os_list values (NULL, "Fedora 12 x64 - Constantine");
 insert into os_list values (NULL, "Nokia n900");
 insert into os_list values (NULL, "MacOSX 10.6.2");
 insert into os_list values (NULL, "CentOS (x86_64) release 5 (Final)");
+insert into os_list values (NULL, "WINNT 6.1 x64");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox3.0");
@@ -645,8 +646,56 @@ insert into machines values (NULL,17,0,"2.26","talos-r3-snow-047",1,unix_timesta
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-048",1,unix_timestamp());
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-049",1,unix_timestamp());
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-050",1,unix_timestamp());
-
-
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-001",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-002",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-003",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-004",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-005",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-006",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-007",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-008",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-009",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-010",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-011",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-012",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-013",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-014",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-015",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-016",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-017",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-018",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-019",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-020",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-021",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-022",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-023",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-024",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-025",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-026",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-027",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-028",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-029",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-030",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-031",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-032",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-033",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-034",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-035",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-036",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-037",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-038",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-039",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-040",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-041",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-042",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-043",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-044",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-045",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-046",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-047",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-048",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-049",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","t-r3-w764-050",1,unix_timestamp());
 
 
 -- builders
@@ -691,6 +740,15 @@ insert into machines values (NULL,8,0,NULL,"WINNT_5.2_lorentz",1,unix_timestamp(
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_lorentz_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_tryserver",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_tryserver_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_mozilla-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_tracemonkey",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_tracemonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_places",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_places_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_electrolysis",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_electrolysis_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_tryserver",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_tryserver_leak_test",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central_leak_test",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central_tracemonkey",1,unix_timestamp());
