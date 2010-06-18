@@ -19,6 +19,7 @@ def getTests(id, attribute, form):
                         INNER JOIN os_list ON (machines.os_id = os_list.id)
                             INNER JOIN builds ON (test_runs.build_id = builds.id)
                                 INNER JOIN branches on (builds.branch_id = branches.id)
+            WHERE machines.is_active <> 0 
             ORDER BY branches.id, machines.id"""
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql)
@@ -46,7 +47,7 @@ def getTestRuns(id, attribute, form):
             FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id) 
             INNER JOIN branches ON (builds.branch_id = branches.id) 
             INNER JOIN machines ON (test_runs.machine_id = machines.id)
-            WHERE test_runs.test_id = %s AND machines.id = %s AND branches.id = %s  ORDER BY date_run ASC"""
+            WHERE test_runs.test_id = %s AND machines.id = %s AND branches.id = %s AND machines.is_active <> 0  ORDER BY date_run ASC"""
     
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql, (id, machineid, branchid))
