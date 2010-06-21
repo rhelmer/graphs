@@ -708,8 +708,8 @@ insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.1",1,unix_timestam
 insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.1_leak_test",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_mozilla-central",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_mozilla-central_leak_test",1,unix_timestamp());
-insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.3",1,unix_timestamp());
-insert into machines values (NULL,6,0,NULL,"Linux_mozilla-1.9.3_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_mozilla-2.0",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_mozilla-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_tracemonkey",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_tracemonkey_leak_test",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_places",1,unix_timestamp());
@@ -738,8 +738,8 @@ insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_electrolysis",1,unix_tim
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_electrolysis_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-central_leak_test",1,unix_timestamp());
-insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-1.9.3",1,unix_timestamp());
-insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-1.9.3_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-2.0",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_lorentz",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_lorentz_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_tryserver",1,unix_timestamp());
@@ -756,8 +756,8 @@ insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-1.9.1",1,unix_time
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-1.9.1_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-central",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-central_leak_test",1,unix_timestamp());
-insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-1.9.3",1,unix_timestamp());
-insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-1.9.3_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-2.0",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_tracemonkey",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_tracemonkey_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_places",1,unix_timestamp());
@@ -795,8 +795,8 @@ insert into machines values (NULL,19,0,NULL,"WINNT_6.1_jaegermonkey",1,unix_time
 insert into machines values (NULL,19,0,NULL,"WINNT_6.1_jaegermonkey_leak_test",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-central_leak_test",1,unix_timestamp());
-insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-1.9.3",1,unix_timestamp());
-insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-1.9.3_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-2.0",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_tryserver",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_tryserver_leak_test",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_maple",1,unix_timestamp());
@@ -813,8 +813,8 @@ insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.2",1,unix_
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.2_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-central",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-central_leak_test",1,unix_timestamp());
-insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.3",1,unix_timestamp());
-insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-1.9.3_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-2.0",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_tracemonkey",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_tracemonkey_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_places",1,unix_timestamp());
