@@ -40,6 +40,12 @@ insert into branches values (NULL,"mobile-1.9.2");
 insert into branches values (NULL,"mobile-lorentz");
 insert into branches values (NULL,"mobile-electrolysis");
 insert into branches values (NULL,"mobile-places");
+insert into branches values (NULL,"mobile-qt");
+insert into branches values (NULL,"mobile-tracemonkey-qt");
+insert into branches values (NULL,"mobile-1.9.2-qt");
+insert into branches values (NULL,"mobile-lorentz-qt");
+insert into branches values (NULL,"mobile-electrolysis-qt");
+insert into branches values (NULL,"mobile-places-qt");
 
 -- osid,isthrottling,cpuspeed,name,isactive,dateadded
 -- stage talos
