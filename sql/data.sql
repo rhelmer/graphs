@@ -407,6 +407,9 @@ insert into machines values (NULL,12,0,"2.26","talos-r3-w7-047",1,unix_timestamp
 insert into machines values (NULL,12,0,"2.26","talos-r3-w7-048",1,unix_timestamp());
 insert into machines values (NULL,12,0,"2.26","talos-r3-w7-049",1,unix_timestamp());
 insert into machines values (NULL,12,0,"2.26","talos-r3-w7-050",1,unix_timestamp());
+insert into machines values (NULL,12,0,"2.26","talos-r3-w7-051",1,unix_timestamp());
+insert into machines values (NULL,12,0,"2.26","talos-r3-w7-052",1,unix_timestamp());
+insert into machines values (NULL,12,0,"2.26","talos-r3-w7-053",1,unix_timestamp());
 insert into machines values (NULL,1,0,"2.26","talos-r3-xp-001",1,unix_timestamp());
 insert into machines values (NULL,1,0,"2.26","talos-r3-xp-002",1,unix_timestamp());
 insert into machines values (NULL,1,0,"2.26","talos-r3-xp-003",1,unix_timestamp());
@@ -457,6 +460,9 @@ insert into machines values (NULL,1,0,"2.26","talos-r3-xp-047",1,unix_timestamp(
 insert into machines values (NULL,1,0,"2.26","talos-r3-xp-048",1,unix_timestamp());
 insert into machines values (NULL,1,0,"2.26","talos-r3-xp-049",1,unix_timestamp());
 insert into machines values (NULL,1,0,"2.26","talos-r3-xp-050",1,unix_timestamp());
+insert into machines values (NULL,1,0,"2.26","talos-r3-xp-051",1,unix_timestamp());
+insert into machines values (NULL,1,0,"2.26","talos-r3-xp-052",1,unix_timestamp());
+insert into machines values (NULL,1,0,"2.26","talos-r3-xp-053",1,unix_timestamp());
 insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-001",1,unix_timestamp());
 insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-002",1,unix_timestamp());
 insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-003",1,unix_timestamp());
@@ -507,6 +513,9 @@ insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-047",1,unix_time
 insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-048",1,unix_timestamp());
 insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-049",1,unix_timestamp());
 insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-050",1,unix_timestamp());
+insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-051",1,unix_timestamp());
+insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-052",1,unix_timestamp());
+insert into machines values (NULL,13,0,"2.26","talos-r3-leopard-053",1,unix_timestamp());
 insert into machines values (NULL,14,0,"2.26","talos-r3-fed-001",1,unix_timestamp());
 insert into machines values (NULL,14,0,"2.26","talos-r3-fed-002",1,unix_timestamp());
 insert into machines values (NULL,14,0,"2.26","talos-r3-fed-003",1,unix_timestamp());
@@ -557,6 +566,9 @@ insert into machines values (NULL,14,0,"2.26","talos-r3-fed-047",1,unix_timestam
 insert into machines values (NULL,14,0,"2.26","talos-r3-fed-048",1,unix_timestamp());
 insert into machines values (NULL,14,0,"2.26","talos-r3-fed-049",1,unix_timestamp());
 insert into machines values (NULL,14,0,"2.26","talos-r3-fed-050",1,unix_timestamp());
+insert into machines values (NULL,14,0,"2.26","talos-r3-fed-051",1,unix_timestamp());
+insert into machines values (NULL,14,0,"2.26","talos-r3-fed-052",1,unix_timestamp());
+insert into machines values (NULL,14,0,"2.26","talos-r3-fed-053",1,unix_timestamp());
 insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-001",1,unix_timestamp());
 insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-002",1,unix_timestamp());
 insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-003",1,unix_timestamp());
@@ -607,6 +619,11 @@ insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-047",1,unix_timest
 insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-048",1,unix_timestamp());
 insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-049",1,unix_timestamp());
 insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-050",1,unix_timestamp());
+insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-051",1,unix_timestamp());
+insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-052",1,unix_timestamp());
+insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-053",1,unix_timestamp());
+insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-054",1,unix_timestamp());
+insert into machines values (NULL,15,0,"2.26","talos-r3-fed64-055",1,unix_timestamp());
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-001",1,unix_timestamp());
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-002",1,unix_timestamp());
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-003",1,unix_timestamp());
@@ -657,6 +674,11 @@ insert into machines values (NULL,17,0,"2.26","talos-r3-snow-047",1,unix_timesta
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-048",1,unix_timestamp());
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-049",1,unix_timestamp());
 insert into machines values (NULL,17,0,"2.26","talos-r3-snow-050",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","talos-r3-snow-051",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","talos-r3-snow-052",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","talos-r3-snow-053",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","talos-r3-snow-054",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","talos-r3-snow-055",1,unix_timestamp());
 insert into machines values (NULL,19,0,"2.26","t-r3-w764-001",1,unix_timestamp());
 insert into machines values (NULL,19,0,"2.26","t-r3-w764-002",1,unix_timestamp());
 insert into machines values (NULL,19,0,"2.26","t-r3-w764-003",1,unix_timestamp());
