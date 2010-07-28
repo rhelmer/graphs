@@ -1023,3 +1023,7 @@ insert into pages values (NULL, 12, "deltablue.html");
 insert into pages values (NULL, 12, "earley-boyer.html");
 insert into pages values (NULL, 12, "raytrace.html");
 insert into pages values (NULL, 12, "richards.html");
+
+-- "a11y"
+insert into pages values (NULL, 13, "dhtml.html");
+insert into pages values (NULL, 13, "tablemutation.html");
