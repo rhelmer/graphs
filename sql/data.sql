@@ -1085,3 +1085,4 @@ insert into tests values (NULL,"dromaeo_jslib","Dromaeo (jslib)",1,1,12);
 insert into tests values (NULL,"dromaeo_sunspider","Dromaeo (SunSpider)",1,1,12);
 insert into tests values (NULL,"dromaeo_v8","Dromaeo (V8)",1,1,12);
 insert into tests values (NULL,"dromaeo_basics","Dromaeo (String/Array/Eval/Regex)",1,1,12);
+insert into tests values (NULL,"a11y","a11y",1,1,13);
