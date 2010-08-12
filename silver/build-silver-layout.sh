@@ -31,7 +31,7 @@ if [ ! -e src/webtestrecorder/.hg ] ; then
 fi
 if [ ! -L app.ini ] ; then
     rm -f app.ini
-    ln -s src/graphs/silver-app.ini app.ini
+    ln -s src/graphs/silver/app.ini app.ini
 fi
 if [ -e README.txt ] ; then
     rm README.txt
