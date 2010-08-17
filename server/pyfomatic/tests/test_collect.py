@@ -5,81 +5,96 @@ import StringIO
 
 import pyfomatic.collect as c
 
+
 #=================================================================================================================
 class FakeInputStream(object):
-  def __init__(self, dataSource):
-    self.dataSource = dataSource
-    self.currentIter = None
-  def readline(self):
-    if not self.currentIter:
-      self.currentIter = self._iter()
-    return self.currentIter.next()
-  def __iter__(self):
-    if not self.currentIter:
-      for x in self._iter():
-        yield x
-    else:
-      for x in self.currentIter:
-        yield x
-  def _iter(self):
-    for x in self.dataSource:
-      yield x
+    def __init__(self, dataSource):
+        self.dataSource = dataSource
+        self.currentIter = None
+
+    def readline(self):
+        if not self.currentIter:
+            self.currentIter = self._iter()
+        return self.currentIter.next()
+
+    def __iter__(self):
+        if not self.currentIter:
+            for x in self._iter():
+                yield x
+        else:
+            for x in self.currentIter:
+                yield x
+
+    def _iter(self):
+        for x in self.dataSource:
+            yield x
+
 
 #=================================================================================================================
 class FakeDatabaseModule(object):
-  Error = Exception
+    Error = Exception
+
 
 #=================================================================================================================
 class FakeCursor(object):
-  spaceKillerRe = re.compile(r'\s+')
-  def __init__(self, selectLookup):
-    self.selectLookup = selectLookup
-    self.inTransaction = True
-    self.currentSelect = None
-    self.inserts = {}
-    self.connection = self
-  def execute(self, sql, parameters):
-    self.inTransaction = True
-    if "select" in sql:
-      self.currentSelect = parameters
-    elif "insert" in sql:
-      insertComponents = sql.split(' ')
-      self.inserts.setdefault(insertComponents[2].strip(), []).append(parameters)
-      self.recentInsert = parameters
-    return None
-  def commit(self):
-    self.inTransaction = False
-  rollback = commit
-  def fetchall(self):
-    try:
-      return [ (self.selectLookup[self.currentSelect],) ]
-    except KeyError:
-      return [ () ]
-  def cursor(self):
-    return self
+    spaceKillerRe = re.compile(r'\s+')
+
+    def __init__(self, selectLookup):
+        self.selectLookup = selectLookup
+        self.inTransaction = True
+        self.currentSelect = None
+        self.inserts = {}
+        self.connection = self
+
+    def execute(self, sql, parameters):
+        self.inTransaction = True
+        if "select" in sql:
+            self.currentSelect = parameters
+        elif "insert" in sql:
+            insertComponents = sql.split(' ')
+            self.inserts.setdefault(insertComponents[2].strip(), []).append(parameters)
+            self.recentInsert = parameters
+        return None
+
+    def commit(self):
+        self.inTransaction = False
+
+    rollback = commit
+
+    def fetchall(self):
+        try:
+            return [(self.selectLookup[self.currentSelect],)]
+        except KeyError:
+            return [()]
+
+    def cursor(self):
+        return self
+
 
 #=================================================================================================================
 class FakeForm(dict):
-  def __init__(self, dataSource):
-    class A(object):
-      pass
-    self["filename"] = file = A()
-    setattr(file, "file", FakeInputStream(dataSource))
+
+    def __init__(self, dataSource):
+        class A(object):
+            pass
+        self["filename"] = file = A()
+        setattr(file, "file", FakeInputStream(dataSource))
+
 
 #=================================================================================================================
-metadataTest1 = [ "machine_1", "test_1", "branch_1", "changeset_1", 13, 1229477017]
+metadataTest1 = ["machine_1", "test_1", "branch_1", "changeset_1", 13, 1229477017]
 metadataTest2 = "machine_1, test_1, branch_1, changeset_1, 13, 1229477017\n"
 
 #-----------------------------------------------------------------------------------------------------------------
 databaseSelectResponsesTest1 = {
-  ("machine_1",): 234,            #machine_id given machine_name
-  (234,): 1,                      #os_id given machine_id
-  ("test_1",): 45,                #test_id given test_name
-  ("branch_1",): 3455,            #branch_id given branch_name
-  (3455, 13,"changeset_1"): 2220, #build_id given branch_id, ref_build_id, ref_changeset
-  (234, 45, 2220): 99,            #max(run_number) given machine_id, test_id, branch_id
-  (234, 45, 2220, 100): 6667,     #test_run_id given machine_id, test_id, build_id, run_number
-  (6667, 6667): 2.0,              #average given testrun_id twice
+  ("machine_1",): 234,            # machine_id given machine_name
+  (234,): 1,                      # os_id given machine_id
+  ("test_1",): 45,                # test_id given test_name
+  ("branch_1",): 3455,            # branch_id given branch_name
+  (3455, 13, "changeset_1"): 2220,  # build_id given branch_id, ref_build_id, ref_changeset
+  (234, 45, 2220): 99,            # max(run_number) given machine_id, test_id, branch_id
+  (234, 45, 2220, 100): 6667,     # test_run_id given machine_id, test_id, build_id, run_number
+  (6667, 6667): 2.0,              # average given testrun_id twice
   ("page_01",): 1001,
   ("page_02",): 1002,
   ("page_03",): 1003,
@@ -97,25 +112,25 @@ databaseSelectResponsesTest1 = {
 #-----------------------------------------------------------------------------------------------------------------
 databaseSelectResponsesTest2 = {
   ("machine_1",): 234,
-  (234,): 1,  #os_id
+  (234,): 1,  # os_id
   ("test_1",): 45,
   #("branch_1",): 3455,
-  (3455, 13,"changeset_1"): 2220,
+  (3455, 13, "changeset_1"): 2220,
   (234, 45, 2220): 99,
   (234, 45, 2220, 100): 6667,
-  (6667, 6667): 2.0,              #average given testrun_id twice
+  (6667, 6667): 2.0,              # average given testrun_id twice
   }
 
 #-----------------------------------------------------------------------------------------------------------------
 databaseSelectResponsesTest3 = {
   ("machine_1",): 234,
-  (234,): 1,  #os_id
+  (234,): 1,  # os_id
   ("test_1",): 45,
   ("branch_1",): 3455,
-  (3455, 13,"changeset_1"): 2220,
+  (3455, 13, "changeset_1"): 2220,
   (234, 45, 2220): 99,
   (234, 45, 2220, 100): 6667,
-  #(6667, 6667): 2.0,              #average given testrun_id twice not given
+  #(6667, 6667): 2.0,              # average given testrun_id twice not given
   }
 
 #-----------------------------------------------------------------------------------------------------------------
@@ -150,7 +165,7 @@ valuesList1a = [ (6667, 1, 2.0, 1001),
               ]
 
 #-----------------------------------------------------------------------------------------------------------------
-averageList1 = [ "4.5" ]
+averageList1 = ["4.5"]
 
 #-----------------------------------------------------------------------------------------------------------------
 fullStream01 = [ "START\n",
@@ -237,170 +252,184 @@ fullStream05 = [ "START\n",
 #-----------------------------------------------------------------------------------------------------------------
 databaseSelectResponsesTest4 = {
   ("qm-pubuntu-stage01",): 234,
-  (234,): 1,  #os_id
+  (234,): 1,  # os_id
   ("tsunspider",): 45,
   ("Firefox",): 3455,
-  (3455, 20090115164131L,"a2018012b3ee"): 2220,
+  (3455, 20090115164131L, "a2018012b3ee"): 2220,
   (234, 45, 2220): 99,
   (234, 45, 2220, 100): 6667,
   ("3d-cube.html",): 10000,
-  ("3d-morph.html",):10001,
-  ("3d-raytrace.html",):10002,
-  ("access-binary-trees.html",):10003,
-  ("access-fannkuch.html",):10004,
-  ("access-nbody.html",):10005,
-  ("access-nsieve.html",):10006,
-  ("bitops-3bit-bits-in-byte.html",):10007,
-  ("bitops-bits-in-byte.html",):10008,
-  ("bitops-bitwise-and.html",):10009,
-  ("bitops-nsieve-bits.html",):10001,
-  ("controlflow-recursive.html",):10011,
-  ("crypto-aes.html",):10012,
-  ("crypto-md5.html",):100113,
-  ("crypto-sha1.html",):10014,
-  ("date-format-tofte.html",):10015,
-  ("date-format-xparb.html",):10016,
-  ("math-cordic.html",):100017,
-  ("math-partial-sums.html",):10018,
-  ("math-spectral-norm.html",):10019,
-  ("regexp-dna.html",):10020,
-  ("string-base64.html",):10021,
-  ("string-fasta.html",):10022,
-  ("string-tagcloud.html",):10023,
-  ("string-unpack-code.html",):10024,
-  ("string-validate-input.html",):10025,
+  ("3d-morph.html",): 10001,
+  ("3d-raytrace.html",): 10002,
+  ("access-binary-trees.html",): 10003,
+  ("access-fannkuch.html",): 10004,
+  ("access-nbody.html",): 10005,
+  ("access-nsieve.html",): 10006,
+  ("bitops-3bit-bits-in-byte.html",): 10007,
+  ("bitops-bits-in-byte.html",): 10008,
+  ("bitops-bitwise-and.html",): 10009,
+  ("bitops-nsieve-bits.html",): 10001,
+  ("controlflow-recursive.html",): 10011,
+  ("crypto-aes.html",): 10012,
+  ("crypto-md5.html",): 100113,
+  ("crypto-sha1.html",): 10014,
+  ("date-format-tofte.html",): 10015,
+  ("date-format-xparb.html",): 10016,
+  ("math-cordic.html",): 100017,
+  ("math-partial-sums.html",): 10018,
+  ("math-spectral-norm.html",): 10019,
+  ("regexp-dna.html",): 10020,
+  ("string-base64.html",): 10021,
+  ("string-fasta.html",): 10022,
+  ("string-tagcloud.html",): 10023,
+  ("string-unpack-code.html",): 10024,
+  ("string-validate-input.html",): 10025,
   }
 #=================================================================================================================
 
+
 #-----------------------------------------------------------------------------------------------------------------
 def test_StringValidator():
-  py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('*'))
-  py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('hello_\t'))
-  py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('fred\nfred'))
-  py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('<sally>'))
-  py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('[wilma]'))
-  py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('this & that'))
-  assert c.StringValidator.validate(None) == ''
-  assert c.StringValidator.validate('fred') == 'fred'
-  assert c.StringValidator.validate('fred fred')  == 'fred fred'
-  assert c.StringValidator.validate('__fred')  == '__fred'
-  assert c.StringValidator.validate('fred.fred+')  == 'fred.fred+'
-  assert c.StringValidator.validate('0123456789')  == '0123456789'
-  assert c.StringValidator.validate('1Aa9Zz._()%-+ ')  == '1Aa9Zz._()%-+ '
+    py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('*'))
+    py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('hello_\t'))
+    py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('fred\nfred'))
+    py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('<sally>'))
+    py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('[wilma]'))
+    py.test.raises(c.ImproperFormatException, c.StringValidator.validate, ('this & that'))
+    assert c.StringValidator.validate(None) == ''
+    assert c.StringValidator.validate('fred') == 'fred'
+    assert c.StringValidator.validate('fred fred') == 'fred fred'
+    assert c.StringValidator.validate('__fred') == '__fred'
+    assert c.StringValidator.validate('fred.fred+') == 'fred.fred+'
+    assert c.StringValidator.validate('0123456789') == '0123456789'
+    assert c.StringValidator.validate('1Aa9Zz._()%-+ ') == '1Aa9Zz._()%-+ '
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_MetaDataFromTalos_1():
-  print "test_MetaDataFromTalos_1"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest1)
-  metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
-  assert fakeCursor.inTransaction == False
-  assert metadata.machine_id == 234
-  #assert metadata.os_id == 1
-  assert metadata.test_id == 45
-  assert metadata.branch_id == 3455
-  assert metadata.build_id == 2220
-  assert metadata.test_run_id == 6667
+    print "test_MetaDataFromTalos_1"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest1)
+    metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
+    assert fakeCursor.inTransaction == False
+    assert metadata.machine_id == 234
+    #assert metadata.os_id == 1
+    assert metadata.test_id == 45
+    assert metadata.branch_id == 3455
+    assert metadata.build_id == 2220
+    assert metadata.test_run_id == 6667
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_MetaDataFromTalos_2():
-  print "test_MetaDataFromTalos_2"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest2)
-  py.test.raises(c.DatabaseException, c.MetaDataFromTalos, fakeCursor, FakeDatabaseModule, metadataTest1)
-  assert fakeCursor.inTransaction == False
+    print "test_MetaDataFromTalos_2"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest2)
+    py.test.raises(c.DatabaseException, c.MetaDataFromTalos, fakeCursor, FakeDatabaseModule, metadataTest1)
+    assert fakeCursor.inTransaction == False
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_MetaDataFromTalos_3():
-  print "test_MetaDataFromTalos_3"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest1)
-  metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest2)
-  assert fakeCursor.inTransaction == False
-  assert metadata.machine_id == 234
-  #assert metadata.os_id == 1
-  assert metadata.test_id == 45
-  assert metadata.branch_id == 3455
-  assert metadata.build_id == 2220
-  assert metadata.test_run_id == 6667
-  #assert type(metadata.ref_build_id) == long
+    print "test_MetaDataFromTalos_3"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest1)
+    metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest2)
+    assert fakeCursor.inTransaction == False
+    assert metadata.machine_id == 234
+    #assert metadata.os_id == 1
+    assert metadata.test_id == 45
+    assert metadata.branch_id == 3455
+    assert metadata.build_id == 2220
+    assert metadata.test_run_id == 6667
+    #assert type(metadata.ref_build_id) == long
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_valuesReader():
-  print "test_valuesReader"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest1)
-  metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
-  average = c.valuesReader(fakeCursor, FakeDatabaseModule, FakeInputStream(valuesList1), metadata)
-  assert average == 2.0
-  assert fakeCursor.inTransaction == False
+    print "test_valuesReader"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest1)
+    metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
+    average = c.valuesReader(fakeCursor, FakeDatabaseModule, FakeInputStream(valuesList1), metadata)
+    assert average == 2.0
+    assert fakeCursor.inTransaction == False
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_averageReader():
-  print "test_averageReader"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest1)
-  metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
-  average = c.averageReader(fakeCursor, FakeDatabaseModule, FakeInputStream(averageList1), metadata)
-  assert average == 4.5
-  assert fakeCursor.inTransaction == False
+    print "test_averageReader"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest1)
+    metadata = c.MetaDataFromTalos(fakeCursor, FakeDatabaseModule, metadataTest1)
+    average = c.averageReader(fakeCursor, FakeDatabaseModule, FakeInputStream(averageList1), metadata)
+    assert average == 4.5
+    assert fakeCursor.inTransaction == False
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestValues01():
-  print "test_handleRequestValues01"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest1)
-  fakeForm = FakeForm(fullStream01)
-  s = StringIO.StringIO()
-  exitCode = c.handleRequest(fakeForm, fakeCursor, c, s)
-  value = s.getvalue()
-  assert value == """Content-type: text/plain\n\nRETURN\ttest_1\tgraph.html#type=series&tests=[{"test":45,"branch":3455,"machine":234,"testrun":6667}]\nRETURN\ttest_1\t2.00\tgraph.html#tests=[{"test":45,"branch":3455,"machine":234}]\n"""
-  for testTuple, answerTuple in zip(fakeCursor.inserts["test_run_values"],valuesList1a):
-    assert testTuple  == answerTuple
-  assert fakeCursor.inTransaction == False
-  assert exitCode == None
+    print "test_handleRequestValues01"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest1)
+    fakeForm = FakeForm(fullStream01)
+    s = StringIO.StringIO()
+    exitCode = c.handleRequest(fakeForm, fakeCursor, c, s)
+    value = s.getvalue()
+    assert value == """Content-type: text/plain\n\nRETURN\ttest_1\tgraph.html#type=series&tests=[{"test":45,"branch":3455,"machine":234,"testrun":6667}]\nRETURN\ttest_1\t2.00\tgraph.html#tests=[{"test":45,"branch":3455,"machine":234}]\n"""
+    for testTuple, answerTuple in zip(fakeCursor.inserts["test_run_values"], valuesList1a):
+        assert testTuple == answerTuple
+    assert fakeCursor.inTransaction == False
+    assert exitCode == None
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestValues02():
-  print "test_handleRequestValues02"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest2)
-  fakeForm = FakeForm(fullStream01)
-  exitCode = c.handleRequest(fakeForm, fakeCursor, c)
-  assert fakeCursor.inTransaction == False
-  assert exitCode == 500
+    print "test_handleRequestValues02"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest2)
+    fakeForm = FakeForm(fullStream01)
+    exitCode = c.handleRequest(fakeForm, fakeCursor, c)
+    assert fakeCursor.inTransaction == False
+    assert exitCode == 500
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestValues03():
-  print "test_handleRequestValues03"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest1)
-  fakeForm = FakeForm(fullStream03)
-  exitCode = c.handleRequest(fakeForm, fakeCursor, c)
-  assert fakeCursor.inTransaction == False
-  assert exitCode == None
+    print "test_handleRequestValues03"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest1)
+    fakeForm = FakeForm(fullStream03)
+    exitCode = c.handleRequest(fakeForm, fakeCursor, c)
+    assert fakeCursor.inTransaction == False
+    assert exitCode == None
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestAverage01():
-  print "test_handleRequestAverage01"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest1)
-  fakeForm = FakeForm(fullStream02)
-  s = StringIO.StringIO()
-  exitCode = c.handleRequest(fakeForm, fakeCursor, c, s)
-  value = s.getvalue()
-  assert value == """Content-type: text/plain\n\nRETURN\ttest_1\t2.00\tgraph.html#tests=[{"test":45,"branch":3455,"machine":234}]\n"""
-  assert fakeCursor.inTransaction == False
-  assert exitCode == None
+    print "test_handleRequestAverage01"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest1)
+    fakeForm = FakeForm(fullStream02)
+    s = StringIO.StringIO()
+    exitCode = c.handleRequest(fakeForm, fakeCursor, c, s)
+    value = s.getvalue()
+    assert value == """Content-type: text/plain\n\nRETURN\ttest_1\t2.00\tgraph.html#tests=[{"test":45,"branch":3455,"machine":234}]\n"""
+    assert fakeCursor.inTransaction == False
+    assert exitCode == None
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestAverage02():
-  print "test_handleRequestAverage02"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest2)
-  fakeForm = FakeForm(fullStream02)
-  exitCode = c.handleRequest(fakeForm, fakeCursor, c)
-  assert fakeCursor.inTransaction == False
-  assert exitCode == 500
+    print "test_handleRequestAverage02"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest2)
+    fakeForm = FakeForm(fullStream02)
+    exitCode = c.handleRequest(fakeForm, fakeCursor, c)
+    assert fakeCursor.inTransaction == False
+    assert exitCode == 500
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def test_handleRequestAverage04():
-  print "test_handleRequestAverage04"
-  fakeCursor = FakeCursor(databaseSelectResponsesTest4)
-  fakeForm = FakeForm(fullStream04)
-  exitCode = c.handleRequest(fakeForm, fakeCursor, c)
-  assert fakeCursor.inTransaction == False
-  #assert exitCode == 500
+    print "test_handleRequestAverage04"
+    fakeCursor = FakeCursor(databaseSelectResponsesTest4)
+    fakeForm = FakeForm(fullStream04)
+    exitCode = c.handleRequest(fakeForm, fakeCursor, c)
+    assert fakeCursor.inTransaction == False
+    #assert exitCode == 500
+
+
 #-----------------------------------------------------------------------------------------------------------------
 #def test_handleRequestAverage05():
   #"""single value in a VALUE list"""
