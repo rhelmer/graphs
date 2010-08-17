@@ -11,12 +11,27 @@ parser.add_option(
     '--sql',
     help='Show SQL that would be executed',
     action='store_true')
+parser.add_option(
+    '--drop',
+    help='Drop tables first',
+    action='store_true')
+parser.add_option(
+    '--create',
+    help='Create tables first',
+    action='store_true')
 
 
 def main():
     options, args = parser.parse_args()
+    sql = ''
+    if options.drop:
+        fn = os.path.join(sql_dir, 'schema_drop.sql')
+        sql += open(fn).read()
+    if options.create or options.drop:
+        fn = os.path.join(sql_dir, 'schema.sql')
+        sql += open(fn).read()
     fn = os.path.join(sql_dir, 'test_data.sql')
-    sql = open(fn).read()
+    sql += open(fn).read()
     if options.sql:
         print sql
         return
@@ -44,4 +59,3 @@ def sql_lines(sql):
 
 if __name__ == '__main__':
     main()
-    

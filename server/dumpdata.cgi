@@ -22,7 +22,7 @@ id = form.getvalue('id')
 if form.has_key('show'): #Legacy url?
     id = form.getfirst('show').split(',')
 
-if(id):
+if id:
     id = int(id)
     sel = form.getvalue('sel')
     selections = []
@@ -41,7 +41,7 @@ if(id):
         
     cursor.execute(sql, (id))
 
-    if(cursor.rowcount == 1):
+    if cursor.rowcount == 1:
         test = cursor.fetchone()
         print "dataset,machine,branch,test"
         print str(test['id'])+','+test['machine_name']+','+str(test['ref_build_id'])+','+test['name']
@@ -57,9 +57,9 @@ if(id):
             
         cursor.execute(sql, params)
         
-        if(cursor.rowcount > 0):
+        if cursor.rowcount > 0:
             rows = cursor.fetchall()
             for row in rows:
-                print str(test['id']) + str(row['date_run'])+','+str(row['average'])+','+str(row['ref_build_id'])
+                print str(test['id']) + str(row['date_run']) + ',' + str(row['average']) + ',' + str(row['ref_build_id'])
 else:
     print "Test not found"

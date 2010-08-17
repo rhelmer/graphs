@@ -1,6 +1,6 @@
 from graphsdb import db
 import MySQLdb.cursors
-import minjson as json
+
 
 #Get an array of all tests by build and os
 def getTests(id, attribute, form):
@@ -29,13 +29,19 @@ def getTests(id, attribute, form):
         rows = cursor.fetchall()
 
         for row in rows:
-            tests.append({'id':row['id'], 'name':row['test_name'], 'branch':{'name':row['branch_name'], 'id':row['branch_id']}, 'os':{'name':row['os_name'], 'id':row['os_id']}, 'machine':{'name':row['machine_name'], 'id':row['machine_id']}})
+            tests.append(
+                {'id': row['id'],
+                 'name': row['test_name'],
+                 'branch': {'name': row['branch_name'], 'id': row['branch_id']},
+                 'os': {'name': row['os_name'], 'id': row['os_id']},
+                 'machine': {'name': row['machine_name'], 'id': row['machine_id']}})
 
-        result = {'stat':'ok', "from":"db", 'tests':tests}
+        result = {'stat': 'ok', "from": "db", 'tests': tests}
     else:
         #if we don't find any tests, we have a problem
-        result = {'stat':'fail', 'code':'103', 'message':'No tests found'}
+        result = {'stat': 'fail', 'code': '103', 'message': 'No tests found'}
     return result
+
 
 #Get a list of test runs for a test id and branch and os with annotations
 def getTestRuns(id, attribute, form):
@@ -59,11 +65,12 @@ def getTestRuns(id, attribute, form):
             annotations = getAnnotations(row['id'], 'array')
             testRuns.append([row['id'], [row['build_id'], row['ref_build_id'], row['ref_changeset']], row['date_run'], row['average'], row['run_number'], annotations])
             
-        result = {'stat':'ok', 'test_runs':testRuns}
+        result = {'stat': 'ok', 'test_runs': testRuns}
     else:
-        result = {'stat':'fail', 'code':'102', 'message':'No test runs found for test id '+str(id)}
+        result = {'stat': 'fail', 'code': '102', 'message': 'No test runs found for test id ' + str(id)}
         
     return result
+
 
 def getTestRun(id, attribute, form):
     if attribute == 'values':
@@ -82,10 +89,14 @@ def getTestRun(id, attribute, form):
         if cursor.rowcount == 1:
             testRun = cursor.fetchone()
             annotations = getAnnotations(id, 'dictionary')
-            result = {'stat':'ok', 'testrun':{'id':testRun['id'], 'build':{'id':testRun['build_id'], 'build_id':testRun['ref_build_id'], 'changeset':testRun['changeset']}, 'date_run':testRun['date_run'], 'average':testRun['average'], 'annotations':annotations}}
+            result = {'stat': 'ok',
+                      'testrun': {'id': testRun['id'], 'build': {'id': testRun['build_id'], 'build_id': testRun['ref_build_id'], 'changeset': testRun['changeset']},
+                                  'date_run': testRun['date_run'], 'average': testRun['average'], 'annotations': annotations},
+                      }
         else:
-            return {'stat':'fail', 'code':'104', 'message':'Test run not found'}
+            return {'stat': 'fail', 'code': '104', 'message': 'Test run not found'}
     return result
+
 
 def getLatestTestRunValues(id, form):
     #first get build information
@@ -112,7 +123,6 @@ def getLatestTestRunValues(id, form):
                LIMIT 1
                     """
     
-              
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql, (id, machineid, branchid))
    
@@ -120,11 +130,16 @@ def getLatestTestRunValues(id, form):
         testRun = cursor.fetchone()
         values = getTestRunValues(testRun['id'])
         if values['stat'] == 'ok':
-            result = {'stat':'ok', 'id':testRun['id'], 'date_run':testRun['date_run'], 'build_id':testRun['ref_build_id'], 'values':values['values']}
+            result = {'stat': 'ok',
+                      'id': testRun['id'],
+                      'date_run': testRun['date_run'],
+                      'build_id': testRun['ref_build_id'],
+                      'values': values['values'],
+                      }
         else:
             result = values
     else:
-        result = {'stat':'fail', 'code':'106', 'message':'No values found for test '+str(id)}
+        result = {'stat': 'fail', 'code': '106', 'message': 'No values found for test ' + str(id)}
 
     return result
 
@@ -142,16 +157,17 @@ def getTestRunValues(id):
     if cursor.rowcount > 0:
         rows = cursor.fetchall()
         for row in rows:
-            testRun = {'interval':row['interval_id'], 'value':row['value']}
+            testRun = {'interval': row['interval_id'], 'value': row['value']}
             if row['page'] != None:
                 testRun['page'] = row['page']
             
             testRunValues.append(testRun)
-        result = {'stat':'ok', 'values':testRunValues}
+        result = {'stat': 'ok', 'values': testRunValues}
     else:
-        result = {'stat':'fail', 'code':'105', 'message':'No values found for test run '+str(id)}
+        result = {'stat': 'fail', 'code': '105', 'message': 'No values found for test run ' + str(id)}
     
     return result
+
 
 def getAnnotations(test_run_id, returnType='dictionary'):
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
@@ -163,11 +179,10 @@ def getAnnotations(test_run_id, returnType='dictionary'):
         annRows = cursor.fetchall()
         for annotation in annRows:
             if(returnType == 'dictionary'):
-                annotations.append({'note':annotation['note'], 'bug_id':annotation['bug_id']})
+                annotations.append({'note': annotation['note'], 'bug_id': annotation['bug_id']})
             elif returnType == 'array':
                 annotations.append([annotation['note'], annotation['bug_id']])
     return annotations
-    
 
 
 #Get a specific test by id. Fetched based on last test run for the test. This is required to get the machine it was run on
@@ -200,12 +215,18 @@ def getTest(id, attribute, form):
         if cursor.rowcount == 1:
             row = cursor.fetchone()
             #change column names to the names used here, then we don't need to re-label them
-            test = {'id':row['id'], 'name':row['test_name'], 'branch':row['branch_name'], 'os':row['os_name'], 'machine':row['machine_name']}
-            result = {'stat':'ok', 'test':test}
+            test = {'id': row['id'],
+                    'name': row['test_name'],
+                    'branch': row['branch_name'],
+                    'os': row['os_name'],
+                    'machine': row['machine_name'],
+                    }
+            result = {'stat': 'ok', 'test': test}
         else:
-            result = {'stat':'fail', 'code':'101', 'message':'Test not found'}
+            result = {'stat': 'fail', 'code': '101', 'message': 'Test not found'}
 
         return result
+
 
 def getRevisionValues(form):
     """Returns a set of values for a given revision"""
