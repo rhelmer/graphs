@@ -19,7 +19,7 @@ def getTests(id, attribute, form):
                         INNER JOIN os_list ON (machines.os_id = os_list.id)
                             INNER JOIN builds ON (test_runs.build_id = builds.id)
                                 INNER JOIN branches on (builds.branch_id = branches.id)
-            WHERE machines.is_active <> 0 
+            WHERE machines.is_active <> 0
             ORDER BY branches.id, machines.id"""
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql)
@@ -45,30 +45,30 @@ def getTests(id, attribute, form):
 
 #Get a list of test runs for a test id and branch and os with annotations
 def getTestRuns(id, attribute, form):
-    
+
     machineid = int(form.getvalue('machineid'))
     branchid = int(form.getvalue('branchid'))
-    
+
     sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset
-            FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id) 
-            INNER JOIN branches ON (builds.branch_id = branches.id) 
+            FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id)
+            INNER JOIN branches ON (builds.branch_id = branches.id)
             INNER JOIN machines ON (test_runs.machine_id = machines.id)
             WHERE test_runs.test_id = %s AND machines.id = %s AND branches.id = %s AND machines.is_active <> 0  ORDER BY date_run ASC"""
-    
+
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql, (id, machineid, branchid))
-    
+
     if cursor.rowcount > 0:
         rows = cursor.fetchall()
         testRuns = []
         for row in rows:
             annotations = getAnnotations(row['id'], 'array')
             testRuns.append([row['id'], [row['build_id'], row['ref_build_id'], row['ref_changeset']], row['date_run'], row['average'], row['run_number'], annotations])
-            
+
         result = {'stat': 'ok', 'test_runs': testRuns}
     else:
         result = {'stat': 'fail', 'code': '102', 'message': 'No test runs found for test id ' + str(id)}
-        
+
     return result
 
 
@@ -80,12 +80,12 @@ def getTestRun(id, attribute, form):
     elif attribute == 'revisions':
         return getRevisionValues(form)
     else:
-        sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id as ref_build_id, builds.ref_changeset as changeset                                                                                  
+        sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id as ref_build_id, builds.ref_changeset as changeset
                 FROM test_runs INNER JOIN builds ON (test_runs.build_id = builds.id)
                 WHERE test_runs.id = %s"""
         cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
         cursor.execute(sql, (id))
-        
+
         if cursor.rowcount == 1:
             testRun = cursor.fetchone()
             annotations = getAnnotations(id, 'dictionary')
@@ -100,32 +100,32 @@ def getTestRun(id, attribute, form):
 
 def getLatestTestRunValues(id, form):
     #first get build information
-    
+
     machineid = int(form.getvalue('machineid'))
     branchid = int(form.getvalue('branchid'))
-    
-    sql = """SELECT 
-                test_runs.*, 
-                builds.id as build_id, 
-                builds.ref_build_id, 
+
+    sql = """SELECT
+                test_runs.*,
+                builds.id as build_id,
+                builds.ref_build_id,
                 builds.ref_changeset,
                 date_run
-               FROM 
-                    test_runs INNER JOIN builds ON (builds.id = test_runs.build_id) 
-                        INNER JOIN branches ON (builds.branch_id = branches.id) 
+               FROM
+                    test_runs INNER JOIN builds ON (builds.id = test_runs.build_id)
+                        INNER JOIN branches ON (builds.branch_id = branches.id)
                                 INNER JOIN machines ON (test_runs.machine_id = machines.id)
-               WHERE 
-                    test_runs.test_id = %s 
-                    AND machines.id = %s 
-                    AND branches.id = %s 
-               ORDER BY 
+               WHERE
+                    test_runs.test_id = %s
+                    AND machines.id = %s
+                    AND branches.id = %s
+               ORDER BY
                     date_run DESC
                LIMIT 1
                     """
-    
+
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql, (id, machineid, branchid))
-   
+
     if cursor.rowcount == 1:
         testRun = cursor.fetchone()
         values = getTestRunValues(testRun['id'])
@@ -145,27 +145,27 @@ def getLatestTestRunValues(id, form):
 
 
 def getTestRunValues(id):
-    sql = """SELECT test_run_values.*, pages.name as page FROM test_run_values 
-            LEFT JOIN pages ON(test_run_values.page_id = pages.id) 
+    sql = """SELECT test_run_values.*, pages.name as page FROM test_run_values
+            LEFT JOIN pages ON(test_run_values.page_id = pages.id)
             WHERE test_run_values.test_run_id = %s"""
-            
+
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql, (id))
-    
+
     testRunValues = []
-    
+
     if cursor.rowcount > 0:
         rows = cursor.fetchall()
         for row in rows:
             testRun = {'interval': row['interval_id'], 'value': row['value']}
             if row['page'] != None:
                 testRun['page'] = row['page']
-            
+
             testRunValues.append(testRun)
         result = {'stat': 'ok', 'values': testRunValues}
     else:
         result = {'stat': 'fail', 'code': '105', 'message': 'No values found for test run ' + str(id)}
-    
+
     return result
 
 
@@ -174,7 +174,7 @@ def getAnnotations(test_run_id, returnType='dictionary'):
     sql = "SELECT * FROM annotations WHERE test_run_id = %s"
     annotations = []
     cursor.execute(sql, (test_run_id))
-    
+
     if cursor.rowcount > 0:
         annRows = cursor.fetchall()
         for annotation in annRows:
@@ -191,26 +191,26 @@ def getTest(id, attribute, form):
     if(attribute == 'runs'):
         return getTestRuns(id)
     else:
-        sql = """SELECT 
-            tests.id, 
-            tests.pretty_name AS test_name, 
-            machines.name as machine_name, 
-            branches.name AS branch_name, 
+        sql = """SELECT
+            tests.id,
+            tests.pretty_name AS test_name,
+            machines.name as machine_name,
+            branches.name AS branch_name,
             os_list.name AS os_name,
             test_runs.date_run
-        FROM 
-            tests INNER JOIN test_runs ON (tests.id = test_runs.test_id) 
-                INNER JOIN machines ON (machines.id = test_runs.machine_id) 
-                    INNER JOIN os_list ON (machines.os_id = os_list.id) 
-                        INNER JOIN builds ON (test_runs.build_id = builds.id) 
-                            INNER JOIN branches on (builds.branch_id = branches.id) 
-        WHERE 
+        FROM
+            tests INNER JOIN test_runs ON (tests.id = test_runs.test_id)
+                INNER JOIN machines ON (machines.id = test_runs.machine_id)
+                    INNER JOIN os_list ON (machines.os_id = os_list.id)
+                        INNER JOIN builds ON (test_runs.build_id = builds.id)
+                            INNER JOIN branches on (builds.branch_id = branches.id)
+        WHERE
             tests.id = %s
         ORDER BY
             test_runs.date_run DESC
         LIMIT 1"""
         cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-        cursor.execute(sql, (id))
+        cursor.execute(sql, (id,))
 
         if cursor.rowcount == 1:
             row = cursor.fetchone()
