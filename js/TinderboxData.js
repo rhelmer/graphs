@@ -84,16 +84,16 @@ TinderboxData.prototype = {
 
     requestTestList: function (callback) {
         var self = this;
-        
+
         if (this.testList != null) {
             callback.call (window, this.testList);
         } else {
-            var cb = 
+            var cb =
             function (event, testList) {
                 $(self.eventTarget).unbind("tinderboxTestListAvailable", cb);
                 (event.data).call (window, testList);
             };
-            
+
             $(self.eventTarget).bind("tinderboxTestListAvailable", callback, cb);
         }
     },
@@ -113,8 +113,8 @@ TinderboxData.prototype = {
         var endTime = arg2;
         var callback = arg3;
         var testKey = makeTestKey(test);
-        
-        
+
+
         if (arg1 && arg2 == null && arg3 == null) {
             callback = arg1;
             if (this.defaultLoadRange) {
@@ -126,7 +126,7 @@ TinderboxData.prototype = {
                 endTime = null;
             }
         }
-    
+
         var cb = function (event, test, aDS, aStartTime, aEndTime) {
             if (makeTestKey(test) != testKey ||
                 aStartTime > startTime ||
@@ -144,7 +144,7 @@ TinderboxData.prototype = {
         $(self.eventTarget).bind("tinderboxDataSetAvailable", callback, cb);
 
         var reqstr = getdatacgi + "/test/runs/latest?id=" + test.id + "&branchid=" + test.branch_id + "&machineid=" + test.machine_id;
-        
+
         if (startTime)
             reqstr += "&starttime=" + startTime;
         if (endTime)
@@ -155,13 +155,13 @@ TinderboxData.prototype = {
         $.get(reqstr,
               function (resp) {
                 var obj = JSON.parse(resp);
-                
-                if (!checkErrorReturn(obj)) return;    
-                
+
+                if (!checkErrorReturn(obj)) return;
+
                 test.testRunId = obj.id;
-                test.testRun = [obj.id,[null,obj.build_id],obj.date_run,[]]
+                test.testRun = [obj.id,[null,obj.build_id],obj.date_run,[]];
                 testKey = makeTestKey(test);
-                
+
                 var ds = gGraphType == GRAPH_TYPE_VALUE ? new TimeValueDataSet(obj.test_runs) : new TimeValueDataSet(obj.values);
                 //this is the the case of a discrete graph - where the entire test run is always requested
                 //so the start and end points are the first and last entries in the returned data set
@@ -250,7 +250,7 @@ TinderboxData.prototype = {
         } else {
             var reqstr = getdatacgi + "/test/runs/values?id=" + test.testRunId;
         }
-        
+
         if (startTime)
             reqstr += "&starttime=" + startTime;
         if (endTime)
@@ -261,9 +261,9 @@ TinderboxData.prototype = {
         $.get(reqstr,
               function (resp) {
                 var obj = JSON.parse(resp);
-                
+
                 if (!checkErrorReturn(obj)) return;
-                
+
                 var ds = gGraphType == GRAPH_TYPE_VALUE ? new TimeValueDataSet(obj.test_runs) : new TimeValueDataSet(obj.values);
                 //this is the the case of a discrete graph - where the entire test run is always requested
                 //so the start and end points are the first and last entries in the returned data set
@@ -282,17 +282,17 @@ TinderboxData.prototype = {
                     ds.rawdata = obj.rawdata;
                 if (obj.stats)
                     ds.stats = obj.stats;
-              
+
                 $(self.eventTarget).trigger("tinderboxDataSetAvailable", [test, ds, startTime, endTime]);
 
                   });
 
 // function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
     },
-    
-    
+
+
     getTestRunInfo: function(testRunId, cb) {
-        $.get('/api/test/runs/info?id='+testRunId, 
+        $.get('/api/test/runs/info?id='+testRunId,
             function(resp) {
                 var obj = JSON.parse(resp);
                   if (!checkErrorReturn(obj)) return;
@@ -313,10 +313,10 @@ function DiscreteTinderboxData() {
 
 DiscreteTinderboxData.prototype = {
     __proto__: new TinderboxData(),
-   
+
     init: function () {
     },
-    
+
     requestTestList: function (limitDate, branch, machine, testname, getBuildID, callback) {
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
@@ -329,7 +329,7 @@ DiscreteTinderboxData.prototype = {
           //log ("returning test lists greater than this date" + (new Date(tDate)).toGMTString());
           //TODO hack hack hack
           tDate = Math.floor(tDate/1000);
-          
+
         }
         if (branch != null) limiters += "&branch=" + branch;
         if (machine != null) limiters += "&machine=" + machine;
@@ -346,22 +346,22 @@ DiscreteTinderboxData.prototype = {
                 callback.call(window, self.testList);
                   });
     },
-    
+
     requestTestRuns : function(limitDate, testId, branchId, machineId, callback) {
         var self = this;
         var limiters = "id=" + testId + "&branchid=" + branchId + "&machineid=" + machineId;
-        
+
         if(limitDate != null) {
             tDate = new Date().getTime();
             tDate -= limitDate * 86400 * 1000;
             tDate = Math.floor(tDate/1000);
             limiters += "&start="+tDate;
         }
-        
-        $.get(getdatacgi + "/test/runs?"+limiters, 
+
+        $.get(getdatacgi + "/test/runs?"+limiters,
             function(resp) {
                 var obj = JSON.parse(resp);
-                
+
                 if(!checkErrorReturn(obj)) return;
                 self.testRuns = obj.test_runs;
                 callback.call(window, self.testRuns);
@@ -370,7 +370,7 @@ DiscreteTinderboxData.prototype = {
 
     requestSearchList: function (branch, machine, testname, callback) {
         var self = this;
-        limiters = ""; 
+        limiters = "";
         if (branch != null) limiters += "&branch=" + branch;
         if (machine != null) limiters += "&machine=" + machine;
         if (testname != null) limiters += "&test=" + testname;
@@ -387,10 +387,10 @@ function ExtraDataTinderboxData() {
 
 ExtraDataTinderboxData.prototype = {
     __proto__: new TinderboxData(),
-   
+
     init: function () {
     },
-    
+
     requestTestList: function (limitDate, branch, machine, testname, callback) {
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
@@ -403,7 +403,7 @@ ExtraDataTinderboxData.prototype = {
           //log ("returning test lists greater than this date" + (new Date(tDate)).toGMTString());
           //TODO hack hack hack
           tDate = Math.floor(tDate/1000)
-          
+
         }
         if (branch != null) limiters += "&branch=" + branch;
         if (machine != null) limiters += "&machine=" + machine;
@@ -422,7 +422,7 @@ ExtraDataTinderboxData.prototype = {
 
     requestSearchList: function (branch, machine, testname, callback) {
         var self = this;
-        limiters = ""; 
+        limiters = "";
         if (branch != null) limiters += "&branch=" + branch;
         if (machine != null) limiters += "&machine=" + machine;
         if (testname != null) limiters += "&test=" + testname;
@@ -481,7 +481,7 @@ ExtraDataTinderboxData.prototype = {
                 endTime = ds.lastTime;
         }
 
-        var cb = 
+        var cb =
         function (event, aTID, aDS, aStartTime, aEndTime) {
             if (aTID != testId ||
                 aStartTime > startTime ||
