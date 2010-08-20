@@ -16,12 +16,12 @@ def application(req):
     if req.path_info == '/':
         # Must redirect
         raise exc.HTTPFound(location='/graph.html')
+    py_name = None
     if req.path_info_peek() == 'server':
         req.path_info_pop()
         script_path = os.path.join(cgi_scripts, req.path_info.lstrip('/'))
         script_path = os.path.abspath(script_path)
         assert script_path.startswith(cgi_scripts + '/')
-        py_name = None
         if script_path.endswith('.cgi'):
             py_name = script_path[:-4]
             py_name = os.path.join(os.path.dirname(py_name), os.path.basename(py_name).replace('-', '_'))
