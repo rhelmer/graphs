@@ -18,7 +18,12 @@ def application(req):
         # Must redirect
         raise exc.HTTPFound(location='/graph.html')
     py_name = None
-    if req.path_info_peek() == 'server':
+    if req.path_info_peek() == 'api':
+        req.path_info_pop()
+        # This seems to be how the rewrite rules are setup:
+        req.GET['item'] = req.path_info.strip('/')
+        script_path = os.path.join(cgi_scripts, 'api.cgi')
+    elif req.path_info_peek() == 'server':
         req.path_info_pop()
         script_path = os.path.join(cgi_scripts, req.path_info.lstrip('/'))
         script_path = os.path.abspath(script_path)
@@ -39,7 +44,6 @@ def application(req):
         __import__(mod_name)
         mod = sys.modules[mod_name]
         app = mod.application
-        print 'Using', app
     else:
         app = CGIApplication({}, script_path)
     return app
@@ -59,7 +63,6 @@ class Proxy(object):
     def __call__(self, environ, start_response):
         from wsgiproxy.exactproxy import proxy_exact_request
         path_info = environ['PATH_INFO']
-        print 'trying proxy %s from %s' % (path_info, self.proxies)
         for prefix, dest in self.proxies:
             if path_info.startswith(prefix + '/'):
                 print >> environ['wsgi.errors'], 'Sending request to %s' % dest
@@ -76,17 +79,24 @@ class Proxy(object):
                 return proxy_exact_request(environ, start_response)
         return self.app(environ, start_response)
 
-config = os.environ.get('SILVER_APP_CONFIG')
-if config:
+config_dir = os.environ.get('SILVER_APP_CONFIG')
+if config_dir:
     from silversupport.util import read_config, fill_config_environ, asbool
-    conf = read_config(os.path.join(config, 'config.ini'))
+    fn = os.path.join(config_dir, 'config.ini')
+    conf = read_config(fn)
     conf = fill_config_environ(conf)
-    if asbool(conf.get('proxy', {}).get('enable')):
-        application = Proxy(application, conf['proxy'])
-    if conf.get('testing', {}).get('test'):
-        from webtestrecorder import Recorder
-        application = Recorder(
-            application, os.path.join(os.environ['CONFIG_FILES'], 'webtest-record.requests'))
+    from paste.reloader import watch_file
+    watch_file(fn)
+else:
+    conf = {}
+
+if asbool(conf.get('proxy', {}).get('enable')):
+    application = Proxy(application, conf['proxy'])
+
+if asbool(conf.get('testing', {}).get('test')):
+    from webtestrecorder import Recorder
+    application = Recorder(
+        application, os.path.join(os.environ['CONFIG_FILES'], 'webtest-record.requests'))
 
 if not is_production():
     application = TransLogger(application)
