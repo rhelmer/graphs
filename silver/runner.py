@@ -1,5 +1,6 @@
 import sys
 import os
+import urlparse
 from webob import exc
 from webob.dec import wsgify
 from paste.cgiapp import CGIApplication
@@ -41,16 +42,51 @@ def application(req):
         print 'Using', app
     else:
         app = CGIApplication({}, script_path)
-    if not is_production():
-        app = TransLogger(app)
     return app
+
+
+class Proxy(object):
+
+    def __init__(self, app, proxies):
+        self.app = app
+        proxies = proxies.copy()
+        if 'enabled' in proxies:
+            del proxies['enabled']
+        proxies = sorted(proxies.items(),
+                         key=lambda x: -len(x[0]))
+        self.proxies = proxies
+
+    def __call__(self, environ, start_response):
+        from wsgiproxy.exactproxy import proxy_exact_request
+        path_info = environ['PATH_INFO']
+        print 'trying proxy %s from %s' % (path_info, self.proxies)
+        for prefix, dest in self.proxies:
+            if path_info.startswith(prefix + '/'):
+                print >> environ['wsgi.errors'], 'Sending request to %s' % dest
+                environ['PATH_INFO'] = path_info[len(prefix):]
+                parts = urlparse.urlsplit(dest)
+                environ['wsgi.url_scheme'] = parts.scheme
+                if ':' in parts.netloc:
+                    host, port = parts.netloc.split(':', 1)
+                else:
+                    host, port = parts.netloc, '80'
+                environ['SERVER_NAME'] = environ['HTTP_HOST'] = host
+                environ['SERVER_PORT'] = port
+                environ['SCRIPT_NAME'] = parts.path
+                return proxy_exact_request(environ, start_response)
+        return self.app(environ, start_response)
 
 config = os.environ.get('SILVER_APP_CONFIG')
 if config:
-    from silversupport.util import read_config, fill_config_environ
+    from silversupport.util import read_config, fill_config_environ, asbool
     conf = read_config(os.path.join(config, 'config.ini'))
     conf = fill_config_environ(conf)
+    if asbool(conf.get('proxy', {}).get('enable')):
+        application = Proxy(application, conf['proxy'])
     if conf.get('testing', {}).get('test'):
         from webtestrecorder import Recorder
         application = Recorder(
             application, os.path.join(os.environ['CONFIG_FILES'], 'webtest-record.requests'))
+
+if not is_production():
+    application = TransLogger(application)
