@@ -738,6 +738,21 @@ insert into machines values (NULL,19,0,"2.26","t-r3-w764-047",1,unix_timestamp()
 insert into machines values (NULL,19,0,"2.26","t-r3-w764-048",1,unix_timestamp());
 insert into machines values (NULL,19,0,"2.26","t-r3-w764-049",1,unix_timestamp());
 insert into machines values (NULL,19,0,"2.26","t-r3-w764-050",1,unix_timestamp());
+-- auto-tools staging
+insert into machines values (NULL,12,0,"2.26","tools-r3-w7-001",1,unix_timestamp());
+insert into machines values (NULL,12,0,"2.26","tools-r3-w7-002",1,unix_timestamp());
+insert into machines values (NULL,1,0,"2.26","tools-r3-xp-001",1,unix_timestamp());
+insert into machines values (NULL,1,0,"2.26","tools-r3-xp-002",1,unix_timestamp());
+insert into machines values (NULL,13,0,"2.26","tools-r3-leopard-001",1,unix_timestamp());
+insert into machines values (NULL,13,0,"2.26","tools-r3-leopard-002",1,unix_timestamp());
+insert into machines values (NULL,14,0,"2.26","tools-r3-fed-001",1,unix_timestamp());
+insert into machines values (NULL,14,0,"2.26","tools-r3-fed-002",1,unix_timestamp());
+insert into machines values (NULL,15,0,"2.26","tools-r3-fed64-001",1,unix_timestamp());
+insert into machines values (NULL,15,0,"2.26","tools-r3-fed64-002",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","tools-r3-snow-001",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","tools-r3-snow-002",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","tools-r3-w764-001",1,unix_timestamp());
+insert into machines values (NULL,19,0,"2.26","tools-r3-w764-002",1,unix_timestamp());
 
 
 -- builders
