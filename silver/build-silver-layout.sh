@@ -44,7 +44,7 @@ if [ ! -e lib/python/.hg ] ; then
 fi
 
 cd static
-for NAME in images jq js graphs.html dgraphs.html ; do
+for NAME in images jq js index.html dgraphs.html ; do
     if [ ! -L $NAME ] ; then
         ln -s ../src/graphs/$NAME $NAME
     fi

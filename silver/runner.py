@@ -26,9 +26,9 @@ cgi_scripts = os.path.join(here, 'server')
 @wsgify
 def application(req):
     script_path = None
-    if req.path_info == '/':
+    if req.path_info == '/graphs.html':
         # Must redirect
-        raise exc.HTTPFound(location='/graph.html')
+        raise exc.HTTPFound(location='/')
     py_name = None
     ## Rewrite rules:
     if re.match('/api/test/?$', req.path_info):
