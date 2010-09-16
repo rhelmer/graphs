@@ -7,6 +7,8 @@ import re
 import traceback
 import cStringIO
 
+from webob import Response
+
 
 #-----------------------------------------------------------------------------------------------------------------
 def getTraceback():
@@ -137,7 +139,7 @@ class MetaDataFromTalos(object):
             raise DatabaseException("No branch_id for a branch_name '%s' can be found" % self.branch_name)
         # get build_id
         try:
-            databaseCursor.execute("select id from builds where branch_id = %s and ref_build_id = %s and ref_changeset = %s",  
+            databaseCursor.execute("select id from builds where branch_id = %s and ref_build_id = %s and ref_changeset = %s",
                                    (self.branch_id, self.ref_build_id, self.ref_changeset))
             self.build_id = databaseCursor.fetchall()[0][0]
         except (self.databaseModule.Error, IndexError), x:
@@ -260,18 +262,17 @@ def averageReader(databaseCursor, databaseModule, inputStream, metadata):
 
 
 #-----------------------------------------------------------------------------------------------------------------
-def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream=sys.stdout):
+def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys.stdout):
     if not databaseModule:
         databaseModule = sys.modules[databaseConnection.__module__.split('.')[0]]
 
-    exitCode = None
-    responseList = ["Content-type: text/plain\n"]
+    resp = Response(content_type='text/plain')
 
     try:
-        if "filename" not in theForm:
+        if "filename" not in req.POST:
             raise ImproperFormatException("Cannot find input stream")
 
-        inputStream = theForm["filename"].file
+        inputStream = req.POST["filename"].file
         startLine = inputStream.readline().strip()
         #responseList.append('line 1: "%s"' % startLine)
         if startLine.upper() not in 'START':
@@ -286,17 +287,14 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
         metadata = MetaDataFromTalos(databaseCursor, databaseModule, inputStream)
         if dataSetType == 'VALUES':
             average = valuesReader(databaseCursor, databaseModule, inputStream, metadata)
-            responseList.append("""RETURN\t%s\tgraph.html#type=series&tests=[{"test":%d,"branch":%d,"machine":%d,"testrun":%d}]""" % (metadata.test_name, metadata.test_id, metadata.branch_id, metadata.machine_id, metadata.test_run_id))
+            resp.write("""RETURN\t%s\tgraph.html#type=series&tests=[{"test":%d,"branch":%d,"machine":%d,"testrun":%d}]\n""" % (metadata.test_name, metadata.test_id, metadata.branch_id, metadata.machine_id, metadata.test_run_id))
         else:
             average = averageReader(databaseCursor, databaseModule, inputStream, metadata)
-        responseList.append("""RETURN\t%s\t%.2f\tgraph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
+        resp.write("""RETURN\t%s\t%.2f\tgraph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]\n""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
 
     except Exception, x:
-        responseList.append(x)
-        responseList.append(getTraceback())
-        exitCode = 500
+        resp.write(str(x))
+        resp.write(getTraceback())
+        resp.status = 500
 
-    for aResponseLine in responseList:
-        print >> outputStream, aResponseLine
-
-    return exitCode
+    return resp
