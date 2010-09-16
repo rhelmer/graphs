@@ -65,6 +65,77 @@ TinderboxData.prototype = {
     defaultLoadRange: null,
     raw: 1,
 
+    get: function (path, callback, finalCallback, dataType) {
+        var success = callback;
+        var error = this.requestFailure;
+        if (finalCallback) {
+            success = function () {
+                var result = callback.apply(this, arguments);
+                finalCallback();
+                return result;
+            };
+            error = function () {
+                var result = this.requestFailure.apply(this, arguments);
+                finalCallback();
+                return result;
+            };
+        }
+        var req = $.ajax({
+          url: path,
+          success: success,
+          error: error,
+          dataType: dataType
+        });
+        req.requestPath = path;
+        if (finalCallback) {
+            req.finalCallback = finalCallback;
+        }
+        return req;
+    },
+
+    getJSON: function (path, callback, finalCallback) {
+        return this.get(path, callback, finalCallback, "json");
+    },
+
+    requestFailure: function (request, textStatus, errorThrown) {
+        var errorMessage = "Request error";
+        if (request.requestPath) {
+            errorMessage += " (getting " + request.requestPath + ")";
+        }
+        errorMessage += ": ";
+        var data = request.responseText;
+        if (! data) {
+            if (errorThrown) {
+                errorMessage += "HTTP error " + errorThrown;
+            } else {
+                errorMessage += "specifics unknown";
+            }
+        } else {
+            if (data.substr(0, 1) == '{') {
+                // Treat it as JSON
+                // FIXME: better way to get JSON?:
+                try {
+                    data = JSON.parse(data);
+                } catch (e) {
+                    if (console) {
+                        console.log("Invalid JSON error data:", data, e);
+                    }
+                }
+                errorMessage += data.message || "Unknown error";
+            } else {
+                errorMessage += data;
+            }
+        }
+        // FIXME: CSS class?:
+        var el = $('<div style="background-color: #600; color: #fff"></div>');
+        el.text(errorMessage);
+        $("body").prepend(el);
+        if (typeof console != 'undefined') {
+            console.log(errorMessage, request);
+        }
+        $('#throbber').hide();
+    },
+
     init: function () {
         // create an element to use as the event target
         $("body").append("<div style='display:none' id='__TinderboxData" + this._id + "'></div>");
@@ -73,7 +144,7 @@ TinderboxData.prototype = {
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
 
-        $.get(getdatacgi + "/test",
+        this.get(getdatacgi + "/test",
             function (resp) {
                 var obj = JSON.parse(resp);
                 if (!checkErrorReturn(obj)) return;
@@ -152,7 +223,7 @@ TinderboxData.prototype = {
         //raw data is the extra_data column
 
         //log (reqstr);
-        $.get(reqstr,
+        this.get(reqstr,
               function (resp) {
                 var obj = JSON.parse(resp);
 
@@ -258,7 +329,7 @@ TinderboxData.prototype = {
         //raw data is the extra_data column
 
         //log (reqstr);
-        $.get(reqstr,
+        this.get(reqstr,
               function (resp) {
                 var obj = JSON.parse(resp);
 
@@ -292,7 +363,7 @@ TinderboxData.prototype = {
 
 
     getTestRunInfo: function(testRunId, cb) {
-        $.get('/api/test/runs/info?id='+testRunId,
+        this.get('/api/test/runs/info?id='+testRunId,
             function(resp) {
                 var obj = JSON.parse(resp);
                   if (!checkErrorReturn(obj)) return;
@@ -338,7 +409,7 @@ DiscreteTinderboxData.prototype = {
         if (getBuildID) limiters += "&graphby=buildid";
 
         //log("drequestTestList: " + getdatacgi + "type=discrete&datelimit=" + tDate + limiters);
-        $.getJSON(getdatacgi + "/test/"+ limiters,
+        this.getJSON(getdatacgi + "/test/"+ limiters,
             function (obj) {
                 if (!checkErrorReturn(obj)) return;
                 self.testList = obj.tests;
@@ -358,7 +429,7 @@ DiscreteTinderboxData.prototype = {
             limiters += "&start="+tDate;
         }
 
-        $.get(getdatacgi + "/test/runs?"+limiters,
+        this.get(getdatacgi + "/test/runs?"+limiters,
             function(resp) {
                 var obj = JSON.parse(resp);
 
@@ -375,12 +446,12 @@ DiscreteTinderboxData.prototype = {
         if (machine != null) limiters += "&machine=" + machine;
         if (testname != null) limiters += "&test=" + testname;
         //log(getdatacgi + "getlist=1&type=discrete" + limiters);
-        $.getJSON(getdatacgi + "getlist=1&type=discrete" + limiters,
+        this.getJSON(getdatacgi + "getlist=1&type=discrete" + limiters,
             function (obj) {
                 if (!checkErrorReturn(obj)) return;
                 callback.call(window, obj.results);
                   });
-    },
+    }
 };
 function ExtraDataTinderboxData() {
 };
