@@ -1,6 +1,7 @@
 import sys
 import os
 import urlparse
+import re
 from webob import exc
 from webob.dec import wsgify
 from paste.cgiapp import CGIApplication
@@ -10,6 +11,17 @@ from silversupport.env import is_production
 here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 cgi_scripts = os.path.join(here, 'server')
 
+# .htaccess rewrite rules:
+"""
+    RewriteRule ^api/test/?$ server/api.cgi?item=tests [QSA]
+    RewriteRule ^api/test/runs/info/?$ server/api.cgi?item=testrun [QSA]
+    RewriteRule ^api/test/runs/values/?$ server/api.cgi?item=testrun&attribute=values [QSA]
+    RewriteRule ^api/test/runs/revisions/?$ server/api.cgi?item=testrun&attribute=revisions [QSA]
+    RewriteRule ^api/test/runs/latest/?$ server/api.cgi?item=testrun&id=$1&attribute=latest [QSA]
+    RewriteRule ^api/test/runs/? server/api.cgi?item=testruns [QSA]
+    RewriteRule ^api/test/([0-9]+)/?$ server/api.cgi?item=test&id=$1
+"""
+
 
 @wsgify
 def application(req):
@@ -18,12 +30,33 @@ def application(req):
         # Must redirect
         raise exc.HTTPFound(location='/graph.html')
     py_name = None
-    if req.path_info_peek() == 'api':
-        req.path_info_pop()
-        # This seems to be how the rewrite rules are setup:
-        req.GET['item'] = req.path_info.strip('/')
-        script_path = os.path.join(cgi_scripts, 'api.cgi')
-    elif req.path_info_peek() == 'server':
+    ## Rewrite rules:
+    if re.match('/api/test/?$', req.path_info):
+        req.path_info = '/server/api.cgi'
+        req.GET['item'] = 'tests'
+    elif re.match(r'/api/test/run/info/?$', req.path_info):
+        req.path_info = '/server/api.cgi'
+        req.GET['item'] = 'testrun'
+    elif re.match(r'/api/test/runs/values/?$', req.path_info):
+        req.path_info = '/server/api.cgi'
+        req.GET['item'] = 'testrun'
+        req.GET['attribute'] = 'values'
+    elif re.match(r'/api/test/runs/revisions/?$', req.path_info):
+        req.path_info = '/server/api.cgi'
+        req.GET['item'] = 'testrun'
+        req.GET['attribute'] = 'revisions'
+    elif re.match(r'/api/test/runs/latest/?$', req.path_info):
+        req.path_info = '/server/api.cgi'
+        req.GET['item'] = 'testrun'
+        req.GET['id'] = ''  # The RewriteRule doesn't make sense
+        req.GET['attribute'] = 'latest'
+    else:
+        match = re.match('/api/test/([0-9]+)/?$', req.path_info)
+        if match:
+            req.path_info = '/server/api.cgi'
+            req.GET['item'] = 'test'
+            req.GET['id'] = match.group(1)
+    if req.path_info_peek() == 'server':
         req.path_info_pop()
         script_path = os.path.join(cgi_scripts, req.path_info.lstrip('/'))
         script_path = os.path.abspath(script_path)
@@ -90,10 +123,10 @@ if config_dir:
 else:
     conf = {}
 
-if asbool(conf.get('proxy', {}).get('enable')):
+if asbool(conf.get('proxy', {}).get('enable'), False):
     application = Proxy(application, conf['proxy'])
 
-if asbool(conf.get('testing', {}).get('test')):
+if asbool(conf.get('testing', {}).get('test'), False):
     from webtestrecorder import Recorder
     application = Recorder(
         application, os.path.join(os.environ['CONFIG_FILES'], 'webtest-record.requests'))
