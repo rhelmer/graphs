@@ -41,6 +41,7 @@ def main():
         cursor = db.cursor()
         cursor.execute(sql)
         cursor.close()
+        db.commit()
 
 
 def sql_lines(sql):
