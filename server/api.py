@@ -3,7 +3,7 @@ import MySQLdb.cursors
 
 
 #Get an array of all tests by build and os
-def getTests(id, attribute, form):
+def getTests(id, attribute, req):
     sql = """SELECT DISTINCT
                 tests.id,
                 tests.pretty_name AS test_name,
@@ -44,10 +44,10 @@ def getTests(id, attribute, form):
 
 
 #Get a list of test runs for a test id and branch and os with annotations
-def getTestRuns(id, attribute, form):
+def getTestRuns(id, attribute, req):
 
-    machineid = int(form.getvalue('machineid'))
-    branchid = int(form.getvalue('branchid'))
+    machineid = int(req.params['machineid'])
+    branchid = int(req.params['branchid'])
 
     sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset
             FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id)
@@ -72,13 +72,13 @@ def getTestRuns(id, attribute, form):
     return result
 
 
-def getTestRun(id, attribute, form):
+def getTestRun(id, attribute, req):
     if attribute == 'values':
         return getTestRunValues(id)
     elif attribute == 'latest':
-        return getLatestTestRunValues(id, form)
+        return getLatestTestRunValues(id, req)
     elif attribute == 'revisions':
-        return getRevisionValues(form)
+        return getRevisionValues(req)
     else:
         sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id as ref_build_id, builds.ref_changeset as changeset
                 FROM test_runs INNER JOIN builds ON (test_runs.build_id = builds.id)
@@ -98,11 +98,11 @@ def getTestRun(id, attribute, form):
     return result
 
 
-def getLatestTestRunValues(id, form):
+def getLatestTestRunValues(id, req):
     #first get build information
 
-    machineid = int(form.getvalue('machineid'))
-    branchid = int(form.getvalue('branchid'))
+    machineid = int(req.params['machineid'])
+    branchid = int(req.params['branchid'])
 
     sql = """SELECT
                 test_runs.*,
@@ -187,7 +187,7 @@ def getAnnotations(test_run_id, returnType='dictionary'):
 
 #Get a specific test by id. Fetched based on last test run for the test. This is required to get the machine it was run on
 # as the machine could change per test
-def getTest(id, attribute, form):
+def getTest(id, attribute, req):
     if(attribute == 'runs'):
         return getTestRuns(id)
     else:
@@ -228,9 +228,9 @@ def getTest(id, attribute, form):
         return result
 
 
-def getRevisionValues(form):
+def getRevisionValues(req):
     """Returns a set of values for a given revision"""
-    revisions = form.getlist('revision')
+    revisions = req.params.getall('revision')
     result = {'stat': 'ok',
               'revisions': {},
               }
