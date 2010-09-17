@@ -37,7 +37,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-var getdatacgi = "api";
+if (typeof getdatacgi == 'undefined') {
+    var getdatacgi = "api";
+}
 
 function checkErrorReturn(obj) {
     if (!obj || obj.stat != 'ok') {
@@ -67,7 +69,10 @@ TinderboxData.prototype = {
 
     get: function (path, callback, finalCallback, dataType) {
         var success = callback;
-        var error = this.requestFailure;
+        var self = this;
+        var error = function (request, textStatus, errorThrown) {
+            self.requestFailure(path, request, textStatus, errorThrown);
+        };
         if (finalCallback) {
             success = function () {
                 var result = callback.apply(this, arguments);
@@ -75,7 +80,7 @@ TinderboxData.prototype = {
                 return result;
             };
             error = function () {
-                var result = this.requestFailure.apply(this, arguments);
+                var result = self.requestFailure.apply(this, path, arguments);
                 finalCallback();
                 return result;
             };
@@ -97,10 +102,10 @@ TinderboxData.prototype = {
         return this.get(path, callback, finalCallback, "json");
     },
 
-    requestFailure: function (request, textStatus, errorThrown) {
+    requestFailure: function (path, request, textStatus, errorThrown) {
         var errorMessage = "Request error";
-        if (request.requestPath) {
-            errorMessage += " (getting " + request.requestPath + ")";
+        if (request.requestPath || path) {
+            errorMessage += " (getting " + (request.requestPath || path) + ")";
         }
         errorMessage += ": ";
         var data = request.responseText;
@@ -114,13 +119,7 @@ TinderboxData.prototype = {
             if (data.substr(0, 1) == '{') {
                 // Treat it as JSON
                 // FIXME: better way to get JSON?:
-                try {
-                    data = JSON.parse(data);
-                } catch (e) {
-                    if (console) {
-                        console.log("Invalid JSON error data:", data, e);
-                    }
-                }
+                data = JSON.parse(data);
                 errorMessage += data.message || "Unknown error";
             } else {
                 errorMessage += data;
@@ -608,5 +607,5 @@ ExtraDataTinderboxData.prototype = {
                 $(self.eventTarget).trigger("tinderboxDataSetAvailable", [testId, ds, startTime, endTime]);
             },
             function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
-    },
+    }
 };
