@@ -57,6 +57,9 @@ def application(req):
         req.GET['item'] = 'testrun'
         req.GET['id'] = ''  # The RewriteRule doesn't make sense
         req.GET['attribute'] = 'latest'
+    elif re.match(r'/api/test/runs?$', req.path_info):
+        req.path_info = '/server/api.cgi'
+        req.GET['item'] = 'testruns'
     else:
         match = re.match('/api/test/([0-9]+)/?$', req.path_info)
         if match:
@@ -86,7 +89,10 @@ def application(req):
         app = mod.application
     else:
         app = CGIApplication({}, script_path)
-    return app
+    resp = req.get_response(app)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+    return resp
 
 
 class Proxy(object):
