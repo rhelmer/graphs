@@ -4,6 +4,7 @@ import urlparse
 import re
 from webob import exc
 from webob.dec import wsgify
+from webob import Response
 from paste.cgiapp import CGIApplication
 from paste.translogger import TransLogger
 from silversupport.env import is_production
@@ -25,6 +26,12 @@ cgi_scripts = os.path.join(here, 'server')
 
 @wsgify
 def application(req):
+    if req.method == 'OPTIONS':
+        resp = Response('', content_type='text/plain')
+        resp.allow = 'GET,POST,OPTIONS'
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+        return resp
     script_path = None
     if req.path_info == '/graphs.html':
         # Must redirect
