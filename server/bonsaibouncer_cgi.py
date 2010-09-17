@@ -6,20 +6,19 @@
 # cross-domain XMLHTTPRequest deficiencies.
 #
 
-import cgitb; cgitb.enable()
-
-import os
-import sys
-import cgi
-import gzip
 import urllib
 from urllib import quote
 
-import cStringIO
+from webob.dec import wsgify
+from webob import Response
+from webob import exc
 
-bonsai = "http://bonsai.mozilla.org/cvsquery.cgi";
 
-def main():
+bonsai = "http://bonsai.mozilla.org/cvsquery.cgi"
+
+
+@wsgify
+def application(req):
     #doGzip = 0
     #try:
     #    if string.find(os.environ["HTTP_ACCEPT_ENCODING"], "gzip") != -1:
@@ -27,33 +26,25 @@ def main():
     #except:
     #    pass
 
-    form = cgi.FieldStorage()
-    
-    treeid = form.getfirst("treeid")
-    module = form.getfirst("module")
-    branch = form.getfirst("branch")
-    mindate = form.getfirst("mindate")
-    maxdate = form.getfirst("maxdate")
-    xml_nofiles = form.getfirst("xml_nofiles")
+    treeid = req.params.get("treeid")
+    module = req.params.get("module")
+    branch = req.params.get("branch")
+    mindate = req.params.get("mindate")
+    maxdate = req.params.get("maxdate")
+    xml_nofiles = req.params.get("xml_nofiles")
 
     if not treeid or not module or not branch or not mindate or not maxdate:
-        print "Content-type: text/plain\n\n"
-        print "ERROR"
-        return
-    
+        raise exc.HTTPBadRequest("ERROR")
+
     url = bonsai + "?" + "branchtype=match&sortby=Date&date=explicit&cvsroot=%2Fcvsroot&xml=1"
     url += "&treeid=%s&module=%s&branch=%s&mindate=%s&maxdate=%s" % (quote(treeid), quote(module), quote(branch), quote(mindate), quote(maxdate))
-    
-    if (xml_nofiles):
+
+    if xml_nofiles:
         url += "&xml_nofiles=1"
 
     urlstream = urllib.urlopen(url)
-    
-    sys.stdout.write("Content-type: text/xml\n\n")
-
+    resp = Response(content_type='text/xml')
     for s in urlstream:
-        sys.stdout.write(s)
-
+        resp.write(s)
     urlstream.close()
-
-main()
+    return resp

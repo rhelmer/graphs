@@ -26,7 +26,7 @@
 
 /**
     Core Concepts:
-    
+
         gGraphType : Can be GRAPH_TYPE_VALUE (average data for a test over time) OR GRAPH_TYPE_SERIES (an individual test run with multiple values)
         Tinderbox : Object used to fetch info from graph server using callbacks
 **/
@@ -59,7 +59,7 @@ var kRecentDate = 14*24*60*60*1000;
 if (!("now" in Date)) {
     Date.now = function() {
         return (new Date()).getTime();
-    }
+    };
 }
 
 window.addEventListener("load", handleLoad, false);
@@ -109,7 +109,7 @@ function handleLoad()
                 }
                 $("#throbber").hide();
             });
-            
+
     } else if (gGraphType == GRAPH_TYPE_SERIES) {
         $("#bonsaispan").hide();
 
@@ -171,34 +171,34 @@ function initOptions()
     if (ctr > 1) {
         loadFunctions.push (function() {
                for (var i=1; i<ctr; i++) {
-                  id = "m" + i + "tid"; 
+                  var id = "m" + i + "tid";
                   doAddTest(qsdata[id], true);
                }
         });
     }
-    
+
     if("spst" in qsdata) {
         if(window.location.toString().indexOf('graphs.mozilla.org') != -1) {
             window.location = 'http://graphs-old.mozilla.org'+document.location.hash;
         }
-        
+
         if(window.location.toString().indexOf('graphs-stage.mozilla.org') != -1) {
             window.location = 'http://graphs-stage-old.mozilla.org'+document.location.hash;
         }
     }
-    
-    
+
+
     if ("show" in qsdata) {
         if(window.location.toString().indexOf('graphs.mozilla.org') != -1) {
             window.location = 'http://graphs-old.mozilla.org'+document.location.hash;
         }
-        
+
         if(window.location.toString().indexOf('graphs-stage.mozilla.org') != -1) {
             window.location = 'http://graphs-stage-old.mozilla.org'+document.location.hash;
         }
-        
+
         var ids = qsdata["show"].split(",").map(function (k) { return parseInt(k); });
- 
+
         loadFunctions.push (function() {
                 for (var i = 0; i < ids.length; i++)
                     doAddTest(ids[i], true);
@@ -257,13 +257,13 @@ function initOptions()
         $("#avgcheckbox")[0].checked = true;
         showAverages(true);
     }
-    
+
     if("testname" in qsdata) {
         loadFunctions.push(function() {
             searchAndAddTest(qsdata['testname'], qsdata['machine'] ,qsdata['date'], qsdata['branch']);
         });
     }
-    
+
     if (loadFunctions.length) {
         gPostDataLoadFunction = function () {
             for (var i = 0; i < loadFunctions.length; i++)
@@ -280,7 +280,7 @@ function makeBonsaiLink(start, end) {
 }
 
 /**
- * Given a start / end time range, combine that with the global list of 
+ * Given a start / end time range, combine that with the global list of
  * tests shown to build a CSV dump URL.
  */
 function makeCsvLink(start, end) {
@@ -381,13 +381,13 @@ function doFilterTests()
 }
 
 function doRemoveTest(id)
-{   
+{
     var testKey = makeTestKey(id);
     gActiveTests = gActiveTests.filter(function(k) {
-        return k != testKey; 
+        return k != testKey;
     });
 
-    
+
     $("#activetests #testid-" + testKey).remove();
 
     removeTestFromGraph(id);
@@ -416,8 +416,8 @@ function doAddAll()
 function findTestByInfo(testInfo) {
     for (var i = 0; i < gAllTestsList.length; i++) {
         var test = gAllTestsList[i];
-        if (test.id == testInfo.id && 
-            test.branch_id == testInfo.branch_id && 
+        if (test.id == testInfo.id &&
+            test.branch_id == testInfo.branch_id &&
             test.machine_id == testInfo.machine_id) {
             return gAllTestsList[i];
         }
@@ -441,7 +441,7 @@ function findTestById(id) {
     discrete or continuous test.
 */
 function searchAndAddTest(testname, machine, date, branch) {
-    
+
     if(!branch) {
         branch = '';
         var action = 'finddiscretetestid';
@@ -449,7 +449,7 @@ function searchAndAddTest(testname, machine, date, branch) {
         date = '';
         var action = 'findcontinuoustestid';
     }
-    
+
     $.getJSON(getdatacgi+ 'action='+action+'&test='+testname+'&date='+date+'&machine='+machine+'&branch='+branch, function(data) {
         doAddTest(data.test.id);
     });
@@ -468,14 +468,14 @@ function doAddTest(testInfo, optSkipAnimation)
     var t = findTestByInfo(testInfo);
     var color = randomColor();
     var opts = { active: true };
-    
+
     if (gGraphType == GRAPH_TYPE_SERIES) {
         opts.showDate = true;
         gActiveTests.push(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id);
     } else {
         gActiveTests.push(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id);
     }
-        
+
     var html = makeTestDiv(t, opts);
 
     $("#activetests").append(html);
@@ -505,7 +505,7 @@ function addLatestTestRun(testInfo) {
     var test = findTestByInfo(testInfo);
     var html = makeTestLoadingDiv(test);
     var loadingDiv = $("#activetests").append(html);
-    
+
     addLatestTestRunToGraph(testInfo, function(ds, testInfo) {
         if (gActiveTests.indexOf(testInfo.id+"-"+testInfo.branch_id+"-"+testInfo.machine_id+"-"+testInfo.testRunId) != -1) {
             // test already exists, indicate that
@@ -513,7 +513,7 @@ function addLatestTestRun(testInfo) {
             $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testInfo.testRunId).fadeIn(300);
             return;
         }
-        
+
         var test = findTestByInfo(testInfo);
         var testRun = testInfo.testRun;
         var color = randomColor();
@@ -521,7 +521,7 @@ function addLatestTestRun(testInfo) {
         var html = makeTestDiv(test, {"showDate":true, "active":true}, testRun);
         var domId = test.domId + "-" + testInfo.testRunId;
         gActiveTests.push(testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testInfo.testRunId);
-        
+
         $("#activetests").append(html);
         $("#activetests #"+test.domId).remove();
         $("#activetests #" + domId + " .colorcell")[0].style.background = colorToRgbString(color);
@@ -536,7 +536,7 @@ function addLatestTestRun(testInfo) {
 }
 
 function doAddTestRun(testRunId, test) {
-    
+
     if (gActiveTests.indexOf(test.id+"-"+test.branch_id+"-"+test.machine_id+"-"+testRunId) != -1) {
         // test already exists, indicate that
         $("#activetests #testid-" + testInfo.id + "-" + testInfo.branch_id +"-" + testInfo.machine_id +"-"+testRunId[0]).hide();
@@ -582,7 +582,7 @@ function doAddTestRun(testRunId, test) {
         var test = findTestByInfo(test)
         var html = makeTestLoadingDiv(test);
         var loadingDiv = $("#activetests").append(html);
-        
+
         Tinderbox.getTestRunInfo(testRunId, function(testRun) {
 
             $("#activetests #"+test.domId).remove();
@@ -608,11 +608,11 @@ function doAddTestRun(testRunId, test) {
                                ds.color = color;
                           });
             updateLinks();
-            
-            
-            
-            
-        });   
+
+
+
+
+        });
     }
 }
 
@@ -630,10 +630,10 @@ function makeTestLoadingDiv(test) {
     // The body content of the test entry
     html += "<td class='testmain' width='100%'>";
     html += "<b class='test-name'>Loading latest testrun for  " + test.id + "</b><br>";
-    
+
     // any trailing buttons/throbbers/etc.
     html += "<td style='white-space: nowrap'>";
-    html += "<div class='iconcell'><img src='images/throbber-small.gif'></div><div class='iconcell removecell'></div>";    
+    html += "<div class='iconcell'><img src='images/throbber-small.gif'></div><div class='iconcell removecell'></div>";
     html += "</td></tr></table></div>";
 
     return html;
@@ -666,7 +666,7 @@ function makeTestDiv(test, opts, testRun)
     var platformclass = "test-platform-" + test.platform.toLowerCase().replace(/[^\w-]/g, "");
     var html = "";
     var domId = (testRun == null) ? test.domId : test.domId + "-" + testRun[0];
-    
+
     html += "<div class='testline' id='" + domId + "'>";
     html += "<table><tr>";
 
@@ -731,9 +731,9 @@ function doAddWithDate(evt) {
         alert("Couldn't find a test with ID " + tid + " -- what happened?");
         return;
     }
-    
+
     $("#datesel").empty();
-    displayedTestRunsTest = t;    
+    displayedTestRunsTest = t;
     Tinderbox.requestTestRuns(30, t.id, t.branch_id, t.machine_id,
 
 	    function(data) {
@@ -746,9 +746,9 @@ function doAddWithDate(evt) {
             $("#datesel").append(tests);
             $("#seriesdialog .throbber").hide();
     });
-    
+
     $("#datesel > :first-child").attr("selected", "");
-    
+
     if (dialogOpen) {
         $("#availabletests #testid" + gSeriesDialogShownForTestId + " td").removeClass("dateselshown");
         $("#seriesdialog").animate({ left: evt.pageX, top: evt.pageY }, 'fast');
@@ -768,7 +768,7 @@ function updateAvailableTests()
     $("#availabletests").append("<div class='testline'><img src='images/throbber-small.gif'> <i>Loading...</i></div>");
     var tests = filterTestListForSelections();
 
-    
+
     // if we're a selector for SERIES tests,
     // then add the date selector flag to get it to appear
     var opts = {};
@@ -779,9 +779,9 @@ function updateAvailableTests()
     for (var i = 0; i < tests.length; i++) {
         newTests[i] = makeTestDiv(tests[i], opts);
     }
-    
+
     document.getElementById("availabletests").innerHTML = newTests.join("");
-    
+
     if (tests.length == 0) {
         $("#availabletests").append("<div class='testline'><i>No tests matched.</i></div>");
     }
@@ -798,14 +798,14 @@ function updateAvailableTests()
             addLatestTestRun(testInfo);
         }
     }
-    
+
     $("#availabletests .dateaddcell").click(doAddWithDate);
     $("#availabletests .addcell").click(doAdd);
     $("#availabletests #testline").dblclick(doAdd);
 }
 
 function testInfoFromElement(el) {
-    
+
     var k;
     while (el.tagName != "body" && el.id != null &&
            (!(k=el.id.match(/^testid-([\d]+)-([\d]+)-([\d]+)-([\d]+)$/)) &&
@@ -816,13 +816,13 @@ function testInfoFromElement(el) {
 
     if (el.tagName == "body")
         return -1;
-    
+
     var obj = {id:k[1], branch_id:k[2], machine_id:k[3]};
-    
+
     if(k[4]) {
         obj.testRunId = k[4];
     }
-    
+
     return obj;
 }
 
@@ -928,7 +928,7 @@ function onToggleAutoScaleClick(ev)
 function onToggleFloaterClick(ev)
 {
     var floater = ev.target.checked;
-    setShouldShowFloater(floater)
+    setShouldShowFloater(floater);
 }
 
 function onNewRangeClick(ev)
@@ -1006,7 +1006,7 @@ function onNewRangeClick(ev)
 
 
 /**
-    Creates links to the displayed graphs. Needed because this is an AJAX app. 
+    Creates links to the displayed graphs. Needed because this is an AJAX app.
     See https://wiki.mozilla.org/Perfomatic:SendingData#Return_Values for the defined format
 **/
 function updateLinks() {
@@ -1048,7 +1048,7 @@ function updateLinks() {
         loc += "&sel=";
         loc += Math.floor(SmallPerfGraph.selectionStartTime) + "," + Math.ceil(SmallPerfGraph.selectionEndTime);
     }
-    
+
     document.location.hash = loc;
     $("#linkanchor").attr("href", url+loc);
 
