@@ -29,8 +29,7 @@ def application(req):
     if req.method == 'OPTIONS':
         resp = Response('', content_type='text/plain')
         resp.allow = 'GET,POST,OPTIONS'
-        resp.headers['Access-Control-Allow-Origin'] = '*'
-        resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+        add_access_headers(resp)
         return resp
     script_path = None
     if req.path_info == '/graphs.html':
@@ -90,9 +89,15 @@ def application(req):
     else:
         app = CGIApplication({}, script_path)
     resp = req.get_response(app)
-    resp.headers['Access-Control-Allow-Origin'] = '*'
-    resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+    add_access_headers(resp)
     return resp
+
+
+def add_access_headers(resp):
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Methods'] = 'GET,OPTIONS'
+    resp.headers['Access-Control-Allow-Headers'] = 'X-Requested-With'
+    resp.headers['Access-Control-Max-Age'] = str(60 * 60 * 24)
 
 
 class Proxy(object):
