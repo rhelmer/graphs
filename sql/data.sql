@@ -17,6 +17,7 @@ insert into os_list values (NULL, "Nokia n900");
 insert into os_list values (NULL, "MacOSX 10.6.2");
 insert into os_list values (NULL, "CentOS (x86_64) release 5 (Final)");
 insert into os_list values (NULL, "WINNT 6.1 x64");
+insert into os_list values (NULL, "Android 2.2");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox-Release");
@@ -1017,6 +1018,9 @@ insert into machines values (NULL,16,0,0.5,"n900-047",1,unix_timestamp());
 insert into machines values (NULL,16,0,0.5,"n900-048",1,unix_timestamp());
 insert into machines values (NULL,16,0,0.5,"n900-049",1,unix_timestamp());
 insert into machines values (NULL,16,0,0.5,"n900-050",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-001",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-002",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-003",1,unix_timestamp());
 
 insert into pagesets values (NULL,"Tp December, 2006 (393 pages)");
 insert into pagesets values (NULL,"Tp November, 2000 (40 pages)");
