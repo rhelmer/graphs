@@ -25,16 +25,71 @@ def getTests(id, attribute, req):
     cursor.execute(sql)
     tests = []
     #fetch row count first, then check for length
+    if attribute == 'short':
+        testMap = {}
+        branchMap = {}
+        platformMap = {}
+        machineMap = {}
     if cursor.rowcount > 0:
         rows = cursor.fetchall()
 
         for row in rows:
+            if attribute == 'short':
+                if row['id'] not in tests:
+                    testMap[row['id']] = {'name': row['test_name'],
+                                          'branch': set(),
+                                          'platform': set(),
+                                          'machine': set(),
+                                          }
+                testMap[row['id']]['branch'].add(row['branch_id'])
+                testMap[row['id']]['platform'].add(row['os_id'])
+                testMap[row['id']]['machine'].add(row['machine_id'])
+                if row['branch_id'] not in branchMap:
+                    branchMap[row['branch_id']] = {'name': row['branch_name'],
+                                                   'test': set(),
+                                                   'platform': set(),
+                                                   'machine': set(),
+                                                  }
+                branchMap[row['branch_id']]['test'].add(row['id'])
+                branchMap[row['branch_id']]['platform'].add(row['os_id'])
+                branchMap[row['branch_id']]['machine'].add(row['machine_id'])
+                if row['os_id'] not in platformMap:
+                    platformMap[row['os_id']] = {'name': row['os_name'],
+                                                 'test': set(),
+                                                 'branch': set(),
+                                                 'machine': set(),
+                                                 }
+                platformMap[row['os_id']]['test'].add(row['id'])
+                platformMap[row['os_id']]['branch'].add(row['branch_id'])
+                platformMap[row['os_id']]['machine'].add(row['machine_id'])
+                if row['machine_id'] not in machineMap:
+                    machineMap[row['machine_id']] = {'name': row['machine_name'],
+                                                     'test': set(),
+                                                     'platform': set(),
+                                                     'branch': set(),
+                                                     }
+                machineMap[row['machine_id']]['test'].add(row['id'])
+                machineMap[row['machine_id']]['branch'].add(row['branch_id'])
+                machineMap[row['machine_id']]['platform'].add(row['os_id'])
+                continue
+
             tests.append(
                 {'id': row['id'],
                  'name': row['test_name'],
                  'branch': {'name': row['branch_name'], 'id': row['branch_id']},
-                 'os': {'name': row['os_name'], 'id': row['os_id']},
+                 'platform': {'name': row['os_name'], 'id': row['os_id']},
                  'machine': {'name': row['machine_name'], 'id': row['machine_id']}})
+
+        if attribute == 'short':
+            for item in testMap, machineMap, branchMap, platformMap:
+                for id in item:
+                    for key in item[id]:
+                        if isinstance(item[id][key], set):
+                            item[id][key] = list(item[id][key])
+            result = {'stat': 'ok', 'from': 'db', 'testMap': testMap,
+                      'machineMap': machineMap, 'branchMap': branchMap,
+                      'platformMap': platformMap}
+            return result
 
         result = {'stat': 'ok', "from": "db", 'tests': tests}
     else:
