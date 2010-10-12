@@ -86,7 +86,7 @@ def sendJsonResponse(status, data, lastmod):
     if lastmod and status != 304:
         resp.last_modified = lastmod
     if data:
-        data = json.dumps(data)
+        data = json.dumps(data, separators=(',', ':'))
         resp.body = data
     return resp
 
