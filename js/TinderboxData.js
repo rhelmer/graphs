@@ -143,7 +143,7 @@ TinderboxData.prototype = {
         var self = this;
         //netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect")
 
-        this.get(getdatacgi + "/test",
+        this.get(getdatacgi + "/test?attribute=short",
             function (resp) {
                 var obj = JSON.parse(resp);
                 if (!checkErrorReturn(obj)) return;
@@ -608,4 +608,103 @@ ExtraDataTinderboxData.prototype = {
             },
             function (obj) {alert ("Error talking to " + getdatacgi + " (" + obj + ")"); log (obj.stack); });
     }
+};
+
+function Tests(testMap, branchMap, platformMap, machineMap) {
+    if (this === window) {
+        throw 'You forgot *new* Tests()';
+    }
+    this.testMap = testMap;
+    this.branchMap = branchMap;
+    this.platformMap = platformMap;
+    this.machineMap = machineMap;
+};
+
+Tests.prototype.dataNames = ['test', 'branch', 'platform', 'machine'];
+Tests.prototype.eachName = function (callback) {
+  for (var i=0; i<this.dataNames.length; i++) {
+    var result = callback(this.dataNames[i]);
+    if (result === false) {
+      break;
+    }
+  }
+};
+
+/* Note, this is a class method (creates Tests), not an instance method */
+Tests.fetch = function (options) {
+  var success = options.success;
+  var error = options.error || this.genericError;
+  return $.ajax({
+    url: getdatacgi + '/test?attribute=short',
+    dataType: "json",
+    success: function (result) {
+      if (result.stat != 'ok') {
+        error(result);
+      }
+      var obj = new Tests(result.testMap, result.branchMap,
+                          result.platformMap, result.machineMap);
+      success(obj);
+    },
+    error: error
+  });
+};
+
+Tests.prototype.genericError = function (req) {
+  if (typeof console != 'undefined') {
+    console.log(req);
+  }
+};
+
+Tests.prototype.fillSelects = function () {
+  var self = this;
+  this.eachName(function (dataName) {
+    self.fillSelect(self[dataName+'Map'], '#test'+dataName);
+  });
+};
+
+Tests.prototype.fillSelect = function (data, select) {
+  var i;
+  select = $(select);
+  select.html('');
+  var byName = {};
+  var names = [];
+  for (i in data) {
+    names.push(data[i].name);
+    byName[data[i].name] = i;
+  }
+  names.sort();
+  select.append($('<option id="">All</option>'));
+  for (i in names) {
+    var name = names[i];
+    var id = byName[name];
+    var option = $('<option value="'+id+'"></option>');
+    option.text(name);
+    select.append(option);
+  }
+};
+
+Tests.prototype.updateAvailable = function () {
+  var constraints = {};
+  var self = this;
+  this.eachName(function (dataName) {
+    $('#test'+dataName+' option').show();
+    var selected = $('#test'+dataName).val();
+    if (selected && selected != 'All') {
+      constraints[dataName] = parseInt(selected);
+    }
+  });
+  this.eachName(function (dataName) {
+    if (! constraints[dataName]) {
+      $('#test'+dataName+' option').each(function () {
+        var item = $(this);
+        for (var name in constraints) {
+          var constraintData = self[name+'Map'][constraints[name]];
+          if (! $.inArray(parseInt(item.val()), constraintData[dataName])) {
+          console.log('hide', item.val());
+            item.hide();
+          }
+        }
+      });
+    }
+  });
 };
