@@ -51,12 +51,27 @@
 			borderWidth: 2,
 			backgroundColor: '#fff',
 			tickColor: 'rgba(0,0,0,0)'
-		},
+		}
 	};
 	
 	
 	var plot, overview, ajaxSeries;
 	var selStart, selEnd;
+
+	var gdata =
+	{
+		"branch": "Firefox",
+		"maxT": undefined,
+		"minT": undefined,
+		"maxV": undefined,
+		"minV": undefined,
+		"mean": [],
+		"platform":"Vista",
+		"runs":[],
+		"test": "Ts"
+	};
+	
+	var machineid = null;
 
 	function init()
 	{
@@ -64,11 +79,73 @@
 		
 		initPlot();
 		
-	    $.getJSON('chart_demo/data/output1.json', function(data) {
-			initData(data);
-			initBindings();
-			updatePlot(true);
-	    });
+		var testruns = JSON.parse(window.location.hash.split("=")[1]);
+		for (var i=0; i < testruns.length; i++)
+		{
+			var run = testruns[i];
+			var id = run[0];
+			var branchid = run[1];
+			var machineid = run[2];
+			debug(machineid);
+			
+			$.getJSON('http://graphs.mozilla.org/api/test/runs', {id:id, branchid:branchid, machineid: machineid}, function(data, status, xhr) {
+				data = fixData(data, xhr);
+				//debug(data);
+				debug(machineid);
+				initData(data);
+				initBindings();
+				updatePlot(true);
+			});
+			}
+	}
+
+	// FIXME graphserver should send us data in this format instead	
+	function fixData(data, xhr)
+	{
+		// FIXME check stat
+		debug(xhr);
+		d = data["test_runs"];
+		rugdata = [];
+		for (var i=0; i < d.length; i++)
+		{
+			var changeset = d[i][1][2];
+ 			// graphserver gives us seconds, flot wants ms
+			var t = d[i][2] * 1000;
+			var v = d[i][3];
+
+			rugdata.push({
+				"changeset": changeset,
+				"t": t,
+				"v": v
+			});
+		}
+		gdata.runs.push({
+			"machine": "FIXME",
+			"data": rugdata
+			
+		});
+
+		for (var i=0; i < gdata.runs.length; i++)
+		{
+			var mean = [];
+			for (var j=0; j < gdata.runs[i].data.length; j++)
+			{
+				var changeset = gdata.runs[i].data[j].changeset;
+				var t = gdata.runs[i].data[j].t;
+				var v = gdata.runs[i].data[j].v;
+				mean.push(v);
+				gdata.maxT = (gdata.maxT==undefined) ? t : Math.max(gdata.maxT, t);
+				gdata.maxV = (gdata.maxV==undefined) ? v : Math.max(gdata.maxV, v);
+				gdata.minT = (gdata.minT==undefined) ? t : Math.min(gdata.minT, t);
+				gdata.minV = (gdata.minV==undefined) ? v : Math.min(gdata.minV, v);
+			}
+			
+			// FIXME do the avg for reals
+			// check that branch and test are the same and correlate by changeset...
+			gdata.mean = gdata.runs[i].data;
+
+		}
+		return gdata;
 	}
 
 	function initPlot()
@@ -328,6 +405,11 @@
 	
 	function isTooltipLocked() { return ttLocked; }
 	
+	function debug(message)
+	{
+		if(typeof(console) !== 'undefined' && console != null) console.log(JSON.stringify(message));
+	}
+
 
 	$(init);
 
