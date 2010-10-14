@@ -67,7 +67,7 @@
 			<em style="background-color: #6dba4b;"></em>
 			<strong>GFX</strong>
 			<span>Firefox 3.6</span>
-			<span>WINNT 6.1</span>
+			<span>MacOSX Darwin 8.8.1</span>
 			<a class="remove" href="#" title="Remove this series"></a>
 			<a class="show" href="#" title="Show this series"></a>
 			<a class="hide" href="#" title="Hide this series"></a>
@@ -112,11 +112,56 @@
 	<div class="tip"></div>
 </div>
 
+<div id="add-data">
+	<form id="add-data-form">
+		<div id="add-data-branches">
+			Select Branches:
+			<select id="branches" multiple="true">
+				<option value="16">Firefox4.0</option>
+				<option>Firefox3.6</option>
+				<option>...</option>
+			</select>
+		</div>
+		<div id="add-data-tests">
+			<br>
+			Select Tests:
+			<select id="tests" multiple="true">
+				<option value="1">Dromaeo</option>
+				<option>Tp4</option>
+				<option>...</option>
+			</select>
+		</div>
+		<br>
+		<div id="add-data-platforms">
+			Select Platforms:
+			<select id="platforms" multiple="true">
+				<option value="351">WINNT 6.1</option>
+				<option>MacOSX 10.6.2</option>
+				<option>...</option>
+			</select>
+		</div>
+		<br>
+		<div id="add-data-pages">
+			Select Pages:
+			<select id="pages" multiple="true">
+				<option>youtube.com</option>
+				<option>msn.com</option>
+				<option>...</option>
+			</select>
+		</div>
+		<br>
+		<a class="button" id="add-series-cancel" href="#">Cancel</a>
+		<button class="button" id="add-series-done" href="#">Add n Data Series</button>
+	</form>
+</div>
+<div id="backgroundPopup"></div>  
+
 <script type="text/javascript" src="jq/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="jq/flot-0.6/jquery.flot.js"></script>
 <script type="text/javascript" src="jq/flot-0.6/jquery.flot.selection.min.js"></script>
 <script type="text/javascript" src="jq/flot-0.6/jquery.flot.crosshair.min.js"></script>
 <script type="text/javascript" src="js/graph-2.js"></script>
+<script type="text/javascript" src="js/addData.js"></script>
 
 </body>
 
