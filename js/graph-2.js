@@ -68,10 +68,9 @@
 		"mean": [],
 		"platform":"Vista",
 		"runs":[],
-		"test": "Ts"
+		"test": "Ts",
+		"mean": []
 	};
-	
-	var machineid = null;
 
 	function init()
 	{
@@ -85,13 +84,10 @@
 			var run = testruns[i];
 			var id = run[0];
 			var branchid = run[1];
-			var machineid = run[2];
-			debug(machineid);
+			var platformid = run[2];
 			
-			$.getJSON('http://graphs.mozilla.org/api/test/runs', {id:id, branchid:branchid, machineid: machineid}, function(data, status, xhr) {
+			$.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
 				data = fixData(data, xhr);
-				//debug(data);
-				debug(machineid);
 				initData(data);
 				initBindings();
 				updatePlot(true);
@@ -103,9 +99,9 @@
 	function fixData(data, xhr)
 	{
 		// FIXME check stat
-		debug(xhr);
+		//debug(xhr);
 		d = data["test_runs"];
-		rugdata = [];
+		rundata = [];
 		for (var i=0; i < d.length; i++)
 		{
 			var changeset = d[i][1][2];
@@ -113,37 +109,36 @@
 			var t = d[i][2] * 1000;
 			var v = d[i][3];
 
-			rugdata.push({
+			rundata.push({
 				"changeset": changeset,
 				"t": t,
 				"v": v
 			});
 		}
+		// FIXME need machineid in the JSON
 		gdata.runs.push({
 			"machine": "FIXME",
-			"data": rugdata
-			
+			"data": rundata
 		});
+
+		gdata.minT= data["date_range"][0] * 1000;
+		gdata.maxT = data["date_range"][1] * 1000;
 
 		for (var i=0; i < gdata.runs.length; i++)
 		{
-			var mean = [];
 			for (var j=0; j < gdata.runs[i].data.length; j++)
 			{
 				var changeset = gdata.runs[i].data[j].changeset;
 				var t = gdata.runs[i].data[j].t;
 				var v = gdata.runs[i].data[j].v;
-				mean.push(v);
-				gdata.maxT = (gdata.maxT==undefined) ? t : Math.max(gdata.maxT, t);
+				if (changeset in data["averages"]) {
+					gdata.runs[i].data[j].v = data["averages"][changeset];
+				}
 				gdata.maxV = (gdata.maxV==undefined) ? v : Math.max(gdata.maxV, v);
-				gdata.minT = (gdata.minT==undefined) ? t : Math.min(gdata.minT, t);
 				gdata.minV = (gdata.minV==undefined) ? v : Math.min(gdata.minV, v);
 			}
 			
-			// FIXME do the avg for reals
-			// check that branch and test are the same and correlate by changeset...
 			gdata.mean = gdata.runs[i].data;
-
 		}
 		return gdata;
 	}
