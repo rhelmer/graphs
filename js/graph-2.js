@@ -167,8 +167,8 @@
 		$('#overview').bind('plotselected', onOverviewSelect);
 		$('#overview').bind('plotunselected', onOverviewUnselect);
 
-		$('#explode, #implode').click(onExplode);
-		$('#show, #hide').click(onShow);
+		$('.explode, .implode').click(onExplode);
+		$('.show, .hide').click(onShow);
 		
 		$(window).resize(onResize);
 	}
@@ -196,7 +196,7 @@
 	function onExplode(e)
 	{
 		ajaxSeries.exploded = !ajaxSeries.exploded;
-		$('#series').toggleClass('exploded', ajaxSeries.exploded);
+		$(e.target.id).toggleClass('exploded', ajaxSeries.exploded);
 		
 		unlockTooltip();
 		hideTooltip();
@@ -208,7 +208,7 @@
 	function onShow(e)
 	{
 		ajaxSeries.visible = !ajaxSeries.visible;
-		$('#series').toggleClass('hidden', !ajaxSeries.visible);
+		$(e.target.id).toggleClass('hidden', !ajaxSeries.visible);
 
 		unlockTooltip();
 		hideTooltip();
@@ -493,10 +493,10 @@
 		$('#'+uniqueSeries+'').append('<span>'+branchName+'</span>');
 		$('#'+uniqueSeries+'').append('<span>'+platformName+'</span>');
 		$('#'+uniqueSeries+'').append('<a class="remove" href="#" title="Remove this series"></a>');
-		$('#'+uniqueSeries+'').append('<a id="show" class="show" href="#" title="Show this series"></a>');
-		$('#'+uniqueSeries+'').append('<a id="hide" class="hide" href="#" title="Hide this series"></a>');
-		$('#'+uniqueSeries+'').append('<a id="explode" class="explode" href="#" title="Explode this series"></a>');
-		$('#'+uniqueSeries+'').append('<a id="implode" class="implode" href="#" title="Implode this series"></a>');
+		$('#'+uniqueSeries+'').append('<a id="show_"'+uniqueSeries+' class="show" href="#" title="Show this series"></a>');
+		$('#'+uniqueSeries+'').append('<a id="hide_"'+uniqueSeries+' class="hide" href="#" title="Hide this series"></a>');
+		$('#'+uniqueSeries+'').append('<a id="explode_'+uniqueSeries+'" class="explode" href="#" title="Explode this series"></a>');
+		$('#'+uniqueSeries+'').append('<a id="implode_'+uniqueSeries+'" class="implode" href="#" title="Implode this series"></a>');
 		$('#'+uniqueSeries+'').append('</li>');
 	}
 	
