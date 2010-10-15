@@ -62,15 +62,20 @@
 		
 		initPlot();
 		
-		var testruns = JSON.parse(window.location.hash.split("=")[1]);
-		for (var i=0; i < testruns.length; i++)
-		{
-			var run = testruns[i];
-			var id = run[0];
-			var branchid = run[1];
-			var platformid = run[2];
-			
-			fetchData(id, branchid, platformid);
+		var args = window.location.hash.split("=")[1];
+		debug(args);
+		if (args) {
+			var testruns = JSON.parse(args);
+			for (var i=0; i < testruns.length; i++)
+			{
+				var run = testruns[i];
+				var id = run[0];
+				var branchid = run[1];
+				var platformid = run[2];
+				
+				addSeries(id, branchid, platformid);
+				fetchData(id, branchid, platformid);
+			}
 		}
 	}
 
@@ -458,13 +463,15 @@
 		var branch = $('#branches').val()[0];
 		var test = $('#tests').val()[0];
 		var platform = $('#platforms').val()[0];
+		debug($('#branches').attr('name'));
+		addSeries(test, branch, platform);
 		fetchData(test, branch, platform);
 	});
 	
 	function buildMenu(data) {
 		for (var index in data.branchMap) {
 			var value = data.branchMap[index];
-			$("#branches").append('<option value="'+index+'">'+value.name+'</option>');
+			$("#branches").append('<option name="'+value.name+'" value="'+index+'">'+value.name+'</option>');
 		}
 		for (var index in data.testMap) {
 			var value = data.testMap[index];
@@ -474,6 +481,21 @@
 			var value = data.platformMap[index];
 			$("#platforms").append('<option value="'+index+'">'+value.name+'</option>');
 		}
+	}
+
+	function addSeries(testName, branchName, platformName) {
+		var uniqueSeries = "series_"+testName+branchName+platformName;
+		$("#legend").append('<li id="'+uniqueSeries+'">');
+		$('#'+uniqueSeries+'').append('<em style="background-color: #e7454c;"></em>');
+		$('#'+uniqueSeries+'').append('<strong>'+testName+'</strong>');
+		$('#'+uniqueSeries+'').append('<span>'+branchName+'</span>');
+		$('#'+uniqueSeries+'').append('<span>'+platformName+'</span>');
+		$('#'+uniqueSeries+'').append('<a class="remove" href="#" title="Remove this series"></a>');
+		$('#'+uniqueSeries+'').append('<a id="show" class="show" href="#" title="Show this series"></a>');
+		$('#'+uniqueSeries+'').append('<a id="hide" class="hide" href="#" title="Hide this series"></a>');
+		$('#'+uniqueSeries+'').append('<a id="explode" class="explode" href="#" title="Explode this series"></a>');
+		$('#'+uniqueSeries+'').append('<a id="implode" class="implode" href="#" title="Implode this series"></a>');
+		$('#'+uniqueSeries+'').append('</li>');
 	}
 	
 	$(init);
