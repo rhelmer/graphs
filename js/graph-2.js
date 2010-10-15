@@ -87,7 +87,8 @@
 			var platformid = run[2];
 			
 			$.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-				data = fixData(data, xhr);
+			//$.getJSON('test.json', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+				data = fixData(data);
 				initData(data);
 				initBindings();
 				updatePlot(true);
@@ -95,51 +96,54 @@
 			}
 	}
 
-	// FIXME graphserver should send us data in this format instead	
-	function fixData(data, xhr)
+	// FIXME perhaps graphserver should send us data in this format instead	
+	function fixData(data)
 	{
 		// FIXME check stat
-		//debug(xhr);
-		d = data["test_runs"];
-		rundata = [];
-		for (var i=0; i < d.length; i++)
-		{
-			var changeset = d[i][1][2];
- 			// graphserver gives us seconds, flot wants ms
-			var t = d[i][2] * 1000;
-			var v = d[i][3];
+		var test_runs = data["test_runs"];
+		var averages = data["averages"];
+		gdata.minT= data["date_range"][0] * 1000;
+		gdata.maxT = data["date_range"][1] * 1000;
+		// FIXME get these from graphserver JSON
+		gdata.minV = 0;
+		gdata.maxV = 20;
 
-			rundata.push({
+		machine_runs = {};
+		for (var i in test_runs)
+		{
+			var run = test_runs[i];
+			// FIXME need machineid in the JSON
+			var machineid = run[6];
+			var changeset = run[1][2];
+ 			// graphserver gives us seconds, flot wants ms
+			var t = run[2] * 1000;
+			var v = run[3];
+
+			var current_run = {
 				"changeset": changeset,
 				"t": t,
 				"v": v
+			};
+
+			if(changeset in averages) {
+				gdata.mean.push(current_run);
+			}
+
+			if (machine_runs[machineid]) {
+				machine_runs[machineid].push(current_run);
+			} else {
+				machine_runs[machineid] = [current_run];
+			}
+		}
+
+		for (var machineid in machine_runs)
+		{
+			gdata.runs.push({
+				"machine": machineid,
+				"data": machine_runs[machineid]
 			});
 		}
-		// FIXME need machineid in the JSON
-		gdata.runs.push({
-			"machine": "FIXME",
-			"data": rundata
-		});
 
-		gdata.minT= data["date_range"][0] * 1000;
-		gdata.maxT = data["date_range"][1] * 1000;
-
-		for (var i=0; i < gdata.runs.length; i++)
-		{
-			for (var j=0; j < gdata.runs[i].data.length; j++)
-			{
-				var changeset = gdata.runs[i].data[j].changeset;
-				var t = gdata.runs[i].data[j].t;
-				var v = gdata.runs[i].data[j].v;
-				if (changeset in data["averages"]) {
-					gdata.runs[i].data[j].v = data["averages"][changeset];
-				}
-				gdata.maxV = (gdata.maxV==undefined) ? v : Math.max(gdata.maxV, v);
-				gdata.minV = (gdata.minV==undefined) ? v : Math.min(gdata.minV, v);
-			}
-			
-			gdata.mean = gdata.runs[i].data;
-		}
 		return gdata;
 	}
 
