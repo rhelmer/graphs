@@ -68,9 +68,10 @@
 		"mean": [],
 		"platform":"Vista",
 		"runs":[],
-		"test": "Ts",
-		"mean": []
+		"test": "Ts"
 	};
+	
+	var machineid = null;
 
 	function init()
 	{
@@ -84,11 +85,13 @@
 			var run = testruns[i];
 			var id = run[0];
 			var branchid = run[1];
-			var platformid = run[2];
+			var machineid = run[2];
+			debug(machineid);
 			
-			$.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-			//$.getJSON('test.json', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-				data = convertData(data);
+			$.getJSON('http://graphs.mozilla.org/api/test/runs', {id:id, branchid:branchid, machineid: machineid}, function(data, status, xhr) {
+				data = fixData(data, xhr);
+				//debug(data);
+				debug(machineid);
 				initData(data);
 				initBindings();
 				updatePlot(true);
@@ -96,53 +99,52 @@
 			}
 	}
 
-	// convert graphserver JSON to something flottable
-	// FIXME perhaps graphserver should send us data in this format instead	
-	function convertData(data)
+	// FIXME graphserver should send us data in this format instead	
+	function fixData(data, xhr)
 	{
 		// FIXME check stat
-		var test_runs = data["test_runs"];
-		var averages = data["averages"];
-		gdata.minT= data["date_range"][0] * 1000;
-		gdata.maxT = data["date_range"][1] * 1000;
-		gdata.minV = data["min"];
-		gdata.maxV = data["max"];
-
-		machine_runs = {};
-		for (var i in test_runs)
+		debug(xhr);
+		d = data["test_runs"];
+		rugdata = [];
+		for (var i=0; i < d.length; i++)
 		{
-			var run = test_runs[i];
-			var machineid = run[6];
-			var changeset = run[1][2];
+			var changeset = d[i][1][2];
  			// graphserver gives us seconds, flot wants ms
-			var t = run[2] * 1000;
-			var v = run[3];
+			var t = d[i][2] * 1000;
+			var v = d[i][3];
 
-			var current_run = {
+			rugdata.push({
 				"changeset": changeset,
 				"t": t,
 				"v": v
-			};
-
-			if(changeset in averages) {
-				gdata.mean.push(current_run);
-			}
-
-			if (machine_runs[machineid]) {
-				machine_runs[machineid].push(current_run);
-			} else {
-				machine_runs[machineid] = [current_run];
-			}
-		}
-
-		for (var machineid in machine_runs)
-		{
-			gdata.runs.push({
-				"machine": machineid,
-				"data": machine_runs[machineid]
 			});
 		}
+		gdata.runs.push({
+			"machine": "FIXME",
+			"data": rugdata
+			
+		});
 
+		for (var i=0; i < gdata.runs.length; i++)
+		{
+			var mean = [];
+			for (var j=0; j < gdata.runs[i].data.length; j++)
+			{
+				var changeset = gdata.runs[i].data[j].changeset;
+				var t = gdata.runs[i].data[j].t;
+				var v = gdata.runs[i].data[j].v;
+				mean.push(v);
+				gdata.maxT = (gdata.maxT==undefined) ? t : Math.max(gdata.maxT, t);
+				gdata.maxV = (gdata.maxV==undefined) ? v : Math.max(gdata.maxV, v);
+				gdata.minT = (gdata.minT==undefined) ? t : Math.min(gdata.minT, t);
+				gdata.minV = (gdata.minV==undefined) ? v : Math.min(gdata.minV, v);
+			}
+			
+			// FIXME do the avg for reals
+			// check that branch and test are the same and correlate by changeset...
+			gdata.mean = gdata.runs[i].data;
+
+		}
 		return gdata;
 	}
 

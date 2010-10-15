@@ -69,7 +69,7 @@ a:hover {
 	#toolbar .group:first-child {
 		margin-left: 0;
 	}
-	#toolbar .button, #toolbar .select, #add-data .button {
+	#toolbar .button, #toolbar .select {
 		display: inline-block;
 		color: #333;
 		border: 1px solid #ccc;
@@ -80,26 +80,24 @@ a:hover {
 		text-shadow: 0 1px 0 rgba(255,255,255,.5);
 		text-decoration: none;
 	}
-	#toolbar .button.disabled, #add-data .button.disabled {
+	#toolbar .button.disabled {
 		color: #c0c0c0;
 		pointer-events: none;
 	}
-	#toolbar .button:first-child, #add-data .button:first-child {
+	#toolbar .button:first-child {
 		border-left-width: 1px;
 		-moz-border-radius-topleft: 4px;
 		-moz-border-radius-bottomleft: 4px;
 	}
-	#toolbar .button:last-child, #add-data .button:last-child {
+	#toolbar .button:last-child {
 		-moz-border-radius-topright: 4px;
 		-moz-border-radius-bottomright: 4px;
 	}
 	#toolbar .button:hover,
-	#toolbar .button.sbFocus,
-	#add-data .button:hover,
-	#add-data .button.sbFocus, {
+	#toolbar .button.sbFocus {
 		background: -moz-linear-gradient(-90deg, #fff, #d1dff0);
 	}
-	#toolbar .button:active, #add-data .button:active {
+	#toolbar .button:active {
 		background: -moz-linear-gradient(-90deg, #c4d0e0, #d1dff0);
 	}
 
@@ -298,26 +296,3 @@ a:hover {
 		z-index: 1;
 		cursor: pointer;
 	}
-
-#add-data {
-	display: none;
-	position: fixed;
-	height: 384px;
-	width: 408px;
-	background: #FFFFFF;
-	border: 2px solid #cecece;
-	z-index: 2;
-	padding: 12px;
-	font-size: 13px;
-}
-#backgroundPopup{  
-	display:none;  
-	position:fixed;  
-	height:100%;  
-	width:100%;  
-	top:0;  
-	left:0;  
-	background:#000000;  
-	border:1px solid #cecece;  
-	z-index:1;  
-}  
