@@ -73,6 +73,7 @@
 				var branchid = run[1];
 				var platformid = run[2];
 				
+				// FIXME pass names not IDs
 				addSeries(id, branchid, platformid);
 				fetchData(id, branchid, platformid);
 			}
@@ -82,20 +83,20 @@
 
 	// convert graphserver JSON to something flottable
 	// FIXME perhaps graphserver should send us data in this format instead	
-	function convertData(data)
+	function convertData(testName,branchName,platformName,data)
 	{
 		// FIXME hardcoded data
 		var gdata =
 		{
-			"branch": "Firefox",
+			"branch": branchName,
 			"maxT": undefined,
 			"minT": undefined,
 			"maxV": undefined,
 			"minV": undefined,
 			"mean": [],
-			"platform":"Vista",
+			"platform": platformName,
 			"runs":[],
-			"test": "Ts",
+			"test": testName,
 			"mean": []
 		};
 
@@ -409,7 +410,8 @@
 
 	function fetchData(id, branchid, platformid) {
 		$.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-			data = convertData(data);
+			// FIXME pass names not IDs
+			data = convertData(id,branchid,platformid,data);
 			initData(data);
 			initBindings();
 			updatePlot(true);
