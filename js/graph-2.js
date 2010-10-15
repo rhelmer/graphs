@@ -1,6 +1,4 @@
 (function($) {
-
-
 	$.fn.selectBox = function() {
 		var sync = function(e) {
 			var sel = $('option:selected', this).html();
@@ -58,20 +56,6 @@
 	var plot, overview, ajaxSeries;
 	var selStart, selEnd;
 
-	var gdata =
-	{
-		"branch": "Firefox",
-		"maxT": undefined,
-		"minT": undefined,
-		"maxV": undefined,
-		"minV": undefined,
-		"mean": [],
-		"platform":"Vista",
-		"runs":[],
-		"test": "Ts",
-		"mean": []
-	};
-
 	function init()
 	{
 		$('.selectBox').selectBox();
@@ -86,20 +70,30 @@
 			var branchid = run[1];
 			var platformid = run[2];
 			
-			$.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-			//$.getJSON('test.json', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-				data = convertData(data);
-				initData(data);
-				initBindings();
-				updatePlot(true);
-			});
-			}
+			fetchData(id, branchid, platformid);
+		}
 	}
+
 
 	// convert graphserver JSON to something flottable
 	// FIXME perhaps graphserver should send us data in this format instead	
 	function convertData(data)
 	{
+		// FIXME hardcoded data
+		var gdata =
+		{
+			"branch": "Firefox",
+			"maxT": undefined,
+			"minT": undefined,
+			"maxV": undefined,
+			"minV": undefined,
+			"mean": [],
+			"platform":"Vista",
+			"runs":[],
+			"test": "Ts",
+			"mean": []
+		};
+
 		// FIXME check stat
 		var test_runs = data["test_runs"];
 		var averages = data["averages"];
@@ -408,7 +402,80 @@
 		if(typeof(console) !== 'undefined' && console != null) console.log(JSON.stringify(message));
 	}
 
+	function fetchData(id, branchid, platformid) {
+		$.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+			data = convertData(data);
+			initData(data);
+			initBindings();
+			updatePlot(true);
+		});
+	}
 
+	function addDataPopup()
+	{
+		$.getJSON('http://graphs-stage.testing/api/test',{attribute:'short'}, function(data, status, xhr) {
+		  buildMenu(data);
+		});
+	
+		$("#backgroundPopup").css({
+			"opacity": "0.7"
+		});
+		$("#backgroundPopup").fadeIn("slow");
+		$("#add-data").fadeIn("slow");
+	
+		// center
+		var windowWidth = document.documentElement.clientWidth;
+		var windowHeight = document.documentElement.clientHeight; 
+		var popupHeight = $("#add-data").height();
+		var popupWidth = $("#add-data").width();
+		$("#add-data").css({
+			"position": "absolute",
+			"top": windowHeight/2-popupHeight/2,
+			"left": windowWidth/2-popupWidth/2
+		});
+	}
+	
+	function disableAddDataPopup()
+	{
+		$("#backgroundPopup").fadeOut("slow");
+		$("#add-data").fadeOut("slow");
+	}
+	
+	$("#add-series").click(function(event){
+		event.preventDefault();
+		addDataPopup();
+	});
+	
+	$("#add-series-cancel").click(function(event){
+		event.preventDefault();
+		disableAddDataPopup();
+	});
+	
+	$("#add-data-form").submit(function(event){
+		event.preventDefault();
+		disableAddDataPopup();
+		// FIXME need to collect all of these not just first, as this is a multiple-select form
+		var branch = $('#branches').val()[0];
+		var test = $('#tests').val()[0];
+		var platform = $('#platforms').val()[0];
+		fetchData(test, branch, platform);
+	});
+	
+	function buildMenu(data) {
+		for (var index in data.branchMap) {
+			var value = data.branchMap[index];
+			$("#branches").append('<option value="'+index+'">'+value.name+'</option>');
+		}
+		for (var index in data.testMap) {
+			var value = data.testMap[index];
+			$("#tests").append('<option value="'+index+'">'+value.name+'</option>');
+		}
+		for (var index in data.platformMap) {
+			var value = data.platformMap[index];
+			$("#platforms").append('<option value="'+index+'">'+value.name+'</option>');
+		}
+	}
+	
 	$(init);
 
 })(jQuery);
