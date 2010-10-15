@@ -1,5 +1,6 @@
 from graphsdb import db
 import MySQLdb.cursors
+from webob import exc
 
 
 #Get an array of all tests by build and os
@@ -101,26 +102,63 @@ def getTests(id, attribute, req):
 #Get a list of test runs for a test id and branch and os with annotations
 def getTestRuns(id, attribute, req):
 
-    machineid = int(req.params['machineid'])
+    machineid = int(req.params.get('machineid', -1))
     branchid = int(req.params['branchid'])
+    platformid = int(req.params.get('platformid', -1))
 
-    sql = """SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset
-            FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id)
-            INNER JOIN branches ON (builds.branch_id = branches.id)
-            INNER JOIN machines ON (test_runs.machine_id = machines.id)
-            WHERE test_runs.test_id = %s AND machines.id = %s AND branches.id = %s AND machines.is_active <> 0  ORDER BY date_run ASC"""
+    if platformid == -1 and machineid != -1:
+        sql = """
+    SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset
+    FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id)
+                   INNER JOIN branches ON (builds.branch_id = branches.id)
+                   INNER JOIN machines ON (test_runs.machine_id = machines.id)
+    WHERE test_runs.test_id = %s
+          AND machines.id = %s
+          AND branches.id = %s
+          AND machines.is_active <> 0
+    ORDER BY date_run ASC
+"""
 
-    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-    cursor.execute(sql, (id, machineid, branchid))
+        cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+        cursor.execute(sql, (id, machineid, branchid))
+    elif machineid == -1 and platformid != -1:
+        sql = """
+    SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset
+    FROM test_runs INNER JOIN builds ON (builds.id = test_runs.build_id)
+                   INNER JOIN branches ON (builds.branch_id = branches.id)
+                   INNER JOIN machines ON (test_runs.machine_id = machines.id)
+                   INNER JOIN os_list ON (machines.os_id = os_list.id)
+    WHERE test_runs.test_id = %s
+          AND os_list.id = %s
+          AND branches.id = %s
+          AND machines.is_active <> 0
+    ORDER BY date_run ASC
+"""
+        cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+        cursor.execute(sql, (id, platformid, branchid))
+    else:
+        raise exc.HTTPBadRequest("You must provide one machineid *or* platformid")
 
     if cursor.rowcount > 0:
         rows = cursor.fetchall()
+        averages = {}
+        ave_totals = {}
         testRuns = []
         for row in rows:
+            averages[row['ref_changeset']] = averages.get(row['ref_changeset'], 0) + row['average']
+            ave_totals[row['ref_changeset']] = ave_totals.get(row['ref_changeset'], 0) + 1
             annotations = getAnnotations(row['id'], 'array')
-            testRuns.append([row['id'], [row['build_id'], row['ref_build_id'], row['ref_changeset']], row['date_run'], row['average'], row['run_number'], annotations])
+            testRuns.append([row['id'], [row['build_id'], row['ref_build_id'], row['ref_changeset']], row['date_run'], row['average'], row['run_number'], annotations, row['machine_id']])
 
-        result = {'stat': 'ok', 'test_runs': testRuns}
+        averages = dict(
+            (changeset, total / ave_totals[changeset])
+            for changeset, total in averages.iteritems())
+        result = {'stat': 'ok', 'test_runs': testRuns,
+                  'averages': averages,
+                  'min': min(row['average'] for row in rows),
+                  'max': max(row['average'] for row in rows),
+                  'date_range': [min(r['date_run'] for r in rows),
+                                 max(r['date_run'] for r in rows)]}
     else:
         result = {'stat': 'fail', 'code': '102', 'message': 'No test runs found for test id ' + str(id)}
 
