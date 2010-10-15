@@ -88,7 +88,7 @@
 			
 			$.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
 			//$.getJSON('test.json', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-				data = fixData(data);
+				data = convertData(data);
 				initData(data);
 				initBindings();
 				updatePlot(true);
@@ -96,23 +96,22 @@
 			}
 	}
 
+	// convert graphserver JSON to something flottable
 	// FIXME perhaps graphserver should send us data in this format instead	
-	function fixData(data)
+	function convertData(data)
 	{
 		// FIXME check stat
 		var test_runs = data["test_runs"];
 		var averages = data["averages"];
 		gdata.minT= data["date_range"][0] * 1000;
 		gdata.maxT = data["date_range"][1] * 1000;
-		// FIXME get these from graphserver JSON
-		gdata.minV = 0;
-		gdata.maxV = 20;
+		gdata.minV = data["min"];
+		gdata.maxV = data["max"];
 
 		machine_runs = {};
 		for (var i in test_runs)
 		{
 			var run = test_runs[i];
-			// FIXME need machineid in the JSON
 			var machineid = run[6];
 			var changeset = run[1][2];
  			// graphserver gives us seconds, flot wants ms
