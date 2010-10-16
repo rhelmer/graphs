@@ -73,8 +73,6 @@
 				var branchid = run[1];
 				var platformid = run[2];
 				
-				// FIXME pass names not IDs
-				addSeries(id, branchid, platformid);
 				fetchData(id, branchid, platformid);
 			}
 		}
@@ -85,7 +83,6 @@
 	// FIXME perhaps graphserver should send us data in this format instead	
 	function convertData(testName,branchName,platformName,data)
 	{
-		// FIXME hardcoded data
 		var gdata =
 		{
 			"branch": branchName,
@@ -100,7 +97,9 @@
 			"mean": []
 		};
 
-		// FIXME check stat
+		if (data["stat"] != "ok") {
+			return false;
+		}
 		var test_runs = data["test_runs"];
 		var averages = data["averages"];
 		gdata.minT= data["date_range"][0] * 1000;
@@ -173,10 +172,10 @@
 		$(window).resize(onResize);
 	}
 
-	function updatePlot(layout)
+	function updatePlot(index)
 	{
-		var plotData = parseSeries(ajaxSeries, 0, 3, 1),
-		    overviewData = parseSeries(ajaxSeries, 0, 1, .5);
+		var plotData = parseSeries(ajaxSeries, index, 3, 1),
+		    overviewData = parseSeries(ajaxSeries, index, 1, .5);
 
 		var minV = ajaxSeries.minV,
 		    maxV = ajaxSeries.maxV,
@@ -412,9 +411,11 @@
 		$.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
 			// FIXME pass names not IDs
 			data = convertData(id,branchid,platformid,data);
+			// FIXME pass names not IDs
+			addSeries(id, branchid, platformid);
 			initData(data);
 			initBindings();
-			updatePlot(true);
+			updatePlot();
 		});
 	}
 
@@ -466,7 +467,6 @@
 		var test = $('#tests').val()[0];
 		var platform = $('#platforms').val()[0];
 		debug($('#branches').attr('name'));
-		addSeries(test, branch, platform);
 		fetchData(test, branch, platform);
 	});
 	
