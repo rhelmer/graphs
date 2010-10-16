@@ -200,11 +200,11 @@
         // FIXME should not clobber previous plot
         $.plot($('#plot'), plotData, plotOptions);
         $.plot($('#overview'), overviewData, overviewOptions);
-
     }
     
     function onExplode(e)
     {
+        // FIXME hardcoded 0
         gdataSeries[0].exploded = !gdataSeries[0].exploded;
         $("#"+e.target.id).toggleClass('exploded', !gdataSeries[0].exploded);
         
@@ -217,6 +217,7 @@
     
     function onShow(e)
     {
+        // FIXME hardcoded 0
         gdataSeries[0].visible = !gdataSeries[0].visible;
         $("#"+e.target.id).toggleClass('visible', !gdataSeries[0].visible);
 
@@ -423,9 +424,9 @@
             // FIXME pass names not IDs
             data = convertData(id,branchid,platformid,data);    
             var index = initData(data);
-            initBindings();
             // FIXME pass names not IDs
             addSeries(index, id, branchid, platformid);
+            initBindings();
             updatePlot();
         });
     }
@@ -481,6 +482,7 @@
     });
     
     function buildMenu(data) {
+        // FIXME use constraints here so only valid selections are possible
         for (var index in data.branchMap) {
                 var value = data.branchMap[index];
                 $("#branches").append('<option name="'+value.name+'" value="'+index+'">'+value.name+'</option>');
@@ -498,7 +500,6 @@
     function addSeries(index, testName, branchName, platformName) {
         var uniqueSeries = "series_"+testName+"_"+branchName+"_"+platformName;
         var color = COLORS[(index-1) % COLORS.length];
-        debug(color);
         $("#legend").append('<li id="'+uniqueSeries+'">');
         $('#'+uniqueSeries+'').append('<em style="background-color: '+color+';"></em>');
         $('#'+uniqueSeries+'').append('<strong>'+testName+'</strong>');
