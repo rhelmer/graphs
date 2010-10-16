@@ -2,9 +2,9 @@
 <html>
 
 <head>
-	<title>Perf-o-Matic</title>
-	<link rel="stylesheet" href="css/reset.min.css" type="text/css" />
-	<link rel="stylesheet" href="css/graph.css" type="text/css" />
+    <title>Perf-o-Matic</title>
+    <link rel="stylesheet" href="css/reset.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/graph.css" type="text/css" />
 </head>
 
 
@@ -15,107 +15,107 @@
 </div>
 
 <div id="toolbar">
-	<div class="group">
-		<span class="button selectBox" title="Time range to display">
-			<select>
-				<option>Last 7 days</option>
-				<option>Last 30 days</option>
-				<option>Last 90 days</option>
-				<option>Last 365 days</option>
-			</select>
-		</span><!--
-		--><span class="button selectBox" title="Type of data to display">
-			<select>
-				<option>Running time</option>
-				<option>Time delta</option>
-				<option>Time delta %</option>
-			</select>
-		</span>
-	</div>
+    <div class="group">
+        <span class="button selectBox" title="Time range to display">
+            <select>
+                <option>Last 7 days</option>
+                <option>Last 30 days</option>
+                <option>Last 90 days</option>
+                <option>Last 365 days</option>
+            </select>
+        </span><!--
+        --><span class="button selectBox" title="Type of data to display">
+            <select>
+                <option>Running time</option>
+                <option>Time delta</option>
+                <option>Time delta %</option>
+            </select>
+        </span>
+    </div>
 
-	<div class="group">
-		<a class="button disabled" href="#" title="Zoom in on the selected range">Zoom In</a><!--
-		--><a class="button disabled" href="#" title="Zoom out from the selected range">Zoom Out</a>
-	</div>
+    <div class="group">
+        <a class="button disabled" href="#" title="Zoom in on the selected range">Zoom In</a><!--
+        --><a class="button disabled" href="#" title="Zoom out from the selected range">Zoom Out</a>
+    </div>
 
-	<div class="group">
-		<a class="button disabled" href="#">Show Changesets</a><!--
-		--><a class="button disabled" href="#">Export CSV</a>
-	</div>
+    <div class="group">
+        <a class="button disabled" href="#">Show Changesets</a><!--
+        --><a class="button disabled" href="#">Export CSV</a>
+    </div>
 
-	<div class="group">
-		<a class="button disabled" href="#">Link</a><!--
-		--><a class="button disabled" href="#">Embed</a>
-	</div>
+    <div class="group">
+        <a class="button disabled" href="#">Link</a><!--
+        --><a class="button disabled" href="#">Embed</a>
+    </div>
 </div>
 
 <div id="options">
-	<ul id="legend">
-	</ul>
-	
-	<a id="add-series" href="#"><span>Add More Test Data</span></a>
-	
-	<div id="docs">
-		<p>Use the eye icon to toggle visibility.</p>
-		<p>Use the plus icon to explode the series.</p>
-		<p>Click and drag to zoom in on a time range. Click outside of the selected range to zoom out.</p>
-		<p>Clicking on a data point locks the tooltip in place. Click anywhere outside of the tooltip to dismiss it.</p>
-	</div>
+    <ul id="legend">
+    </ul>
+    
+    <a id="add-series" href="#"><span>Add More Test Data</span></a>
+    
+    <div id="docs">
+        <p>Use the eye icon to toggle visibility.</p>
+        <p>Use the plus icon to explode the series.</p>
+        <p>Click and drag to zoom in on a time range. Click outside of the selected range to zoom out.</p>
+        <p>Clicking on a data point locks the tooltip in place. Click anywhere outside of the tooltip to dismiss it.</p>
+    </div>
 </div>
 
 
 <div id="charts">
-	<div id="overview-box"><div id="overview"></div></div>
-	<div id="plot-box"><div id="plot"></div></div>
+    <div id="overview-box"><div id="overview"></div></div>
+    <div id="plot-box"><div id="plot"></div></div>
 </div>
 
 
 <div id="tooltip">
-	<div class="body">
-		<div>
-			<p id="tt-series">Ts, Firefox 3.6</p>
-			<p id="tt-series2" class="small">WINNT 6.1, machine-1</p>
-		</div>
-		<div>
-			<p id="tt-v">1000ms</p>
-			<p id="tt-dv" class="small">Delta: 10ms (10%)</p>
-		</div>
-		<div>
-			<p><a id="tt-cset" href="#">89508ed59ad9</a></p>
-			<p id="tt-t" class="small">Dec 31, 2010 23:59</p>
-		</div>
-	</div>
-	<div class="tip"></div>
+    <div class="body">
+        <div>
+            <p id="tt-series">Ts, Firefox 3.6</p>
+            <p id="tt-series2" class="small">WINNT 6.1, machine-1</p>
+        </div>
+        <div>
+            <p id="tt-v">1000ms</p>
+            <p id="tt-dv" class="small">Delta: 10ms (10%)</p>
+        </div>
+        <div>
+            <p><a id="tt-cset" href="#">89508ed59ad9</a></p>
+            <p id="tt-t" class="small">Dec 31, 2010 23:59</p>
+        </div>
+    </div>
+    <div class="tip"></div>
 </div>
 
 <div id="add-data">
-	<form id="add-data-form">
-		<div id="add-data-branches">
-			Select Branches:
-			<select id="branches" multiple="true">
-			</select>
-		</div>
-		<div id="add-data-tests">
-			Select Tests:
-			<select id="tests" multiple="true">
-			</select>
-		</div>
-		<div id="add-data-platforms">
-			Select Platforms:
-			<select id="platforms" multiple="true">
-			</select>
-		</div>
-		<div id="add-data-pages">
-			Select Pages:
-			<select id="pages" multiple="true">
-				<option>www.mozilla.com<option>
-			</select>
-		</div>
-		<div id="add-data-controls">
-			<a class="button" id="add-series-cancel" href="#">Cancel</a>
-			<button class="button" id="add-series-done" href="#">Add n Data Series</button>
-		</div>
-	</form>
+    <form id="add-data-form">
+        <div id="add-data-branches">
+            Select Branches:
+            <select id="branches" multiple="true">
+            </select>
+        </div>
+        <div id="add-data-tests">
+            Select Tests:
+            <select id="tests" multiple="true">
+            </select>
+        </div>
+        <div id="add-data-platforms">
+            Select Platforms:
+            <select id="platforms" multiple="true">
+            </select>
+        </div>
+        <div id="add-data-pages">
+            Select Pages:
+            <select id="pages" multiple="true">
+                <option>www.mozilla.com<option>
+            </select>
+        </div>
+        <div id="add-data-controls">
+            <a class="button" id="add-series-cancel" href="#">Cancel</a>
+            <button class="button" id="add-series-done" href="#">Add n Data Series</button>
+        </div>
+    </form>
 </div>
 <div id="backgroundPopup"></div>  
 
