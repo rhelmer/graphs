@@ -303,7 +303,7 @@ a:hover {
 	display: none;
 	position: fixed;
 	height: 384px;
-	width: 408px;
+	width: 900px;
 	background: #FFFFFF;
 	border: 2px solid #cecece;
 	z-index: 2;
@@ -321,3 +321,27 @@ a:hover {
 	border:1px solid #cecece;  
 	z-index:1;  
 }  
+
+#add-data-branches {
+	float: left;
+	width: 180px;
+}
+#add-data-tests {
+	float: left;
+	width: 250px;
+}
+#add-data-platforms {
+	float: left;
+	width: 250px;
+}
+#add-data-pages {
+	float: left;
+	width: 180px;
+}
+#pages {
+	width: 180px;
+}
+#add-data-controls {
+	clear: both;
+	float: right;
+}
