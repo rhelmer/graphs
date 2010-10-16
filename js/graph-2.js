@@ -471,17 +471,11 @@
     });
     
     function buildMenu(data) {
-        for (var index in data.branchMap) {
-            var value = data.branchMap[index];
-            $("#branches").append('<option name="'+value.name+'" value="'+index+'">'+value.name+'</option>');
-        }
-        for (var index in data.testMap) {
-            var value = data.testMap[index];
-            $("#tests").append('<option value="'+index+'">'+value.name+'</option>');
-        }
-        for (var index in data.platformMap) {
-            var value = data.platformMap[index];
-            $("#platforms").append('<option value="'+index+'">'+value.name+'</option>');
+	for (var map in [data.branchMap, data.testMap, data.platformMap]) {
+	    for (var index in map) {
+	        var value = map[index];
+	        $("#branches").append('<option name="'+value.name+'" value="'+index+'">'+value.name+'</option>');
+	    }
         }
     }
 
