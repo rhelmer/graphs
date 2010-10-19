@@ -515,8 +515,9 @@
 
     function addSeries(testName, branchName, platformName) {
         var uniqueSeries = "series_"+testName+"_"+branchName+"_"+platformName;
+        var color = COLORS[i % COLORS.length];
         $("#legend").append('<li id="'+uniqueSeries+'">');
-        $('#'+uniqueSeries+'').append('<em style="background-color: #e7454c;"></em>');
+        $('#'+uniqueSeries+'').append('<em style="background-color: '+color+';"></em>');
         $('#'+uniqueSeries+'').append('<strong>'+testName+'</strong>');
         $('#'+uniqueSeries+'').append('<span>'+branchName+'</span>');
         $('#'+uniqueSeries+'').append('<span>'+platformName+'</span>');
