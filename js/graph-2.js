@@ -54,7 +54,7 @@
     
     
     var plot, overview, ajaxSeries;
-    var allSeries = [];
+    var allSeries = {};
     var selStart, selEnd;
 
     function init()
@@ -64,7 +64,6 @@
         initPlot();
         
         var args = window.location.hash.split("=")[1];
-        debug(args);
         if (args) {
             var testruns = JSON.parse(args);
             for (var i=0; i < testruns.length; i++)
@@ -152,12 +151,13 @@
         overview = $.plot($('#overview'), [ ], OVERVIEW_OPTIONS);
     }
     
-    function initData(data)
+    function initData(id,branchid,platformid,data)
     {
+        var uniqueSeries = "series_"+id+"_"+branchid+"_"+platformid;
         ajaxSeries = data;
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
-        allSeries.push(ajaxSeries);
+        allSeries[uniqueSeries] = ajaxSeries;
     }
     
     function initBindings()
@@ -170,6 +170,7 @@
 
         $('.explode, .implode').click(onExplode);
         $('.show, .hide').click(onShow);
+        $('.remove').click(onRemove);
         
         $(window).resize(onResize);
     }
@@ -180,9 +181,15 @@
         var overviewData = [];
         var plotOptions, overviewOptions;
         var minV, maxV, marginV, minT, maxT;
+        var count = 0;
         $.each(allSeries, function(index, series) {
-            plotData.push(parseSeries(series, index, 3, 1)[0]);
-            overviewData.push(parseSeries(series, index, 1, .5)[0]);
+            if ($.isEmptyObject(series)) {
+                count++;
+                return true;
+            }
+            plotData.push(parseSeries(series, count, 3, 1)[0]);
+            overviewData.push(parseSeries(series, count, 1, .5)[0]);
+            count++;
     
             minV = minV < series.minV ? minV : series.minV;
             maxV = maxV > series.maxV ? maxV : series.maxV;
@@ -194,7 +201,6 @@
                 yaxis = { yaxis: { min: minV-marginV, max: maxV+marginV } };
             plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
             overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS, yaxis);
-            
         });
         plot = $.plot($('#plot'), plotData, plotOptions);
         overview = $.plot($('#overview'), overviewData, overviewOptions);
@@ -202,8 +208,9 @@
     
     function onExplode(e)
     {
-        ajaxSeries.exploded = !ajaxSeries.exploded;
-        $(e.target.id).toggleClass('exploded', ajaxSeries.exploded);
+        var id = e.target.id;
+        allSeries[id].exploded = !allSeries[id].exploded;
+        $(".explode, .implode #"+id).toggleClass('exploded', !allSeries[id].exploded);
         
         unlockTooltip();
         hideTooltip();
@@ -214,8 +221,22 @@
     
     function onShow(e)
     {
-        ajaxSeries.visible = !ajaxSeries.visible;
-        $(e.target.id).toggleClass('hidden', !ajaxSeries.visible);
+        var id = e.target.id;
+        allSeries[id].visible = !allSeries[id].visible;
+        $(".show, .hide #"+id).toggleClass('hidden', !allSeries[id].visible);
+
+        unlockTooltip();
+        hideTooltip();
+        updatePlot();
+
+        e.preventDefault();
+    }
+
+    function onRemove(e)
+    {
+        var id = e.target.id;
+        allSeries[id] = {};
+        $("#"+id).remove();
 
         unlockTooltip();
         hideTooltip();
@@ -421,7 +442,7 @@
             data = convertData(id,branchid,platformid,data);
             // FIXME pass names not IDs
             addSeries(id, branchid, platformid);
-            initData(data);
+            initData(id, branchid, platformid, data);
             initBindings();
             updatePlot();
         });
@@ -474,7 +495,6 @@
         var branch = $('#branches').val()[0];
         var test = $('#tests').val()[0];
         var platform = $('#platforms').val()[0];
-        debug($('#branches').attr('name'));
         fetchData(test, branch, platform);
     });
     
@@ -494,17 +514,17 @@
     }
 
     function addSeries(testName, branchName, platformName) {
-        var uniqueSeries = "series_"+testName+branchName+platformName;
+        var uniqueSeries = "series_"+testName+"_"+branchName+"_"+platformName;
         $("#legend").append('<li id="'+uniqueSeries+'">');
         $('#'+uniqueSeries+'').append('<em style="background-color: #e7454c;"></em>');
         $('#'+uniqueSeries+'').append('<strong>'+testName+'</strong>');
         $('#'+uniqueSeries+'').append('<span>'+branchName+'</span>');
         $('#'+uniqueSeries+'').append('<span>'+platformName+'</span>');
-        $('#'+uniqueSeries+'').append('<a class="remove" href="#" title="Remove this series"></a>');
-        $('#'+uniqueSeries+'').append('<a id="show_"'+uniqueSeries+' class="show" href="#" title="Show this series"></a>');
-        $('#'+uniqueSeries+'').append('<a id="hide_"'+uniqueSeries+' class="hide" href="#" title="Hide this series"></a>');
-        $('#'+uniqueSeries+'').append('<a id="explode_'+uniqueSeries+'" class="explode" href="#" title="Explode this series"></a>');
-        $('#'+uniqueSeries+'').append('<a id="implode_'+uniqueSeries+'" class="implode" href="#" title="Implode this series"></a>');
+        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="remove" href="#" title="Remove this series"></a>');
+        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="show" href="#" title="Show this series"></a>');
+        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="hide" href="#" title="Hide this series"></a>');
+        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="explode" href="#" title="Explode this series"></a>');
+        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="implode" href="#" title="Implode this series"></a>');
         $('#'+uniqueSeries+'').append('</li>');
     }
     
