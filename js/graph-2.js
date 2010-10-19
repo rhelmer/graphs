@@ -53,8 +53,7 @@
     };
     
     
-    var plot, overview;
-    var gdataSeries = [];
+    var plot, overview, ajaxSeries;
     var selStart, selEnd;
 
     function init()
@@ -64,6 +63,7 @@
         initPlot();
         
         var args = window.location.hash.split("=")[1];
+        debug(args);
         if (args) {
             var testruns = JSON.parse(args);
             for (var i=0; i < testruns.length; i++)
@@ -153,11 +153,9 @@
     
     function initData(data)
     {
-        return gdataSeries.push({
-	    "data": data,
-	    "exploded": false,
-	    "visible": true
-	});
+        ajaxSeries = data;
+        ajaxSeries.exploded = false;
+        ajaxSeries.visible = true;
     }
     
     function initBindings()
@@ -174,39 +172,30 @@
         $(window).resize(onResize);
     }
 
-    function updatePlot()
+    function updatePlot(index)
     {
-        var plotData = [];
-        var overviewData = [];
-        var minV, maxV, marginV, minT, maxT;
-        var xaxis, yaxis, plotOptions, overviewOptions;
-        
-	$.each(gdataSeries, function(index, series){
-            plotData = parseSeries(series, index, 3, 1);
-            overviewData = parseSeries(series, index, 1, .5);
-            
-            minV = series.data.minV;
-            maxV = series.data.maxV;
-            marginV = 0.1 * (maxV - minV);
-            minT = selStart || series.data.minT;
-            maxT = selEnd || series.data.maxT;
-    
-            xaxis = { xaxis: { min: minT, max: maxT } };
-            yaxis = { yaxis: { min: minV-marginV, max: maxV+marginV } };
-            plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
+        var plotData = parseSeries(ajaxSeries, index, 3, 1),
+            overviewData = parseSeries(ajaxSeries, index, 1, .5);
+
+        var minV = ajaxSeries.minV,
+            maxV = ajaxSeries.maxV,
+            marginV = 0.1 * (maxV - minV),
+            minT = selStart || ajaxSeries.minT,
+            maxT = selEnd || ajaxSeries.maxT;
+
+        var xaxis = { xaxis: { min: minT, max: maxT } },
+            yaxis = { yaxis: { min: minV-marginV, max: maxV+marginV } },
+            plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
             overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS, yaxis);
         
-	});
-        // FIXME should not clobber previous plot
-        $.plot($('#plot'), plotData, plotOptions);
-        $.plot($('#overview'), overviewData, overviewOptions);
+        plot = $.plot($('#plot'), plotData, plotOptions);
+        overview = $.plot($('#overview'), overviewData, overviewOptions);
     }
     
     function onExplode(e)
     {
-        // FIXME hardcoded 0
-        gdataSeries[0].exploded = !gdataSeries[0].exploded;
-        $("#"+e.target.id).toggleClass('exploded', !gdataSeries[0].exploded);
+        ajaxSeries.exploded = !ajaxSeries.exploded;
+        $(e.target.id).toggleClass('exploded', ajaxSeries.exploded);
         
         unlockTooltip();
         hideTooltip();
@@ -217,9 +206,8 @@
     
     function onShow(e)
     {
-        // FIXME hardcoded 0
-        gdataSeries[0].visible = !gdataSeries[0].visible;
-        $("#"+e.target.id).toggleClass('visible', !gdataSeries[0].visible);
+        ajaxSeries.visible = !ajaxSeries.visible;
+        $(e.target.id).toggleClass('hidden', !ajaxSeries.visible);
 
         unlockTooltip();
         hideTooltip();
@@ -308,13 +296,13 @@
     {
         if (!seriesIn.exploded) {
             var color = COLORS[i % COLORS.length];
-            var datasets = [{ data: seriesIn.data.mean }];
+            var datasets = [{ data: seriesIn.mean }];
             var lineWidth = seriesIn.visible ? weight : 0;
         }
         
         else {
             var color = LIGHT_COLORS[i % LIGHT_COLORS.length];
-            var datasets = seriesIn.data.runs;
+            var datasets = seriesIn.runs;
             var lineWidth = seriesIn.visible ? explodedWeight : 0;
         }
 
@@ -324,9 +312,9 @@
                 color: color,
                 data: $.map(d.data, function(p) { return [[ p.t, p.v ]]; }),
                 etc: {
-                    branch: seriesIn.data.branch,
-                    test: seriesIn.data.test,
-                    platform: seriesIn.data.platform,
+                    branch: seriesIn.branch,
+                    test: seriesIn.test,
+                    platform: seriesIn.platform,
                     machine: d.machine,
                     changesets: $.map(d.data, function(p) { return p.changeset; })
                 }
@@ -422,10 +410,10 @@
     function fetchData(id, branchid, platformid) {
         $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
             // FIXME pass names not IDs
-            data = convertData(id,branchid,platformid,data);    
-            var index = initData(data);
+            data = convertData(id,branchid,platformid,data);
             // FIXME pass names not IDs
-            addSeries(index, id, branchid, platformid);
+            addSeries(id, branchid, platformid);
+            initData(data);
             initBindings();
             updatePlot();
         });
@@ -478,30 +466,29 @@
         var branch = $('#branches').val()[0];
         var test = $('#tests').val()[0];
         var platform = $('#platforms').val()[0];
+        debug($('#branches').attr('name'));
         fetchData(test, branch, platform);
     });
     
     function buildMenu(data) {
-        // FIXME use constraints here so only valid selections are possible
         for (var index in data.branchMap) {
-                var value = data.branchMap[index];
-                $("#branches").append('<option name="'+value.name+'" value="'+index+'">'+value.name+'</option>');
+            var value = data.branchMap[index];
+            $("#branches").append('<option name="'+value.name+'" value="'+index+'">'+value.name+'</option>');
         }
         for (var index in data.testMap) {
-                var value = data.testMap[index];
-                $("#tests").append('<option value="'+index+'">'+value.name+'</option>');
+            var value = data.testMap[index];
+            $("#tests").append('<option value="'+index+'">'+value.name+'</option>');
         }
         for (var index in data.platformMap) {
-                var value = data.platformMap[index];
-                $("#platforms").append('<option value="'+index+'">'+value.name+'</option>');
+            var value = data.platformMap[index];
+            $("#platforms").append('<option value="'+index+'">'+value.name+'</option>');
         }
     }
 
-    function addSeries(index, testName, branchName, platformName) {
-        var uniqueSeries = "series_"+testName+"_"+branchName+"_"+platformName;
-        var color = COLORS[(index-1) % COLORS.length];
+    function addSeries(testName, branchName, platformName) {
+        var uniqueSeries = "series_"+testName+branchName+platformName;
         $("#legend").append('<li id="'+uniqueSeries+'">');
-        $('#'+uniqueSeries+'').append('<em style="background-color: '+color+';"></em>');
+        $('#'+uniqueSeries+'').append('<em style="background-color: #e7454c;"></em>');
         $('#'+uniqueSeries+'').append('<strong>'+testName+'</strong>');
         $('#'+uniqueSeries+'').append('<span>'+branchName+'</span>');
         $('#'+uniqueSeries+'').append('<span>'+platformName+'</span>');
