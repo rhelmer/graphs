@@ -57,6 +57,8 @@
     var allSeries = {};
     var selStart, selEnd;
 
+    var menuData;
+
     function init()
     {
         $('.selectBox').selectBox();
@@ -175,6 +177,10 @@
         $('.show, .hide').unbind();
         $('.show, .hide').click(onShow);
         $('.remove').click(onRemove);
+
+        $('.add-data, select').unbind();
+        $('.add-data, #branches').change(onAddBranches);
+        $('.add-data, #tests').click(onAddTests);
         
         $(window).resize(onResize);
     }
@@ -250,6 +256,32 @@
         updatePlot();
 
         e.preventDefault();
+    }
+
+    function onAddBranches(e)
+    {
+        var value = e.target.value;
+        $.each($("#tests option"), function(index, option) {
+            $(this).attr("disabled","disabled");
+        });
+        $.each($("#tests option"), function(index, option) {
+            if (option.value in menuData.branchMap[value].test) {
+                $(this).attr("disabled","");
+            }
+        });
+    }
+
+    function onAddTests(e)
+    {
+        var value = e.target.value;
+        $.each($("#platforms option"), function(index, option) {
+            $(this).attr("disabled","disabled");
+        });
+        $.each($("#platforms option"), function(index, option) {
+            if (value in menuData.platformMap[option.value].test) {
+                $(this).attr("disabled","");
+            }
+        });
     }
 
     var prevSeriesIndex = -1,
@@ -443,6 +475,7 @@
         if(typeof(console) !== 'undefined' && console != null) console.log(JSON.stringify(message));
     }
 
+    initBindings();
     function fetchData(id, branchid, platformid) {
         $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
             data = convertData(id,branchid,platformid,data);
@@ -454,14 +487,13 @@
             initData(id, branchid, platformid, data);
             updatePlot();
             addSeries(id, branchid, platformid);
-            initBindings();
         });
     }
 
     function addDataPopup()
     {
         $.getJSON('http://graphs-stage.testing/api/test',{attribute:'short'}, function(data, status, xhr) {
-          buildMenu(data);
+            buildMenu(data);
         });
     
         $("#backgroundPopup").css({
@@ -509,17 +541,18 @@
     });
     
     function buildMenu(data) {
+        menuData = data;
         for (var index in data.branchMap) {
             var value = data.branchMap[index];
             $("#branches").append('<option name="'+value.name+'" value="'+index+'">'+value.name+'</option>');
         }
         for (var index in data.testMap) {
             var value = data.testMap[index];
-            $("#tests").append('<option value="'+index+'">'+value.name+'</option>');
+            $("#tests").append('<option id="'+value.name+'" value="'+index+'" disabled>'+value.name+'</option>');
         }
         for (var index in data.platformMap) {
             var value = data.platformMap[index];
-            $("#platforms").append('<option value="'+index+'">'+value.name+'</option>');
+            $("#platforms").append('<option value="'+index+'" disabled>'+value.name+'</option>');
         }
     }
 
@@ -542,7 +575,7 @@
         $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="implode" href="#" title="Implode this series"></a>');
         $('#'+uniqueSeries+'').append('</li>');
     }
-    
+
     $(init);
 
 })(jQuery);
