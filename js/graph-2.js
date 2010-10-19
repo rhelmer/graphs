@@ -179,16 +179,16 @@
         var plotData = [];
         var overviewData = [];
         var plotOptions, overviewOptions;
+        var minV, maxV, marginV, minT, maxT;
         $.each(allSeries, function(index, series) {
             plotData.push(parseSeries(series, index, 3, 1)[0]);
             overviewData.push(parseSeries(series, index, 1, .5)[0]);
     
-            // FIXME need to adjust the scale for all series, not just the last
-            var minV = series.minV,
-                maxV = series.maxV,
-                marginV = 0.1 * (maxV - minV),
-                minT = selStart || series.minT,
-                maxT = selEnd || series.maxT;
+            minV = minV < series.minV ? minV : series.minV;
+            maxV = maxV > series.maxV ? maxV : series.maxV;
+            marginV = 0.1 * (maxV - minV);
+            minT = selStart || (minT < series.minT ? minT : series.minT);
+            maxT = selEnd || (maxT > series.maxT ? maxT : series.maxT);
     
             var xaxis = { xaxis: { min: minT, max: maxT } },
                 yaxis = { yaxis: { min: minV-marginV, max: maxV+marginV } };
@@ -317,7 +317,6 @@
         return $.map(datasets, function(d) {
             return {
                 lines: { lineWidth: lineWidth },
-                label: color,
                 color: color,
                 data: $.map(d.data, function(p) { return [[ p.t, p.v ]]; }),
                 etc: {
