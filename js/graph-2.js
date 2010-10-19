@@ -97,9 +97,9 @@
             "mean": []
         };
 
-        if (data["stat"] != "ok") {
-            return false;
-        }
+        if (!data) return false;
+        if (data["stat"] != "ok") return false;
+
         var test_runs = data["test_runs"];
         var averages = data["averages"];
         gdata.minT= data["date_range"][0] * 1000;
@@ -157,7 +157,9 @@
         ajaxSeries = data;
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
-        allSeries[uniqueSeries] = ajaxSeries;
+        if (!allSeries[uniqueSeries]) {
+            allSeries[uniqueSeries] = ajaxSeries;
+        }
     }
     
     function initBindings()
@@ -186,11 +188,14 @@
         var count = 0;
         $.each(allSeries, function(index, series) {
             if ($.isEmptyObject(series)) {
+                // purposely deleted, keep colors consistent
                 count++;
                 return true;
             }
+            allSeries[index].count = count;
             plotData.push(parseSeries(series, count, 3, 1)[0]);
             overviewData.push(parseSeries(series, count, 1, .5)[0]);
+
             count++;
     
             minV = minV < series.minV ? minV : series.minV;
@@ -440,13 +445,16 @@
 
     function fetchData(id, branchid, platformid) {
         $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-            // FIXME pass names not IDs
             data = convertData(id,branchid,platformid,data);
-            // FIXME pass names not IDs
-            addSeries(id, branchid, platformid);
+            if (!data) {
+                // FIXME need nicer notification system
+                alert("Could not load data");
+                return false;
+            }
             initData(id, branchid, platformid, data);
-            initBindings();
             updatePlot();
+            addSeries(id, branchid, platformid);
+            initBindings();
         });
     }
 
@@ -515,9 +523,13 @@
         }
     }
 
-    function addSeries(testName, branchName, platformName) {
+    function addSeries(testId, branchId, platformId) {
+        // FIXME need to look these up to names
+        var testName = testId;
+        var branchName = branchId;
+        var platformName = platformId;
         var uniqueSeries = "series_"+testName+"_"+branchName+"_"+platformName;
-        var color = COLORS[i % COLORS.length];
+        var color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
         $("#legend").append('<li id="'+uniqueSeries+'">');
         $('#'+uniqueSeries+'').append('<em style="background-color: '+color+';"></em>');
         $('#'+uniqueSeries+'').append('<strong>'+testName+'</strong>');
