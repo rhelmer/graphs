@@ -217,7 +217,7 @@
     {
         var id = e.target.id;
         allSeries[id].exploded = !allSeries[id].exploded;
-        $(".explode, .implode #"+id).toggleClass('exploded', !allSeries[id].exploded);
+        $(".explode, .implode, #"+id).toggleClass('exploded', allSeries[id].exploded);
         
         unlockTooltip();
         hideTooltip();
@@ -230,7 +230,7 @@
     {
         var id = e.target.id;
         allSeries[id].visible = !allSeries[id].visible;
-        $(".show, .hide #"+id).toggleClass('hidden', !allSeries[id].visible);
+        $(".show, .hide, #"+id).toggleClass('hidden', !allSeries[id].visible);
 
         unlockTooltip();
         hideTooltip();
