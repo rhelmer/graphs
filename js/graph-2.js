@@ -147,6 +147,7 @@
         return gdata;
     }
 
+
     function initPlot()
     {
         plot = $.plot($('#plot'), [ ], PLOT_OPTIONS);
@@ -199,8 +200,17 @@
                 return true;
             }
             allSeries[index].count = count;
-            plotData.push(parseSeries(series, count, 3, 1)[0]);
-            overviewData.push(parseSeries(series, count, 1, .5)[0]);
+            
+            var allPlots = parseSeries(series, count, 3, 1);
+            for (var i=0; i < allPlots.length; i++) {
+                var plot = allPlots[i];
+                plotData.push(plot);
+            }
+            var allOverviews = parseSeries(series, count, 1, .5);
+            for (var i=0; i < allOverviews.length; i++) {
+                var overview = allOverviews[i];
+                overviewData.push(plot);
+            }
 
             count++;
     
@@ -476,6 +486,7 @@
     }
 
     initBindings();
+
     function fetchData(id, branchid, platformid) {
         $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
             data = convertData(id,branchid,platformid,data);
@@ -487,6 +498,7 @@
             initData(id, branchid, platformid, data);
             updatePlot();
             addSeries(id, branchid, platformid);
+            initBindings();
         });
     }
 
