@@ -325,6 +325,7 @@ a:hover {
 #add-data-branches {
 	float: left;
 	width: 180px;
+        height: 400px;
 }
 #add-data-tests {
 	float: left;
