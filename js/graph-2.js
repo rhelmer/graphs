@@ -54,6 +54,7 @@
     
     
     var plot, overview, ajaxSeries;
+    var allSeries = [];
     var selStart, selEnd;
 
     function init()
@@ -156,6 +157,7 @@
         ajaxSeries = data;
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
+        allSeries.push(ajaxSeries);
     }
     
     function initBindings()
@@ -174,20 +176,26 @@
 
     function updatePlot()
     {
-        var plotData = parseSeries(ajaxSeries, 0, 3, 1),
-            overviewData = parseSeries(ajaxSeries, 0, 1, .5);
-
-        var minV = ajaxSeries.minV,
-            maxV = ajaxSeries.maxV,
-            marginV = 0.1 * (maxV - minV),
-            minT = selStart || ajaxSeries.minT,
-            maxT = selEnd || ajaxSeries.maxT;
-
-        var xaxis = { xaxis: { min: minT, max: maxT } },
-            yaxis = { yaxis: { min: minV-marginV, max: maxV+marginV } },
+        var plotData = [];
+        var overviewData = [];
+        var plotOptions, overviewOptions;
+        $.each(allSeries, function(index, series) {
+            plotData.push(parseSeries(series, index, 3, 1)[0]);
+            overviewData.push(parseSeries(series, index, 1, .5)[0]);
+    
+            // FIXME need to adjust the scale for all series, not just the last
+            var minV = series.minV,
+                maxV = series.maxV,
+                marginV = 0.1 * (maxV - minV),
+                minT = selStart || series.minT,
+                maxT = selEnd || series.maxT;
+    
+            var xaxis = { xaxis: { min: minT, max: maxT } },
+                yaxis = { yaxis: { min: minV-marginV, max: maxV+marginV } };
             plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
             overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS, yaxis);
-        
+            
+        });
         plot = $.plot($('#plot'), plotData, plotOptions);
         overview = $.plot($('#overview'), overviewData, overviewOptions);
     }
@@ -309,6 +317,7 @@
         return $.map(datasets, function(d) {
             return {
                 lines: { lineWidth: lineWidth },
+                label: color,
                 color: color,
                 data: $.map(d.data, function(p) { return [[ p.t, p.v ]]; }),
                 etc: {
