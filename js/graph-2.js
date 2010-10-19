@@ -209,7 +209,7 @@
             var allOverviews = parseSeries(series, count, 1, .5);
             for (var i=0; i < allOverviews.length; i++) {
                 var overview = allOverviews[i];
-                overviewData.push(plot);
+                overviewData.push(overview);
             }
 
             count++;
