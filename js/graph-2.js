@@ -172,10 +172,10 @@
         $(window).resize(onResize);
     }
 
-    function updatePlot(index)
+    function updatePlot()
     {
-        var plotData = parseSeries(ajaxSeries, index, 3, 1),
-            overviewData = parseSeries(ajaxSeries, index, 1, .5);
+        var plotData = parseSeries(ajaxSeries, 0, 3, 1),
+            overviewData = parseSeries(ajaxSeries, 0, 1, .5);
 
         var minV = ajaxSeries.minV,
             maxV = ajaxSeries.maxV,
