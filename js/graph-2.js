@@ -168,7 +168,9 @@
         $('#overview').bind('plotselected', onOverviewSelect);
         $('#overview').bind('plotunselected', onOverviewUnselect);
 
+        $('.explode, .implode').unbind();
         $('.explode, .implode').click(onExplode);
+        $('.show, .hide').unbind();
         $('.show, .hide').click(onShow);
         $('.remove').click(onRemove);
         
