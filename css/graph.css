@@ -322,10 +322,12 @@ a:hover {
 	z-index:1;  
 }  
 
+#add-data-form select {
+	height:300px; 
+}
 #add-data-branches {
 	float: left;
 	width: 180px;
-        height: 400px;
 }
 #add-data-tests {
 	float: left;
