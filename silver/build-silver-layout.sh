@@ -21,7 +21,7 @@ fi
 $SILVER init $DIR
 if [ ! -e src/graphs/.hg ] ; then
     cd $DIR/src
-    hg clone ssh://hg.mozilla.org/users/ibicking_mozilla.com/graphs graphs
+    hg clone -r 1.0 ssh://hg.mozilla.org/users/ibicking_mozilla.com/graphs graphs
     cd ..
 fi
 if [ ! -e src/webtestrecorder/.hg ] ; then
