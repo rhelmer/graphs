@@ -16,7 +16,7 @@
 
 <div id="toolbar">
     <div class="group">
-        <span class="button selectBox" title="Time range to display">
+        <span id="displayrange" class="button selectBox disabled" title="Time range to display">
             <select>
                 <option>Last 7 days</option>
                 <option>Last 30 days</option>
@@ -24,7 +24,7 @@
                 <option>Last 365 days</option>
             </select>
         </span><!--
-        --><span class="button selectBox" title="Type of data to display">
+        --><span id="datatype" class="button selectBox disabled" title="Type of data to display">
             <select>
                 <option>Running time</option>
                 <option>Time delta</option>
@@ -34,18 +34,18 @@
     </div>
 
     <div class="group">
-        <a class="button disabled" href="#" title="Zoom in on the selected range">Zoom In</a><!--
-        --><a class="button disabled" href="#" title="Zoom out from the selected range">Zoom Out</a>
+        <a id="zoomin" class="button disabled" href="#" title="Zoom in on the selected range">Zoom In</a><!--
+        --><a id="zoomout" class="button disabled" href="#" title="Zoom out from the selected range">Zoom Out</a>
     </div>
 
     <div class="group">
-        <a class="button disabled" href="#">Show Changesets</a><!--
-        --><a class="button disabled" href="#">Export CSV</a>
+        <a id="showchangesets" class="button disabled" href="#">Show Changesets</a><!--
+        --><a id="exportcsv" class="button disabled" href="#">Export CSV</a>
     </div>
 
     <div class="group">
-        <a class="button disabled" href="#">Link</a><!--
-        --><a class="button disabled" href="#">Embed</a>
+        <a id="link" class="button disabled" href="#">Link</a><!--
+        --><a id="embed" class="button disabled" href="#">Embed</a>
     </div>
 </div>
 
