@@ -433,7 +433,8 @@
         $('#tt-series2').html( platform + ' (' + machine + ')' );
         $('#tt-v').html( parseInt(v) + ' ms' );
         $('#tt-dv').html( '&Delta; ' + dv.toFixed(0) + ' ms (' + (100*dvp).toFixed(1) + '%)' );
-        $('#tt-cset').html( changeset ).attr( 'href', '#'+changeset );
+        // FIXME need a map of branches to mercurial repos...
+        $('#tt-cset').html( changeset ).attr( 'href', 'http://hg.mozilla.org/mozilla-central/rev/'+changeset );
         $('#tt-t').html( $.plot.formatDate(new Date(t), '%b %d, %y %H:%M') );
         
         plot.unhighlight();
