@@ -86,7 +86,6 @@
     function convertData(testid,branchid,platformid,data)
     {
         var testName = manifest.testMap[testid].name;
-        console.log(testName);
         var branchName = manifest.branchMap[branchid].name;
         var platformName = manifest.platformMap[platformid].name;
 
