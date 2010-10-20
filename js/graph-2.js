@@ -112,6 +112,7 @@
 
         //gdata.minT = data["date_range"][0] * 1000;
         //gdata.maxT = data["date_range"][1] * 1000;
+        // FIXME hardcoded 90 days
         gdata.minT = new Date() - (DAY * 90);
         gdata.maxT = new Date();
         gdata.minV = data["min"];
