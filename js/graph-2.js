@@ -83,8 +83,13 @@
 
     // convert graphserver JSON to something flottable
     // FIXME perhaps graphserver should send us data in this format instead    
-    function convertData(testName,branchName,platformName,data)
+    function convertData(testid,branchid,platformid,data)
     {
+        var testName = manifest.testMap[testid].name;
+        console.log(testName);
+        var branchName = manifest.branchMap[branchid].name;
+        var platformName = manifest.platformMap[platformid].name;
+
         var gdata =
         {
             "branch": branchName,
@@ -138,8 +143,9 @@
 
         for (var machineid in machine_runs)
         {
+            var machineName = manifest.machineMap[machineid].name;
             gdata.runs.push({
-                "machine": machineid,
+                "machine": machineName,
                 "data": machine_runs[machineid]
             });
         }
@@ -586,13 +592,10 @@
     }
 
     function addSeries(testid, branchid, platformid) {
-	var testName, branchName, platformName;
         var uniqueSeries = "series_"+testid+"_"+branchid+"_"+platformid;
-        if (manifest) {
-            testName = manifest.testMap[testid].name;
-            branchName = manifest.branchMap[branchid].name;
-            platformName = manifest.platformMap[platformid].name;
-        }
+        var testName = manifest.testMap[testid].name;
+        var branchName = manifest.branchMap[branchid].name;
+        var platformName = manifest.platformMap[platformid].name;
         var color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
         $("#legend").append('<li id="'+uniqueSeries+'">');
         $('#'+uniqueSeries+'').append('<em style="background-color: '+color+';"></em>');
