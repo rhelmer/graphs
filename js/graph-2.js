@@ -20,6 +20,8 @@
     var LIGHT_COLORS = $.map(COLORS, function(color) {
         return $.color.parse(color).add('a', -.5).toString();
     });
+ 
+    var DAY = 86400000;
 
     var PLOT_OPTIONS = {
         xaxis: { mode: "time" },
@@ -80,7 +82,6 @@
         }
     }
 
-
     // convert graphserver JSON to something flottable
     // FIXME perhaps graphserver should send us data in this format instead    
     function convertData(testid,branchid,platformid,data)
@@ -108,8 +109,11 @@
 
         var test_runs = data["test_runs"];
         var averages = data["averages"];
-        gdata.minT= data["date_range"][0] * 1000;
-        gdata.maxT = data["date_range"][1] * 1000;
+
+        //gdata.minT = data["date_range"][0] * 1000;
+        //gdata.maxT = data["date_range"][1] * 1000;
+        gdata.minT = new Date() - (DAY * 90);
+        gdata.maxT = new Date();
         gdata.minV = data["min"];
         gdata.maxV = data["max"];
 
@@ -170,7 +174,7 @@
         }
     }
     
-    function initBindings()
+    function updateBindings()
     {
         $('#plot').bind('plothover', onPlotHover);
         $('#plot').bind('plotclick', onPlotClick);
@@ -187,6 +191,24 @@
         $('.add-data, select').unbind();
         $('.add-data, #branches').change(onAddBranches);
         $('.add-data, #tests').click(onAddTests);
+
+        $('#showchangesets').unbind();
+        $('#showchangesets').click(onShowChangesets);
+
+        $('#exportcsv').unbind();
+        $('#exportcsv').click(onExportCSV);
+
+        $('#link').unbind();
+        $('#link').click(onLink);
+
+        $('#embed').unbind();
+        $('#embed').click(onEmbed);
+
+        $('#onzoomin').unbind();
+        $('#onzoomin').click(onZoomIn);
+
+        $('#zoomout').unbind();
+        $('#zoomout').click(onZoomOut);
         
         $(window).resize(onResize);
     }
@@ -266,6 +288,11 @@
         allSeries[id] = {};
         $("#"+id).remove();
 
+        $("#displayrange").toggleClass('disabled', true);
+        $("#datatype").toggleClass('disabled', true);
+        $("#link").toggleClass('disabled', true);
+        $("#embed").toggleClass('disabled', true);
+
         unlockTooltip();
         hideTooltip();
         updatePlot();
@@ -297,6 +324,39 @@
                 $(this).attr("disabled","");
             }
         });
+    }
+
+    function onShowChangesets(e)
+    {
+        var startDate = new Date(selStart);
+        var endDate = new Date(selEnd);
+        window.open("http://hg.mozilla.org/mozilla-central/pushloghtml?startdate="+startDate+"&enddate="+endDate);
+        e.preventDefault();
+    }
+
+    function onExportCSV(e)
+    {
+        e.preventDefault();
+    }
+
+    function onLink(e)
+    {
+        e.preventDefault();
+    }
+
+    function onEmbed(e)
+    {
+        e.preventDefault();
+    }
+
+    function onZoomIn(e)
+    {
+        e.preventDefault();
+    }
+
+    function onZoomOut(e)
+    {
+        e.preventDefault();
     }
 
     var prevSeriesIndex = -1,
@@ -342,6 +402,10 @@
         hideTooltip(true);
         updatePlot();
         
+        $("#showchangesets").toggleClass('disabled', false);
+        $("#zoomout").toggleClass('disabled', false);
+        $("#exportcsv").toggleClass('disabled', false);
+
         plot.clearSelection(true);
         overview.setSelection(ranges, true);
     }
@@ -491,38 +555,41 @@
         if(typeof(console) !== 'undefined' && console != null) console.log(JSON.stringify(message));
     }
 
-    initBindings();
+    updateBindings();
 
     function fetchData(id, branchid, platformid) {
         // FIXME should not need to block downloading the manifest
         // or if we do, should not repeat so much here
         if (manifest) {
             $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+                // FIXME need loading notification
                 data = convertData(id,branchid,platformid,data);
                 if (!data) {
-                    // FIXME need loading and error notification
+                    // FIXME need error notification
                     // alert("Could not load data");
                     return false;
                 }
                 initData(id, branchid, platformid, data);
                 updatePlot();
                 addSeries(id, branchid, platformid);
-                initBindings();
+
+                updateBindings();
             });
         } else {
             $.getJSON('http://graphs-stage.testing/api/test', {attribute: 'short'}, function(data, status, xhr) {
                 manifest = data;
                 $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+		    // FIXME need loading notification
                     data = convertData(id,branchid,platformid,data);
                     if (!data) {
-                        // FIXME need loading and error notification
+                        // FIXME need error notification
                         // alert("Could not load data");
                         return false;
                     }
                     initData(id, branchid, platformid, data);
                     updatePlot();
                     addSeries(id, branchid, platformid);
-                    initBindings();
+                    updateBindings();
                 });
             });
         }
@@ -608,6 +675,11 @@
         $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="explode" href="#" title="Explode this series"></a>');
         $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="implode" href="#" title="Implode this series"></a>');
         $('#'+uniqueSeries+'').append('</li>');
+
+        $("#displayrange").toggleClass('disabled', false);
+        $("#datatype").toggleClass('disabled', false);
+        $("#link").toggleClass('disabled', false);
+        $("#embed").toggleClass('disabled', false);
     }
 
     $(init);
