@@ -57,7 +57,7 @@
     var allSeries = {};
     var selStart, selEnd;
 
-    var menuData;
+    var manifest;
 
     function init()
     {
@@ -275,7 +275,7 @@
             $(this).attr("disabled","disabled");
         });
         $.each($("#tests option"), function(index, option) {
-            if (option.value in menuData.branchMap[value].test) {
+            if (option.value in manifest.branchMap[value].test) {
                 $(this).attr("disabled","");
             }
         });
@@ -288,7 +288,7 @@
             $(this).attr("disabled","disabled");
         });
         $.each($("#platforms option"), function(index, option) {
-            if (value in menuData.platformMap[option.value].test) {
+            if (value in manifest.platformMap[option.value].test) {
                 $(this).attr("disabled","");
             }
         });
@@ -488,25 +488,43 @@
     initBindings();
 
     function fetchData(id, branchid, platformid) {
-        $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-            data = convertData(id,branchid,platformid,data);
-            if (!data) {
-                // FIXME need nicer notification system
-                alert("Could not load data");
-                return false;
-            }
-            initData(id, branchid, platformid, data);
-            updatePlot();
-            addSeries(id, branchid, platformid);
-            initBindings();
-        });
+        // FIXME should not need to block downloading the manifest
+        // or if we do, should not repeat so much here
+        if (manifest) {
+            $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+                data = convertData(id,branchid,platformid,data);
+                if (!data) {
+                    // FIXME need loading and error notification
+                    // alert("Could not load data");
+                    return false;
+                }
+                initData(id, branchid, platformid, data);
+                updatePlot();
+                addSeries(id, branchid, platformid);
+                initBindings();
+            });
+        } else {
+            $.getJSON('http://graphs-stage.testing/api/test', {attribute: 'short'}, function(data, status, xhr) {
+                manifest = data;
+                $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+                    data = convertData(id,branchid,platformid,data);
+                    if (!data) {
+                        // FIXME need loading and error notification
+                        // alert("Could not load data");
+                        return false;
+                    }
+                    initData(id, branchid, platformid, data);
+                    updatePlot();
+                    addSeries(id, branchid, platformid);
+                    initBindings();
+                });
+            });
+        }
     }
 
     function addDataPopup()
     {
-        $.getJSON('http://graphs-stage.testing/api/test',{attribute:'short'}, function(data, status, xhr) {
-            buildMenu(data);
-        });
+        buildMenu(manifest);
     
         $("#backgroundPopup").css({
             "opacity": "0.7"
@@ -553,7 +571,6 @@
     });
     
     function buildMenu(data) {
-        menuData = data;
         for (var index in data.branchMap) {
             var value = data.branchMap[index];
             $("#branches").append('<option name="'+value.name+'" value="'+index+'">'+value.name+'</option>');
@@ -568,12 +585,14 @@
         }
     }
 
-    function addSeries(testId, branchId, platformId) {
-        // FIXME need to look these up to names
-        var testName = testId;
-        var branchName = branchId;
-        var platformName = platformId;
-        var uniqueSeries = "series_"+testName+"_"+branchName+"_"+platformName;
+    function addSeries(testid, branchid, platformid) {
+	var testName, branchName, platformName;
+        var uniqueSeries = "series_"+testid+"_"+branchid+"_"+platformid;
+        if (manifest) {
+            testName = manifest.testMap[testid].name;
+            branchName = manifest.branchMap[branchid].name;
+            platformName = manifest.platformMap[platformid].name;
+        }
         var color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
         $("#legend").append('<li id="'+uniqueSeries+'">');
         $('#'+uniqueSeries+'').append('<em style="background-color: '+color+';"></em>');
