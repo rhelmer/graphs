@@ -170,9 +170,7 @@
         ajaxSeries = data;
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
-        if (!allSeries[uniqueSeries]) {
-            allSeries[uniqueSeries] = ajaxSeries;
-        }
+        allSeries[uniqueSeries] = ajaxSeries;
     }
     
     function updateBindings()
@@ -598,7 +596,13 @@
 
     function addDataPopup()
     {
-        buildMenu(manifest);
+        if (!manifest)
+        {
+            $.getJSON('http://graphs-stage.testing/api/test', {attribute: 'short'}, function(data, status, xhr) {
+                manifest = data;
+                buildMenu(manifest);
+            });
+        }
     
         $("#backgroundPopup").css({
             "opacity": "0.7"
