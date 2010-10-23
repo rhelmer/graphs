@@ -73,11 +73,11 @@
             for (var i=0; i < testruns.length; i++)
             {
                 var run = testruns[i];
-                var id = run[0];
+                var testid = run[0];
                 var branchid = run[1];
                 var platformid = run[2];
                 
-                fetchData(id, branchid, platformid);
+                fetchData(testid, branchid, platformid);
             }
         }
     }
@@ -164,9 +164,9 @@
         overview = $.plot($('#overview'), [ ], OVERVIEW_OPTIONS);
     }
     
-    function initData(id,branchid,platformid,data)
+    function initData(testid,branchid,platformid,data)
     {
-        var uniqueSeries = "series_"+id+"_"+branchid+"_"+platformid;
+        var uniqueSeries = "series_"+testid+"_"+branchid+"_"+platformid;
         ajaxSeries = data;
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
@@ -556,38 +556,45 @@
 
     updateBindings();
 
-    function fetchData(id, branchid, platformid) {
+    function fetchData(testid, branchid, platformid) {
         // FIXME should not need to block downloading the manifest
         // or if we do, should not repeat so much here
+        var uniqueSeries = "series_"+testid+"_"+branchid+"_"+platformid;
+        if (allSeries.hasOwnProperty(uniqueSeries)) {
+            if (!$.isEmptyObject(allSeries[uniqueSeries])) {
+                // already have this loaded, don't bother
+                return false;
+            }
+        }
         if (manifest) {
-            $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+            $.getJSON('http://graphs-stage.testing/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
                 // FIXME need loading notification
-                data = convertData(id,branchid,platformid,data);
+                data = convertData(testid,branchid,platformid,data);
                 if (!data) {
                     // FIXME need error notification
                     // alert("Could not load data");
                     return false;
                 }
-                initData(id, branchid, platformid, data);
+                initData(testid, branchid, platformid, data);
                 updatePlot();
-                addSeries(id, branchid, platformid);
+                addSeries(testid, branchid, platformid);
 
                 updateBindings();
             });
         } else {
             $.getJSON('http://graphs-stage.testing/api/test', {attribute: 'short'}, function(data, status, xhr) {
                 manifest = data;
-                $.getJSON('http://graphs-stage.testing/api/test/runs', {id:id, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+                $.getJSON('http://graphs-stage.testing/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
 		    // FIXME need loading notification
-                    data = convertData(id,branchid,platformid,data);
+                    data = convertData(testid,branchid,platformid,data);
                     if (!data) {
                         // FIXME need error notification
                         // alert("Could not load data");
                         return false;
                     }
-                    initData(id, branchid, platformid, data);
+                    initData(testid, branchid, platformid, data);
                     updatePlot();
-                    addSeries(id, branchid, platformid);
+                    addSeries(testid, branchid, platformid);
                     updateBindings();
                 });
             });
