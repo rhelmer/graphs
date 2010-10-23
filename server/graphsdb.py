@@ -28,6 +28,9 @@ class RetryConnection(object):
     def _reconnect(self):
         self._db = MySQLdb.connect(**self._kw)
 
+    def cursor(self, *args, **kw):
+        return RetryCursor(self, *args, **kw)
+
     def __getattr__(self, attr):
         def repl(*args, **kw):
             tries = 0
@@ -41,6 +44,39 @@ class RetryConnection(object):
                         if tries >= self._retries:
                             raise
                         self._reconnect()
+                    else:
+                        raise
         return repl
 
 db = RetryConnection(**kw)
+
+
+class RetryCursor(object):
+
+    def __init__(self, conn, *args, **kw):
+        self._args = args
+        self._kw = kw
+        self._connection = conn
+        self._connect_cursor()
+
+    def _connect_cursor(self, reconnect=False):
+        if reconnect:
+            self._connection._reconnect()
+        self._cursor = self._connection._db.cursor(*self._args, **self._kw)
+
+    def execute(self, *args, **kw):
+        tries = 0
+        while 1:
+            try:
+                return self._cursor.execute(*args, **kw)
+            except MySQLdb.OperationalError, e:
+                if e.args[0] == 2006:
+                    tries += 1
+                    if tries >= self._connection._retries:
+                        raise
+                    self._connect_cursor(True)
+                else:
+                    raise
+
+    def __getattr__(self, attr):
+        return getattr(self._cursor, attr)
