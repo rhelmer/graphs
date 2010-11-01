@@ -110,11 +110,11 @@
         var test_runs = data["test_runs"];
         var averages = data["averages"];
 
-        //gdata.minT = data["date_range"][0] * 1000;
-        //gdata.maxT = data["date_range"][1] * 1000;
-        // FIXME hardcoded 90 days
-        gdata.minT = new Date() - (DAY * 90);
-        gdata.maxT = new Date();
+        gdata.minT = data["date_range"][0] * 1000;
+        gdata.maxT = data["date_range"][1] * 1000;
+        // FIXME add date range support, here is a hardcoded 90 days example
+        // gdata.minT = new Date() - (DAY * 90);
+        // gdata.maxT = new Date();
         gdata.minV = data["min"];
         gdata.maxV = data["max"];
 
