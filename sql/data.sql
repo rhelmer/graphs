@@ -1062,6 +1062,17 @@ insert into machines values (NULL,16,0,0.5,"n900-090",1,unix_timestamp());
 insert into machines values (NULL,20,0,1.0,"tegra-001",1,unix_timestamp());
 insert into machines values (NULL,20,0,1.0,"tegra-002",1,unix_timestamp());
 insert into machines values (NULL,20,0,1.0,"tegra-003",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-004",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-005",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-006",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-007",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-008",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-009",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-010",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-011",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-012",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-013",1,unix_timestamp());
+insert into machines values (NULL,20,0,1.0,"tegra-014",1,unix_timestamp());
 
 insert into pagesets values (NULL,"Tp December, 2006 (393 pages)");
 insert into pagesets values (NULL,"Tp November, 2000 (40 pages)");
