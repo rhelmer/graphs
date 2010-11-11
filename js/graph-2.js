@@ -567,7 +567,7 @@
             }
         }
         if (manifest) {
-            $.getJSON('http://graphs-stage.testing/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+            $.getJSON('/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
                 // FIXME need loading notification
                 data = convertData(testid,branchid,platformid,data);
                 if (!data) {
@@ -582,9 +582,9 @@
                 updateBindings();
             });
         } else {
-            $.getJSON('http://graphs-stage.testing/api/test', {attribute: 'short'}, function(data, status, xhr) {
+            $.getJSON('/api/test', {attribute: 'short'}, function(data, status, xhr) {
                 manifest = data;
-                $.getJSON('http://graphs-stage.testing/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
+                $.getJSON('/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
 		    // FIXME need loading notification
                     data = convertData(testid,branchid,platformid,data);
                     if (!data) {
@@ -605,7 +605,7 @@
     {
         if (!manifest)
         {
-            $.getJSON('http://graphs-stage.testing/api/test', {attribute: 'short'}, function(data, status, xhr) {
+            $.getJSON('/api/test', {attribute: 'short'}, function(data, status, xhr) {
                 manifest = data;
                 buildMenu(manifest);
             });
