@@ -110,11 +110,11 @@
         var test_runs = data["test_runs"];
         var averages = data["averages"];
 
-        gdata.minT = data["date_range"][0] * 1000;
-        gdata.maxT = data["date_range"][1] * 1000;
+        //gdata.minT = data["date_range"][0] * 1000;
+        //gdata.maxT = data["date_range"][1] * 1000;
         // FIXME add date range support, here is a hardcoded 90 days example
-        // gdata.minT = new Date() - (DAY * 90);
-        // gdata.maxT = new Date();
+        gdata.minT = new Date() - (DAY * 90);
+        gdata.maxT = new Date();
         gdata.minV = data["min"];
         gdata.maxV = data["max"];
 
@@ -248,8 +248,10 @@
     
             var xaxis = { xaxis: { min: minT, max: maxT } },
                 yaxis = { yaxis: { min: minV-marginV, max: maxV+marginV } };
+            // FIXME add date range support, here is a hardcoded 90 days example
+            var overview_xaxis = { xaxis: { min: new Date() - (DAY * 90), max: new Date() } };
             plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
-            overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS, yaxis);
+            overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS, overview_xaxis, yaxis);
         });
         plot = $.plot($('#plot'), plotData, plotOptions);
         overview = $.plot($('#overview'), overviewData, overviewOptions);
@@ -560,6 +562,7 @@
         // FIXME should not need to block downloading the manifest
         // or if we do, should not repeat so much here
         var uniqueSeries = "series_"+testid+"_"+branchid+"_"+platformid;
+        var addSeriesNode = addSeries(testid, branchid, platformid, false);
         if (allSeries.hasOwnProperty(uniqueSeries)) {
             if (!$.isEmptyObject(allSeries[uniqueSeries])) {
                 // already have this loaded, don't bother
@@ -577,7 +580,7 @@
                 }
                 initData(testid, branchid, platformid, data);
                 updatePlot();
-                addSeries(testid, branchid, platformid);
+                addSeries(testid, branchid, platformid, addSeriesNode);
 
                 updateBindings();
             });
@@ -594,7 +597,7 @@
                     }
                     initData(testid, branchid, platformid, data);
                     updatePlot();
-                    addSeries(testid, branchid, platformid);
+                    addSeries(testid, branchid, platformid, addSeriesNode);
                     updateBindings();
                 });
             });
