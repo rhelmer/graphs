@@ -573,7 +573,7 @@
             $.getJSON('/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
                 data = convertData(testid,branchid,platformid,data);
                 if (!data) {
-                    // FIXME need error notification
+                    error("Could not convert data");
                     return false;
                 }
                 initData(testid, branchid, platformid, data);
@@ -583,10 +583,9 @@
                 updateBindings();
             });
         } else {
-            // FIXME hook up error notification
             $.ajaxSetup({
                 "error": function(xhr,e, exception){
-                    console.log("error", exception);
+                    error(e);
                 }
             });
             $.getJSON('/api/test', { attribute: 'short'}, function(data, status, xhr) {
@@ -595,7 +594,7 @@
                 $.getJSON('/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
                     data = convertData(testid,branchid,platformid,data);
                     if (!data) {
-                        // FIXME need error notification
+                        error("Could not convert data");
                         return false;
                     }
                     initData(testid, branchid, platformid, data);
@@ -710,6 +709,31 @@
         return node;
     }
 
-    $(init);
+function error(message) {
+  $('#errors').hide().css({ opacity: 1 });
+  $('#errors').append('<div class="error">' +
+                      '<h3>Error</h3>' +
+                      '<p>'+message+'</p>' +
+                      '<a class="close" href="#" title="Close"></a>' +
+                      '</div>');
+
+  $('#errors').show();
+
+$('#errors .error .close').click(function() {
+  $(this).closest('.error').animate({ opacity: 0 }, 250).animate({ height: 'hide' }, 250);
+  return false;
+});
+
+
+  var delay = 0;
+  $('#errors .error').each(function() {
+    $(this).delay(delay).animate({ opacity: 'show' }, 500);
+    delay += 500;
+  });
+    
+  return false;
+}
+  
+$(init);
 
 })(jQuery);
