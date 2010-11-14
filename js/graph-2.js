@@ -68,18 +68,22 @@
 
         initPlot();
 
-        var args = window.location.hash.split('=')[1];
-        if (args) {
-            var testruns = JSON.parse(args);
-            for (var i = 0; i < testruns.length; i++)
-            {
-                var run = testruns[i];
-                var testid = run[0];
-                var branchid = run[1];
-                var platformid = run[2];
+        try {
+          var args = window.location.hash.split('=')[1];
+          if (args) {
+              var testruns = JSON.parse(args);
+              for (var i = 0; i < testruns.length; i++)
+              {
+                  var run = testruns[i];
+                  var testid = run[0];
+                  var branchid = run[1];
+                  var platformid = run[2];
 
-                fetchData(testid, branchid, platformid);
-            }
+                  fetchData(testid, branchid, platformid);
+              }
+          }
+        } catch (e) {
+            error('Could not understand URL', e);
         }
     }
 
@@ -343,6 +347,10 @@
 
     function onExportCSV(e)
     {
+        var url = 'http://graphs.mozilla.org/server/dumpdata.cgi';
+        // FIXME use correct string
+        // FIXME Also, fix server!
+        window.open(url + '?show=22-24-495,22-24-651,22-24-654');
         e.preventDefault();
     }
 
@@ -412,8 +420,6 @@
         updatePlot();
 
         $('#showchangesets').toggleClass('disabled', false);
-        $('#zoomout').toggleClass('disabled', false);
-        $('#exportcsv').toggleClass('disabled', false);
 
         plot.clearSelection(true);
         overview.setSelection(ranges, true);
@@ -575,7 +581,7 @@
 
     function fetchData(testid, branchid, platformid) {
         // FIXME should not need to block downloading the manifest
-        // or if we do, should not repeat so much here
+        // FIXME or if we do, should not repeat so much here
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
         if (allSeries.hasOwnProperty(uniqueSeries)) {
@@ -586,43 +592,61 @@
         }
         if (manifest) {
             var addSeriesNode = addSeries(testid, branchid, platformid, false);
+            $.ajaxSetup({
+              'error': function(xhr, e, message) {
+                error('Could not download test run data from server', e);
+              }
+            });
             $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
                                          platformid: platformid},
-              function(data, status, xhr) {
-                data = convertData(testid, branchid, platformid, data);
-                if (!data) {
-                    error('Could not convert data');
-                    return false;
-                }
-                initData(testid, branchid, platformid, data);
-                updatePlot();
-                addSeries(testid, branchid, platformid, addSeriesNode);
+                      function(data) {
+                try {
+                  data = convertData(testid, branchid, platformid, data);
+                  if (!data) {
+                      error('Could not import test run data', false, data);
+                      return false;
+                  }
+                  initData(testid, branchid, platformid, data);
+                  updatePlot();
+                  addSeries(testid, branchid, platformid, addSeriesNode);
 
-                updateBindings();
-            }
-          );
-        } else {
-            $.ajaxSetup({
-                'error': function(xhr, e, exception) {
-                    error(e);
+                  updateBindings();
+                } catch (e) {
+                  error('Could not load data series', e);
                 }
             });
+        } else {
+            $.ajaxSetup({
+              'error': function(xhr, e, message) {
+                error('Could not download manifest data from server', e);
+              }
+            });
             $.getJSON('/api/test', { attribute: 'short'},
-                                     function(data, status, xhr) {
+                                     function(data) {
                 manifest = data;
-                var addSeriesNode = addSeries(testid, branchid, platformid,
-                                              false);
+                var addSeriesNode;
+                try {
+                  addSeriesNode = addSeries(testid, branchid, platformid,
+                                            false);
+                } catch (e) {
+                  error('Could not find data series in manifest', e);
+                  return false;
+                }
                 $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
-                          platformid: platformid}, function(data, status, xhr) {
+                          platformid: platformid}, function(data) {
+                  try {
                     data = convertData(testid, branchid, platformid, data);
                     if (!data) {
-                        error('Could not convert data');
+                        error('Could not import test run data', e);
                         return false;
                     }
                     initData(testid, branchid, platformid, data);
                     updatePlot();
                     addSeries(testid, branchid, platformid, addSeriesNode);
                     updateBindings();
+                  } catch (e) {
+                    error('Could not load data series', e);
+                  }
                 });
             });
         }
@@ -633,7 +657,7 @@
         if (!manifest)
         {
             $.getJSON('/api/test', {attribute: 'short'},
-                      function(data, status, xhr) {
+                      function(data) {
                 manifest = data;
                 buildMenu(manifest);
             });
@@ -677,7 +701,7 @@
         event.preventDefault();
         disableAddDataPopup();
         // FIXME need to collect all of these not just first,
-        // as this is a multiple-select form
+        // FIXME as this is a multiple-select form
         var branch = $('#branches').val()[0];
         var test = $('#tests').val()[0];
         var platform = $('#platforms').val()[0];
@@ -740,17 +764,20 @@
         $('#datatype').toggleClass('disabled', false);
         $('#link').toggleClass('disabled', false);
         $('#embed').toggleClass('disabled', false);
+        $('#zoomin').toggleClass('disabled', false);
+        $('#exportcsv').toggleClass('disabled', false);
 
         return node;
     }
 
-function error(message) {
+function error(message, e, data) {
   $('#errors').hide().css({ opacity: 1 });
-  $('#errors').append('<div class="error">');
-  $('#errors').append('<h3>Error</h3>');
-  $('#errors').append('<p>' + message + '</p>');
-  $('#errors').append('<a class="close" href="#" title="Close"></a>');
-  $('#errors').append('</div>');
+  $('#errors').append('<div class="error">' +
+                      '<h3>Error</h3>' +
+                      '<p>' + message + '</p>' +
+                      '<p>Exception: ' + e.name + '</p>' +
+                      '<a class="close" href="#" title="Close"></a>' +
+                      '</div>');
 
   $('#errors').show();
 
