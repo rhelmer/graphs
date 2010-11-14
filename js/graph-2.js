@@ -61,6 +61,7 @@
     var selStart, selEnd;
 
     var manifest;
+    var menu;
 
     function init()
     {
@@ -654,13 +655,21 @@
 
     function addDataPopup()
     {
-        if (!manifest)
-        {
+        if (!manifest) {
+            $.ajaxSetup({
+              'error': function(xhr, e, message) {
+                error('Could not download manifest data from server', e);
+              }
+            });
             $.getJSON('/api/test', {attribute: 'short'},
                       function(data) {
                 manifest = data;
-                buildMenu(manifest);
+                menu = buildMenu(manifest);
             });
+        } else {
+          if (!menu) {
+            menu = buildMenu(manifest);
+          }
         }
 
         $('#backgroundPopup').css({
@@ -725,6 +734,8 @@
             $('#platforms').append('<option value="' + index + '" disabled>' +
                                    value.name + '</option>');
         }
+
+        return true;
     }
 
     function addSeries(testid, branchid, platformid, node) {
