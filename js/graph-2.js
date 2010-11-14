@@ -562,7 +562,6 @@
         // FIXME should not need to block downloading the manifest
         // or if we do, should not repeat so much here
         var uniqueSeries = "series_"+testid+"_"+branchid+"_"+platformid;
-        var addSeriesNode = addSeries(testid, branchid, platformid, false);
         if (allSeries.hasOwnProperty(uniqueSeries)) {
             if (!$.isEmptyObject(allSeries[uniqueSeries])) {
                 // already have this loaded, don't bother
@@ -570,12 +569,11 @@
             }
         }
         if (manifest) {
+            var addSeriesNode = addSeries(testid, branchid, platformid, false);
             $.getJSON('/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-                // FIXME need loading notification
                 data = convertData(testid,branchid,platformid,data);
                 if (!data) {
                     // FIXME need error notification
-                    // alert("Could not load data");
                     return false;
                 }
                 initData(testid, branchid, platformid, data);
@@ -585,14 +583,19 @@
                 updateBindings();
             });
         } else {
-            $.getJSON('/api/test', {attribute: 'short'}, function(data, status, xhr) {
+            // FIXME hook up error notification
+            $.ajaxSetup({
+                "error": function(xhr,e, exception){
+                    console.log("error", exception);
+                }
+            });
+            $.getJSON('/api/test', { attribute: 'short'}, function(data, status, xhr) {
                 manifest = data;
+                var addSeriesNode = addSeries(testid, branchid, platformid, false);
                 $.getJSON('/api/test/runs', {id:testid, branchid:branchid, platformid: platformid}, function(data, status, xhr) {
-		    // FIXME need loading notification
                     data = convertData(testid,branchid,platformid,data);
                     if (!data) {
                         // FIXME need error notification
-                        // alert("Could not load data");
                         return false;
                     }
                     initData(testid, branchid, platformid, data);
@@ -673,28 +676,38 @@
         }
     }
 
-    function addSeries(testid, branchid, platformid) {
+    function addSeries(testid, branchid, platformid, node) {
         var uniqueSeries = "series_"+testid+"_"+branchid+"_"+platformid;
         var testName = manifest.testMap[testid].name;
         var branchName = manifest.branchMap[branchid].name;
         var platformName = manifest.platformMap[platformid].name;
-        var color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
-        $("#legend").append('<li id="'+uniqueSeries+'">');
-        $('#'+uniqueSeries+'').append('<em style="background-color: '+color+';"></em>');
-        $('#'+uniqueSeries+'').append('<strong>'+testName+'</strong>');
-        $('#'+uniqueSeries+'').append('<span>'+branchName+'</span>');
-        $('#'+uniqueSeries+'').append('<span>'+platformName+'</span>');
-        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="remove" href="#" title="Remove this series"></a>');
-        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="show" href="#" title="Show this series"></a>');
-        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="hide" href="#" title="Hide this series"></a>');
-        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="explode" href="#" title="Explode this series"></a>');
-        $('#'+uniqueSeries+'').append('<a id="'+uniqueSeries+'" class="implode" href="#" title="Implode this series"></a>');
-        $('#'+uniqueSeries+'').append('</li>');
+        var color = 0;
+        if (!node) {
+          $("#legend").append('<li id="'+uniqueSeries+'">');
+          node = $('#'+uniqueSeries+'');
+          $(node).append('<strong>'+testName+'</strong>');
+          $(node).append('<span>'+branchName+'</span>');
+          $(node).append('<span>'+platformName+'</span>');
+          $(node).append('<small class="loader" title="Series is loading"></small>');
+          $('#'+uniqueSeries+' .loader').show();
+          $(node).append('</li>');
+        } else {
+          color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
+          $('#'+uniqueSeries+' .loader').hide();
+          $(node).append('<em style="background-color: '+color+';"></em>');
+          $(node).append('<a id="'+uniqueSeries+'" class="remove" href="#" title="Remove this series"></a>');
+          $(node).append('<a id="'+uniqueSeries+'" class="show" href="#" title="Show this series"></a>');
+          $(node).append('<a id="'+uniqueSeries+'" class="hide" href="#" title="Hide this series"></a>');
+          $(node).append('<a id="'+uniqueSeries+'" class="explode" href="#" title="Explode this series"></a>');
+          $(node).append('<a id="'+uniqueSeries+'" class="implode" href="#" title="Implode this series"></a>');
+        }
 
         $("#displayrange").toggleClass('disabled', false);
         $("#datatype").toggleClass('disabled', false);
         $("#link").toggleClass('disabled', false);
         $("#embed").toggleClass('disabled', false);
+
+        return node;
     }
 
     $(init);
