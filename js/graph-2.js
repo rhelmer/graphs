@@ -326,15 +326,19 @@
 
     function onAddTests(e)
     {
-        var value = e.target.value;
-        $.each($('#platforms option'), function(index, option) {
-            $(this).attr('disabled', 'disabled');
-        });
-        $.each($('#platforms option'), function(index, option) {
-            if (value in manifest.platformMap[option.value].test) {
-                $(this).attr('disabled', '');
-            }
-        });
+        try {
+          var value = e.target.value;
+          $.each($('#platforms option'), function(index, option) {
+              $(this).attr('disabled', 'disabled');
+          });
+          $.each($('#platforms option'), function(index, option) {
+              if (value in manifest.platformMap[option.value].test) {
+                  $(this).attr('disabled', '');
+              }
+          });
+        } catch (e) {
+          error('Could not build menu, constraints broken', e);
+        }
     }
 
     function onShowChangesets(e)
@@ -663,12 +667,20 @@
             });
             $.getJSON('/api/test', {attribute: 'short'},
                       function(data) {
-                manifest = data;
-                menu = buildMenu(manifest);
+                try {
+                    manifest = data;
+                    menu = buildMenu(manifest);
+                } catch (e) {
+                    error('Could not build menu', e);
+                }
             });
         } else {
           if (!menu) {
-            menu = buildMenu(manifest);
+            try {
+                menu = buildMenu(manifest);
+            } catch (e) {
+                error('Could not build menu', e);
+            }
           }
         }
 
