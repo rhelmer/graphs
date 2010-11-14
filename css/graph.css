@@ -1,11 +1,10 @@
-
-
 html {
 	font-family: helvetica, arial, sans-serif;
 	font-size: 12px;
 	background: #eff6fd url(bg.png);
 	margin: 20px;
 	margin-left: 220px;
+	overflow: hidden;
 }
 
 a {
@@ -94,15 +93,22 @@ a:hover {
 		-moz-border-radius-bottomright: 4px;
 	}
 	#toolbar .button:hover,
-	#toolbar .button.sbFocus,
 	#add-data .button:hover,
-	#add-data .button.sbFocus, {
+	#toolbar .button.sbFocus, #add-data .button.sbFocus {
 		background: -moz-linear-gradient(-90deg, #fff, #d1dff0);
 	}
-	#toolbar .button:active, #add-data .button:active {
+	#toolbar .button:active,  #add-data .button:active {
 		background: -moz-linear-gradient(-90deg, #c4d0e0, #d1dff0);
 	}
-
+	#toolbar .button .key {
+		position: relative;
+		top: -2px;
+		padding: 1px 4px;
+		margin-left: 4px;
+		background: rgba(0,0,0,.125);
+		font-size: 9px;
+		-moz-border-radius: 2px;
+	}
 
 #legend {
 	font-size: 11px;
@@ -133,7 +139,7 @@ a:hover {
 			margin-right: 42px;
 			white-space: nowrap;
 			overflow: hidden;
-		}
+		}		
 		#legend strong {
 			font-size: 12px;
 			font-weight: bold;
@@ -175,6 +181,34 @@ a:hover {
 		#legend .explode:hover { background-image: url(explode-hover.png); }
 		#legend .implode:hover { background-image: url(implode-hover.png); }
 
+		#legend li .loader {
+			display: none;
+			position: absolute;
+			right: 10px;
+			bottom: 10px;
+			width: 16px;
+			height: 16px;
+			background: url(loading-small.gif) no-repeat left top;
+		}
+
+		#legend li.loading em,
+		#legend li.loading span,
+		#legend li.loading strong {
+			opacity: .5;
+		}
+		#legend li.loading .explode,
+		#legend li.loading .hide {
+			display: none;
+		}
+		#legend li.loading .loader {
+			display: block;
+		}
+		
+		#legend li.explode-loading .implode {
+			background: url(loading-small.gif) no-repeat left top;
+		}
+		
+
 #add-series {
 	display: block;
 	margin-top: 5px;
@@ -199,6 +233,8 @@ a:hover {
 	left: 10px;
 	right: 10px;
 	bottom: 10px;
+	font-size: 11px;
+	color: #7c7f83;
 }
 
 
@@ -279,6 +315,80 @@ a:hover {
 	#tooltip.locked .tip {
 		background-image: url(tip-locked.png);
 	}
+	
+#loading-overlay {
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0,0,0,.25);
+}
+	#loading-overlay div {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		width: 146px;
+		height: 126px;
+		margin: auto;
+		color: #fff;
+		font-size: 12px;
+	}
+	#loading-overlay b {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		background: #000 url(loading.gif) no-repeat center 20px;
+		opacity: .75;
+		-moz-border-radius: 5px;
+	}
+	#loading-overlay span {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 20px;
+		text-align: center;
+	}
+	
+#errors {
+	display: none;
+	position: absolute;
+	width: 260px;
+	right: 10px;
+	top: 10px;
+}
+	#errors .error {
+		position: relative;
+		min-height: 32px;
+		padding: 10px;
+		padding-left: 52px;
+		padding-right: 36px;
+		background: rgba(85,0,0, .75) url(error.png) no-repeat 10px 10px;
+		color: #fff;
+		-moz-border-radius: 5px;
+		margin-bottom: 5px;
+	}
+		#errors .error h3 {
+			font-size: 14px;
+			font-weight: bold;
+			margin-bottom: 2px;
+		}
+		#errors .error .close {
+			position: absolute;
+			right: 10px;
+			top: 10px;
+			width: 16px;
+			height: 16px;
+			background: url(error-close.png) no-repeat 0 0;
+		}
+		#errors .error .close:hover {
+			background-position: -16px 0;
+		}
 	
 .selectBox {
 	position: relative;
