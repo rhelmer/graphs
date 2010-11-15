@@ -424,8 +424,6 @@
         hideTooltip(true);
         updatePlot();
 
-        $('#showchangesets').toggleClass('disabled', false);
-
         plot.clearSelection(true);
         overview.setSelection(ranges, true);
     }
@@ -785,10 +783,11 @@
 
         $('#displayrange').toggleClass('disabled', false);
         $('#datatype').toggleClass('disabled', false);
+        $('#zoomin').toggleClass('disabled', false);
+        $('#showchangesets').toggleClass('disabled', false);
+        $('#exportcsv').toggleClass('disabled', false);
         $('#link').toggleClass('disabled', false);
         $('#embed').toggleClass('disabled', false);
-        $('#zoomin').toggleClass('disabled', false);
-        $('#exportcsv').toggleClass('disabled', false);
 
         return node;
     }
