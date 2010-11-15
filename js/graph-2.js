@@ -57,8 +57,9 @@
 
 
     var plot, overview, ajaxSeries;
+    var _zoomFrom, _zoomTo;
+    var minT, maxT;
     var allSeries = {};
-    var selStart, selEnd;
 
     var manifest;
     var menu;
@@ -123,6 +124,9 @@
         gdata.maxT = new Date();
         gdata.minV = data['min'];
         gdata.maxV = data['max'];
+
+        minT = gdata.minT;
+        maxT = gdata.maxT;
 
         machine_runs = {};
         for (var i in test_runs)
@@ -210,11 +214,11 @@
         $('#embed').unbind();
         $('#embed').click(onEmbed);
 
-        $('#onzoomin').unbind();
-        $('#onzoomin').click(onZoomIn);
+        $('#zoomin').unbind();
+        $('#zoomin').click(onZoomInClick);
 
         $('#zoomout').unbind();
-        $('#zoomout').click(onZoomOut);
+        $('#zoomout').click(onZoomOutClick);
 
         $(window).resize(onResize);
     }
@@ -250,8 +254,8 @@
             minV = minV < series.minV ? minV : series.minV;
             maxV = maxV > series.maxV ? maxV : series.maxV;
             marginV = 0.1 * (maxV - minV);
-            minT = selStart || (minT < series.minT ? minT : series.minT);
-            maxT = selEnd || (maxT > series.maxT ? maxT : series.maxT);
+            minT = _zoomFrom || (minT < series.minT ? minT : series.minT);
+            maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
 
             var xaxis = { xaxis: { min: minT, max: maxT } },
                 yaxis = { yaxis: { min: minV - marginV, max: maxV + marginV } };
@@ -266,8 +270,102 @@
         overview = $.plot($('#overview'), overviewData, overviewOptions);
     }
 
+    function getZoomRange()
+    {
+        return {
+            from: _zoomFrom || ajaxSeries.minT,
+            to: _zoomTo || ajaxSeries.maxT
+        };
+    }
+
+    function zoomIn()
+    {
+        var sel = plot.getSelection();
+
+        if (sel && sel.xaxis) {
+            var range = sel.xaxis;
+            plot.clearSelection(true);
+        } else {
+            var oldRange = getZoomRange();
+            var range = {
+                from: oldRange.from + (oldRange.to - oldRange.from) / 4,
+                to: oldRange.from + 3 * (oldRange.to - oldRange.from) / 4
+            };
+        }
+
+        zoomTo(range);
+    }
+
+    function zoomOut()
+    {
+        var oldRange = getZoomRange();
+
+        var range = {
+            from: oldRange.from - (oldRange.to - oldRange.from) / 2,
+            to: oldRange.from + 3 * (oldRange.to - oldRange.from) / 2
+        };
+
+        var dt = 0;
+        if (range.from < ajaxSeries.minT) {
+            dt = ajaxSeries.minT - range.from;
+        } else if (range.to > ajaxSeries.maxT) {
+            dt = ajaxSeries.maxT - range.to;
+        }
+
+        range.from = Math.max(range.from + dt, ajaxSeries.minT);
+        range.to = Math.min(range.to + dt, ajaxSeries.maxT);
+
+        zoomTo(range);
+    }
+
+    function zoomTo(range)
+    {
+        _zoomFrom = (range && range.from) || ajaxSeries.minT;
+        _zoomTo = (range && range.to) || ajaxSeries.maxT;
+
+        unlockTooltip();
+        hideTooltip(true);
+        updatePlot();
+
+        if (ajaxSeries.minT < _zoomFrom || _zoomTo < ajaxSeries.maxT) {
+            overview.setSelection({ xaxis: { from: _zoomFrom,
+                                             to: _zoomTo } }, true);
+            var canZoomOut = true;
+        } else {
+            overview.clearSelection(true);
+            var canZoomOut = false;
+        }
+
+        $('#zoomout').toggleClass('disabled', !canZoomOut);
+    }
+
+    function onPageKeyDown(e)
+    {
+        switch (e.keyCode) {
+        case 107: /* + */
+            zoomIn();
+            return false;
+        case 109: /* - */
+            zoomOut();
+            return false;
+        }
+    }
+
+    function onZoomInClick(e)
+    {
+        e.preventDefault();
+        zoomIn();
+    }
+
+    function onZoomOutClick(e)
+    {
+        e.preventDefault();
+        zoomOut();
+    }
+
     function onExplode(e)
     {
+        e.preventDefault();
         var id = e.target.id;
         allSeries[id].exploded = !allSeries[id].exploded;
         $('.explode, .implode, #' + id).toggleClass('exploded',
@@ -276,12 +374,11 @@
         unlockTooltip();
         hideTooltip();
         updatePlot();
-
-        e.preventDefault();
     }
 
     function onShow(e)
     {
+        e.preventDefault();
         var id = e.target.id;
         allSeries[id].visible = !allSeries[id].visible;
         $('.show, .hide, #' + id).toggleClass('hidden', !allSeries[id].visible);
@@ -289,12 +386,11 @@
         unlockTooltip();
         hideTooltip();
         updatePlot();
-
-        e.preventDefault();
     }
 
     function onRemove(e)
     {
+        e.preventDefault();
         var id = e.target.id;
         allSeries[id] = {};
         $('#' + id).remove();
@@ -307,8 +403,6 @@
         unlockTooltip();
         hideTooltip();
         updatePlot();
-
-        e.preventDefault();
     }
 
     function onAddBranches(e)
@@ -343,20 +437,41 @@
 
     function onShowChangesets(e)
     {
-        var startDate = new Date(selStart);
-        var endDate = new Date(selEnd);
-        var url = 'http://hg.mozilla.org/mozilla-central/pushloghtml';
-        window.open(url + '?startdate=' + startDate + '&enddate=' + endDate);
         e.preventDefault();
+        var startDate;
+        var endDate;
+
+        if ((_zoomFrom) && (_zoomTo)) {
+            startDate = new Date(_zoomFrom);
+            endDate = new Date(_zoomTo);
+        } else {
+            startDate = new Date(minT);
+            endDate = new Date(maxT);
+        }
+
+        var url = 'http://hg.mozilla.org/mozilla-central/pushloghtml?' +
+                  'startDate=' + startDate + '&enddate=' + endDate;
+        console.log(url); 
+        window.open(url);
     }
 
     function onExportCSV(e)
     {
-        var url = 'http://graphs.mozilla.org/server/dumpdata.cgi';
-        // FIXME use correct string
-        // FIXME Also, fix server!
-        window.open(url + '?show=22-24-495,22-24-651,22-24-654');
         e.preventDefault();
+        var startDate;
+        var endDate;
+
+        if ((_zoomFrom) && (_zoomTo)) {
+            startDate = new Date(_zoomFrom);
+            endDate = new Date(_zoomTo);
+        } else {
+            startDate = new Date(minT);
+            endDate = new Date(maxT);
+        }
+        var url = 'http://graphs.mozilla.org/server/dumpdata.cgi?' +
+                  'show=' + startDate + ',' + endDate;
+        // FIXME fix server!
+        window.open(url);
     }
 
     function onLink(e)
@@ -365,16 +480,6 @@
     }
 
     function onEmbed(e)
-    {
-        e.preventDefault();
-    }
-
-    function onZoomIn(e)
-    {
-        e.preventDefault();
-    }
-
-    function onZoomOut(e)
     {
         e.preventDefault();
     }
@@ -417,32 +522,25 @@
 
     function onPlotSelect(e, ranges)
     {
-        selStart = ranges.xaxis.from;
-        selEnd = ranges.xaxis.to;
+        _zoomFrom = ranges.xaxis.from;
+        _zoomTo = ranges.xaxis.to;
+    }
 
-        unlockTooltip();
-        hideTooltip(true);
-        updatePlot();
-
-        plot.clearSelection(true);
-        overview.setSelection(ranges, true);
+    function onPlotUnSelect(e, ranges)
+    {
+        _zoomFrom = null;
+        _zoomTo = null;
     }
 
     function onOverviewSelect(e, ranges)
     {
-        plot.setSelection(ranges);
+        plot.clearSelection(true);
+        zoomTo(ranges.xaxis);
     }
 
     function onOverviewUnselect(e)
     {
-        selStart = selEnd = null;
-
-        unlockTooltip();
-        hideTooltip(true);
-        updatePlot();
-
-        plot.clearSelection(true);
-        overview.clearSelection(true);
+        zoomTo(null);
     }
 
     var resizeTimer = null;
