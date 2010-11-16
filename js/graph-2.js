@@ -60,6 +60,7 @@
     var _zoomFrom, _zoomTo;
     var minT, maxT;
     var allSeries = {};
+    var displayDays = 7;
 
     var manifest;
     var menu;
@@ -117,10 +118,7 @@
         var test_runs = data['test_runs'];
         var averages = data['averages'];
 
-        //gdata.minT = data["date_range"][0] * 1000;
-        //gdata.maxT = data["date_range"][1] * 1000;
-        // FIXME add date range support, here is a hardcoded 90 days example
-        gdata.minT = new Date() - (DAY * 90);
+        gdata.minT = new Date() - (DAY * displayDays);
         gdata.maxT = new Date();
         gdata.minV = data['min'];
         gdata.maxV = data['max'];
@@ -202,6 +200,16 @@
         $('.add-data, #branches').change(onAddBranches);
         $('.add-data, #tests').click(onAddTests);
 
+        $('#displayrange').unbind();
+        $('#displayrange').change(onDisplayRange);
+
+        $('#zoomin').unbind();
+        $('#zoomin').click(onZoomInClick);
+
+        $('#zoomout').unbind();
+        $('#zoomout').click(onZoomOutClick);
+
+
         $('#showchangesets').unbind();
         $('#showchangesets').click(onShowChangesets);
 
@@ -214,12 +222,6 @@
         $('#embed').unbind();
         $('#embed').click(onEmbed);
 
-        $('#zoomin').unbind();
-        $('#zoomin').click(onZoomInClick);
-
-        $('#zoomout').unbind();
-        $('#zoomout').click(onZoomOutClick);
-
         $(window).resize(onResize);
     }
 
@@ -228,7 +230,7 @@
         var plotData = [];
         var overviewData = [];
         var plotOptions, overviewOptions;
-        var minV, maxV, marginV, minT, maxT;
+        var minV, maxV, marginV;
         var count = 0;
         $.each(allSeries, function(index, series) {
             if ($.isEmptyObject(series)) {
@@ -259,8 +261,7 @@
 
             var xaxis = { xaxis: { min: minT, max: maxT } },
                 yaxis = { yaxis: { min: minV - marginV, max: maxV + marginV } };
-            // FIXME add date range support, here is a hardcoded 90 days example
-            var overview_xaxis = { xaxis: { min: new Date() - (DAY * 90),
+            var overview_xaxis = { xaxis: { min: new Date() - (DAY * displayDays),
                                             max: new Date() } };
             plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
             overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS,
@@ -349,6 +350,17 @@
             zoomOut();
             return false;
         }
+    }
+
+    function onDisplayRange(e)
+    {
+        displayDays = e.target.value;
+        minT  = new Date() - (DAY * displayDays);
+        maxT  = new Date();
+        _zoomTo = null;
+        _zoomFrom = null;
+        updatePlot();
+        e.preventDefault();
     }
 
     function onZoomInClick(e)
