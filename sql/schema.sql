@@ -98,6 +98,17 @@ CREATE TABLE IF NOT EXISTS annotations (
   test_run_id int UNSIGNED NOT NULL,
   note text NOT NULL,
   bug_id INT UNSIGNED NOT NULL,
-  
+
   PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS valid_test_combinations_updated (
+  -- This matches test_runs.date_run:
+  last_updated INT NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS valid_test_combinations (
+  test_id INT NOT NULL,
+  branch_id INT NOT NULL,
+  os_id INT NOT NULL
 ) ENGINE=InnoDB;
