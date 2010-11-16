@@ -5,6 +5,13 @@ from webob import exc
 
 #Get an array of all tests by build and os
 def getTests(id, attribute, req):
+    if attribute == 'short':
+        update_valid_test_combinations()
+        result = getTestOptions()
+        result['stat'] = 'ok'
+        result['from'] = 'db'
+        return result
+
     sql = """SELECT DISTINCT
                 tests.id,
                 tests.pretty_name AS test_name,
@@ -97,6 +104,144 @@ def getTests(id, attribute, req):
         #if we don't find any tests, we have a problem
         result = {'stat': 'fail', 'code': '103', 'message': 'No tests found'}
     return result
+
+
+def getTestOptions():
+    """Get just the combinations of os/platform/test/branch that are valid
+    (i.e., where there is at least one result)"""
+    results = {}
+    testMap = results['testMap'] = {}
+    platformMap = results['platformMap'] = {}
+    branchMap = results['branchMap'] = {}
+    sql = """SELECT tests.id AS id, tests.pretty_name AS name FROM tests"""
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql)
+    for row in cursor.fetchall():
+        testMap[row['id']] = {'name': row['name'],
+                              'platformIds': set(),
+                              'branchIds': set(),
+                              }
+    sql = """SELECT os_list.id AS id, os_list.name AS name FROM os_list"""
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql)
+    for row in cursor.fetchall():
+        platformMap[row['id']] = {'name': row['name'],
+                                  'testIds': set(),
+                                  'branchIds': set(),
+                                  }
+    sql = """SELECT branches.id AS id, branches.name AS name FROM branches"""
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql)
+    for row in cursor.fetchall():
+        branchMap[row['id']] = {'name': row['name'],
+                                'platformIds': set(),
+                                'testIds': set(),
+                                }
+    for row in get_test_combos():
+        testMap[row['test_id']]['platformIds'].add(row['os_id'])
+        testMap[row['test_id']]['branchIds'].add(row['branch_id'])
+        platformMap[row['os_id']]['testIds'].add(row['test_id'])
+        platformMap[row['os_id']]['branchIds'].add(row['branch_id'])
+        branchMap[row['branch_id']]['testIds'].add(row['test_id'])
+        branchMap[row['branch_id']]['platformIds'].add(row['os_id'])
+    return results
+
+
+def get_test_combos():
+    """Select the test combinations (not in the form we send to the browser,
+    just a list of rows)"""
+    sql = """
+    SELECT valid_test_combinations.test_id AS test_id,
+           valid_test_combinations.branch_id AS branch_id,
+           valid_test_combinations.os_id AS os_id
+    FROM valid_test_combinations
+    """
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+
+def update_valid_test_combinations(reporter=None):
+    """Updates the list of valid test combinations"""
+    sql = """SELECT last_updated FROM valid_test_combinations_updated"""
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql)
+    last_updated = cursor.fetchone()
+    if not last_updated:
+        last_updated = 0
+    else:
+        last_updated = last_updated['last_updated']
+    existing_combos = set()
+    for row in get_test_combos():
+        existing_combos.add((row['test_id'], row['os_id'], row['branch_id']))
+    sql = """
+    SELECT test_runs.test_id AS test_id,
+           machines.os_id AS os_id,
+           builds.branch_id AS branch_id,
+           test_runs.date_run AS date_run
+    FROM test_runs, machines, builds
+    WHERE machines.id = test_runs.machine_id
+          AND test_runs.build_id = builds.id
+          AND machines.is_active
+          AND test_runs.date_run >= %s
+    ORDER BY test_runs.date_run
+    LIMIT 100000
+    """
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql, (last_updated,))
+    new_last_updated = last_updated
+    if reporter:
+        if last_updated:
+            reporter('Updating combos from scratch')
+        else:
+            reporter('Updating combos since %s' % last_updated)
+    count = 0
+    for row in cursor.fetchall():
+        count += 1
+        if reporter and (not count % 1000):
+            reporter('Read %s records' % count)
+        if not count % 10000:
+            # Just update every so often
+            update_combos_last_updated(new_last_updated)
+            db.commit()
+        try:
+            key = (row['test_id'], row['os_id'], row['branch_id'])
+            if key not in existing_combos:
+                sql = """
+                INSERT INTO valid_test_combinations (test_id, os_id, branch_id)
+                VALUES (%s, %s, %s)
+                """
+                cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+                cursor.execute(sql, key)
+                existing_combos.add(key)
+        except:
+            # This way if things are interrupted we can still record our progress
+            if new_last_updated > last_updated:
+                if reporter:
+                    reporter('Exception; updated last_updated to %s'
+                             % new_last_updated)
+                try:
+                    update_combos_last_updated(new_last_updated)
+                    db.commit()
+                except:
+                    pass
+            raise
+        new_last_updated = max(row['date_run'], new_last_updated)
+    if reporter:
+        reporter('Finished completely (%s items), updating last_updated to %s'
+                 % (count, new_last_updated))
+    update_combos_last_updated(new_last_updated)
+    db.commit()
+
+
+def update_combos_last_updated(last_updated):
+    """Sets the valid_test_combinations_updated.last_updated field"""
+    sql = """
+    DELETE FROM valid_test_combinations_updated;
+    INSERT INTO valid_test_combinations_updated VALUES (%s);
+    """
+    cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    cursor.execute(sql, (last_updated,))
 
 
 #Get a list of test runs for a test id and branch and os with annotations
