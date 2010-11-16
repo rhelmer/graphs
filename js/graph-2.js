@@ -196,9 +196,9 @@
         $('.show, .hide').click(onShow);
         $('.remove').click(onRemove);
 
-        $('.add-data, select').unbind();
-        $('.add-data, #branches').change(onAddBranches);
-        $('.add-data, #tests').click(onAddTests);
+        $('.add-data select').unbind();
+        $('.add-data #branches').change(onAddBranches);
+        $('.add-data #tests').click(onAddTests);
 
         $('#displayrange').unbind();
         $('#displayrange').change(onDisplayRange);
@@ -208,7 +208,6 @@
 
         $('#zoomout').unbind();
         $('#zoomout').click(onZoomOutClick);
-
 
         $('#showchangesets').unbind();
         $('#showchangesets').click(onShowChangesets);
@@ -407,8 +406,12 @@
         allSeries[id] = {};
         $('#' + id).remove();
 
+        // FIXME only remove if this is the last series...
         $('#displayrange').toggleClass('disabled', true);
         $('#datatype').toggleClass('disabled', true);
+        $('#zoomin').toggleClass('disabled', true);
+        $('#showchangesets').toggleClass('disabled', true);
+        $('#exportcsv').toggleClass('disabled', true);
         $('#link').toggleClass('disabled', true);
         $('#embed').toggleClass('disabled', true);
 
