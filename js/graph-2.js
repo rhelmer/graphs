@@ -220,6 +220,8 @@
 
         $('#embed').unbind();
         $('#embed').click(onEmbed);
+	
+	$(document).keydown(onPageKeyDown);
 
         $(window).resize(onResize);
     }
@@ -353,13 +355,15 @@
 
     function onDisplayRange(e)
     {
+        e.preventDefault();
         displayDays = e.target.value;
         minT  = new Date() - (DAY * displayDays);
         maxT  = new Date();
-        _zoomTo = null;
+        ajaxSeries.minT = minT;
+        ajaxSeries.maxT = maxT;
         _zoomFrom = null;
+        _zoomTo = null;
         updatePlot();
-        e.preventDefault();
     }
 
     function onZoomInClick(e)
