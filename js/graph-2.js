@@ -220,8 +220,8 @@
 
         $('#embed').unbind();
         $('#embed').click(onEmbed);
-	
-	$(document).keydown(onPageKeyDown);
+
+        $(document).keydown(onPageKeyDown);
 
         $(window).resize(onResize);
     }
@@ -262,7 +262,8 @@
 
             var xaxis = { xaxis: { min: minT, max: maxT } },
                 yaxis = { yaxis: { min: minV - marginV, max: maxV + marginV } };
-            var overview_xaxis = { xaxis: { min: new Date() - (DAY * displayDays),
+            var overview_xaxis = { xaxis: { min: new Date() -
+                                                 (DAY * displayDays),
                                             max: new Date() } };
             plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
             overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS,
@@ -357,8 +358,8 @@
     {
         e.preventDefault();
         displayDays = e.target.value;
-        minT  = new Date() - (DAY * displayDays);
-        maxT  = new Date();
+        minT = new Date() - (DAY * displayDays);
+        maxT = new Date();
         ajaxSeries.minT = minT;
         ajaxSeries.maxT = maxT;
         _zoomFrom = null;
@@ -470,7 +471,7 @@
 
         var url = 'http://hg.mozilla.org/mozilla-central/pushloghtml?' +
                   'startDate=' + startDate + '&enddate=' + endDate;
-        console.log(url); 
+        console.log(url);
         window.open(url);
     }
 
@@ -909,28 +910,28 @@
         return node;
     }
 
-function error(message, e, data) {
-  $('#errors').hide().css({ opacity: 1 });
-  $('#errors').append('<div class="error">' +
-                      '<h3>Error</h3>' +
-                      '<p>' + message + '</p>' +
-                      '<p>Exception: ' + e.name + '</p>' +
-                      '<a class="close" href="#" title="Close"></a>' +
-                      '</div>');
+    function error(message, e, data) {
+        $('#errors').hide().css({ opacity: 1 });
+        $('#errors').append('<div class="error">' +
+                            '<h3>Error</h3>' +
+                            '<p>' + message + '</p>' +
+                            '<p>Exception: ' + e.name + '</p>' +
+                            '<a class="close" href="#" title="Close"></a>' +
+                            '</div>');
 
-  $('#errors').show();
+        $('#errors').show();
 
-  $('#errors .error .close').click(function() {
-    $(this).closest('.error').animate({ opacity: 0 }, 250)
-                             .animate({ height: 'hide' }, 250);
-    return false;
-  });
+        $('#errors .error .close').click(function() {
+        $(this).closest('.error').animate({ opacity: 0 }, 250)
+                                 .animate({ height: 'hide' }, 250);
+        return false;
+    });
 
-  var delay = 0;
-  $('#errors .error').each(function() {
-    $(this).delay(delay).animate({ opacity: 'show' }, 500);
-    delay += 500;
-  });
+    var delay = 0;
+    $('#errors .error').each(function() {
+        $(this).delay(delay).animate({ opacity: 'show' }, 500);
+        delay += 500;
+    });
 
   return false;
 }
