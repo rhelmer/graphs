@@ -196,7 +196,6 @@
         $('.explode, .implode').click(onExplode);
         $('.show, .hide').unbind();
         $('.show, .hide').click(onShow);
-        $('.remove').click(onRemove);
 
         $('#add-data select').unbind();
         $('#add-data #branches').click(onAddBranches);
@@ -938,6 +937,7 @@
                          '</small>');
           $(node).append('<a id="' + uniqueSeries + '" class="remove"' +
                          ' href="#" title="Remove this series"></a>');
+          $('.remove').click(onRemove);
           $('#' + uniqueSeries + ' .loader').show();
           $(node).append('</li>');
         } else {
