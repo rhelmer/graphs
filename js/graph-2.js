@@ -60,7 +60,7 @@
     var _zoomFrom, _zoomTo;
     var minT, maxT;
     var allSeries = {};
-    var displayDays = 7;
+    var displayDays = 30;
 
     var manifest;
     var menu;
