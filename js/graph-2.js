@@ -153,9 +153,11 @@
             }
         }
 
+        // FIXME machineMap removed
+
         for (var machineid in machine_runs)
         {
-            var machineName = manifest.machineMap[machineid].name;
+            var machineName = "machine" + machineid
             gdata.runs.push({
                 'machine': machineName,
                 'data': machine_runs[machineid]
