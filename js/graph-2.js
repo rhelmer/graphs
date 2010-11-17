@@ -860,10 +860,6 @@
         var branches = $('#branches').val();
         var tests = $('#tests').val();
         var platforms = $('#platforms').val();
-        if (branches.length != tests.length != platforms.length) {
-            debug("return early");
-            return;
-        }
         $.each($(branches), function(i, branch) {
             $.each($(tests), function(j, test) {
                 $.each($(platforms), function(k, platform) {
