@@ -60,7 +60,7 @@
     var _zoomFrom, _zoomTo;
     var minT, maxT;
     var allSeries = {};
-    var displayDays = 30;
+    var displayDays = 7;
 
     var manifest;
     var menu;
@@ -199,8 +199,9 @@
         $('.remove').click(onRemove);
 
         $('#add-data select').unbind();
-        $('#add-data #branches').change(onAddBranches);
+        $('#add-data #branches').click(onAddBranches);
         $('#add-data #tests').click(onAddTests);
+        $('#add-data #platforms').click(onAddPlatforms);
 
         $('#displayrange').unbind();
         $('#displayrange').change(onDisplayRange);
@@ -465,6 +466,17 @@
                   $(this).attr('disabled', '');
               }
           });
+        } catch (e) {
+          error('Could not build menu, constraints broken', e);
+        }
+    }
+
+    // FIXME check that tests are valid for this platform
+    // FIXME calculate number of series that will be loaded 
+    function onAddPlatforms(e)
+    {
+        try {
+          $('#add-series-done').toggleClass('disabled', false);
         } catch (e) {
           error('Could not build menu, constraints broken', e);
         }
