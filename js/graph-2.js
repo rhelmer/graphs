@@ -498,7 +498,6 @@
                 });
             });
         });
-        debug(count);
         $('#add-series-done').html('Add ' + count + ' Data Series');
     }
 
@@ -937,14 +936,14 @@
           $(node).append('<span>' + platformName + '</span>');
           $(node).append('<small class="loader" title="Series is loading">' +
                          '</small>');
+          $(node).append('<a id="' + uniqueSeries + '" class="remove"' +
+                         ' href="#" title="Remove this series"></a>');
           $('#' + uniqueSeries + ' .loader').show();
           $(node).append('</li>');
         } else {
           color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
           $('#' + uniqueSeries + ' .loader').hide();
           $(node).append('<em style="background-color: ' + color + ';"></em>');
-          $(node).append('<a id="' + uniqueSeries + '" class="remove"' +
-                         ' href="#" title="Remove this series"></a>');
           $(node).append('<a id="' + uniqueSeries + '" class="show" href="#"' +
                          ' title="Show this series"></a>');
           $(node).append('<a id="' + uniqueSeries + '" class="hide" href="#"' +
