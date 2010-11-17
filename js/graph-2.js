@@ -920,12 +920,15 @@
         }
 
         $('#displayrange').toggleClass('disabled', false);
-        $('#datatype').toggleClass('disabled', false);
+        // TODO add datatype feature
+        //$('#datatype').toggleClass('disabled', false);
         $('#zoomin').toggleClass('disabled', false);
         $('#showchangesets').toggleClass('disabled', false);
         $('#exportcsv').toggleClass('disabled', false);
-        $('#link').toggleClass('disabled', false);
-        $('#embed').toggleClass('disabled', false);
+        // TODO add link feature
+        //$('#link').toggleClass('disabled', false);
+        // TODO add embed feature
+        //$('#embed').toggleClass('disabled', false);
 
         return node;
     }
