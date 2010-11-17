@@ -198,9 +198,9 @@
         $('.show, .hide').click(onShow);
         $('.remove').click(onRemove);
 
-        $('.add-data select').unbind();
-        $('.add-data #branches').change(onAddBranches);
-        $('.add-data #tests').click(onAddTests);
+        $('#add-data select').unbind();
+        $('#add-data #branches').change(onAddBranches);
+        $('#add-data #tests').click(onAddTests);
 
         $('#displayrange').unbind();
         $('#displayrange').change(onDisplayRange);
@@ -413,14 +413,23 @@
         allSeries[id] = {};
         $('#' + id).remove();
 
-        // FIXME only remove if this is the last series...
-        $('#displayrange').toggleClass('disabled', true);
-        $('#datatype').toggleClass('disabled', true);
-        $('#zoomin').toggleClass('disabled', true);
-        $('#showchangesets').toggleClass('disabled', true);
-        $('#exportcsv').toggleClass('disabled', true);
-        $('#link').toggleClass('disabled', true);
-        $('#embed').toggleClass('disabled', true);
+        // only disabled controls if this is the last series
+        var lastSeries = true;
+        $.each(allSeries, function(index) {
+            if (allSeries[index].count != undefined) {
+                lastSeries = false;
+                return false;
+            }
+        });
+        if (lastSeries == true) {
+            $('#displayrange').toggleClass('disabled', true);
+            $('#datatype').toggleClass('disabled', true);
+            $('#zoomin').toggleClass('disabled', true);
+            $('#showchangesets').toggleClass('disabled', true);
+            $('#exportcsv').toggleClass('disabled', true);
+            $('#link').toggleClass('disabled', true);
+            $('#embed').toggleClass('disabled', true);
+        }
 
         unlockTooltip();
         hideTooltip();
@@ -434,7 +443,7 @@
             $(this).attr('disabled', 'disabled');
         });
         $.each($('#tests option'), function(index, option) {
-            if (option.value in manifest.branchMap[value].test) {
+            if (option.value in manifest.branchMap[value].testIds) {
                 $(this).attr('disabled', '');
             }
         });
@@ -448,7 +457,7 @@
               $(this).attr('disabled', 'disabled');
           });
           $.each($('#platforms option'), function(index, option) {
-              if (value in manifest.platformMap[option.value].test) {
+              if (value in manifest.platformMap[option.value].testIds) {
                   $(this).attr('disabled', '');
               }
           });
@@ -473,7 +482,6 @@
 
         var url = 'http://hg.mozilla.org/mozilla-central/pushloghtml?' +
                   'startDate=' + startDate + '&enddate=' + endDate;
-        console.log(url);
         window.open(url);
     }
 
@@ -696,6 +704,7 @@
     function debug(message)
     {
       if (typeof(console) !== 'undefined' && console != null) {
+        console.log(message);
         console.log(JSON.stringify(message));
       }
     }
@@ -918,6 +927,7 @@
     }
 
     function error(message, e, data) {
+        debug(e);
         $('#errors').hide().css({ opacity: 1 });
         $('#errors').append('<div class="error">' +
                             '<h3>Error</h3>' +
