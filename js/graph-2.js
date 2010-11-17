@@ -438,15 +438,19 @@
 
     function onAddBranches(e)
     {
-        var value = e.target.value;
-        $.each($('#tests option'), function(index, option) {
-            $(this).attr('disabled', 'disabled');
-        });
-        $.each($('#tests option'), function(index, option) {
-            if (option.value in manifest.branchMap[value].testIds) {
-                $(this).attr('disabled', '');
-            }
-        });
+        try {
+            var value = e.target.value;
+            $.each($('#tests option'), function(index, option) {
+                $(this).attr('disabled', 'disabled');
+            });
+            $.each($('#tests option'), function(index, option) {
+                if (option.value in manifest.branchMap[value].testIds) {
+                    $(this).attr('disabled', '');
+                }
+            });
+        } catch (e) {
+          error('Could not build menu, constraints broken', e);
+        }
     }
 
     function onAddTests(e)
