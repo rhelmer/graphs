@@ -857,12 +857,20 @@
     $('#add-data-form').submit(function(event) {
         event.preventDefault();
         disableAddDataPopup();
-        // FIXME need to collect all of these not just first,
-        // FIXME as this is a multiple-select form
-        var branch = $('#branches').val()[0];
-        var test = $('#tests').val()[0];
-        var platform = $('#platforms').val()[0];
-        fetchData(test, branch, platform);
+        var branches = $('#branches').val();
+        var tests = $('#tests').val();
+        var platforms = $('#platforms').val();
+        if (branches.length != tests.length != platforms.length) {
+            debug("return early");
+            return;
+        }
+        $.each($(branches), function(i, branch) {
+            $.each($(tests), function(j, test) {
+                $.each($(platforms), function(k, platform) {
+                    fetchData(test, branch, platform);
+                });
+            });
+        });
     });
 
     function buildMenu(data) {
