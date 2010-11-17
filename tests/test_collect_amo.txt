@@ -1,0 +1,144 @@
+This is a basic functional test of ``server/pyfomatic/collect_amo.py``.
+
+The container (``test_collect_amo.py``) sets up ``sys.path``.
+
+First we'll mock the database connections::
+
+    >>> from minimock import mock, Mock
+    >>> from itertools import count
+    >>> import graphsdb
+    >>> # Have to patch this in sometimes
+    >>> graphsdb.amo_db = None
+    >>> mock('graphsdb.db')
+    >>> mock('graphsdb.amo_db')
+    >>> graphsdb.db.cursor.mock_returns = Mock('db_cursor')
+    >>> graphsdb.amo_db.cursor.mock_returns = Mock('amo_cursor')
+    >>> graphsdb.amo_db.insert_id.mock_returns_iter = count(1)
+
+We need to patch in at least one return value for `get_os_for_machine()`::
+
+    >>> return_row_next_time = False
+    >>> def return_os_id_execute(sql, params=None):
+    ...     global return_row_next_time
+    ...     if 'os_list.name' in sql:
+    ...         return_row_next_time = True
+    >>> def return_os_id_fetchone():
+    ...     if return_row_next_time:
+    ...         return [1]
+    ...     else:
+    ...         return None
+    >>> graphsdb.db.cursor.mock_returns.execute.mock_returns_func = return_os_id_execute
+    >>> graphsdb.db.cursor.mock_returns.fetchone = return_os_id_fetchone
+
+Then import stuff::
+
+    >>> from cStringIO import StringIO
+    >>> from pyfomatic.collect_amo import parse_amo_collection
+
+And run the examples (as taken from
+https://wiki.mozilla.org/Buildbot/Talos/DataFormat#Schema_for_AMO_Perf_Results_Storage)::
+
+    >>> pageload_example = StringIO('''\
+    ... Firefox,3.6,1066
+    ... machine_1, tp4, branch_1, changeset_1, 13, 1229477017
+    ... 1,1.0,page_01
+    ... 2,2.0,page_02
+    ... 3,3.0,page_03
+    ... 4,1.0,page_04
+    ... 5,2.0,page_05
+    ... 6,3.0,page_06
+    ... 7,1.0,page_07
+    ... 8,2.0,page_08
+    ... 9,3.0,page_09
+    ... 10,1.0,page_10
+    ... 11,2.0,page_11
+    ... 12,3.0,page_12
+    ... END''')
+    >>> parse_amo_collection(pageload_example)
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        '...SELECT id FROM perf_appversions...',
+        ('fx', '3.6'))
+    Called amo_cursor.fetchone()
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        '...INSERT INTO perf_appversions...VALUES (%s, %s, NOW(), NOW())...',
+        ('fx', '3.6'))
+    Called graphsdb.amo_db.insert_id()
+    Called graphsdb.amo_db.commit()
+    Called graphsdb.db.cursor()
+    Called db_cursor.execute(
+        '...SELECT os_list.name...WHERE machines.os_id = os_list.id...AND machines.name = %s...',
+        ('machine_1',))
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        '...SELECT id FROM perf_osversions...WHERE os = %s...',
+        (1,))
+    Called amo_cursor.fetchone()
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        '...INSERT INTO perf_osversions...VALUES (%s, NOW(), NOW())...',
+        (1,))
+    Called graphsdb.amo_db.insert_id()
+    Called graphsdb.amo_db.commit()
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        "...INSERT INTO perf_results...VALUES (%s, %s, %s, %s, 'ts', NOW(), NOW())...",
+        ('1066', 1, 2.0, 2))
+    Called graphsdb.amo_db.commit()
+    >>> startup_example = StringIO('''\
+    ... Firefox,3.6,1066
+    ... machine_1, ts, branch_1, changeset_1, 13, 1229477017
+    ... 1,1500,NULL
+    ... 2,862,NULL
+    ... 3,863,NULL
+    ... 4,860,NULL
+    ... 5,865,NULL
+    ... 6,865,NULL
+    ... 7,867,NULL
+    ... 8,865,NULL
+    ... 9,870,NULL
+    ... 10,889,NULL
+    ... 11,865,NULL
+    ... 12,864,NULL
+    ... 13,864,NULL
+    ... 14,870,NULL
+    ... 15,871,NULL
+    ... 16,869,NULL
+    ... 17,868,NULL
+    ... 18,870,NULL
+    ... 19,864,NULL
+    ... 20,865,NULL
+    ... END''')
+    >>> parse_amo_collection(startup_example)
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        '...SELECT id FROM perf_appversions...WHERE app = %s AND version = %s...',
+        ('fx', '3.6'))
+    Called amo_cursor.fetchone()
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        '...INSERT INTO perf_appversions...VALUES (%s, %s, NOW(), NOW())...',
+        ('fx', '3.6'))
+    Called graphsdb.amo_db.insert_id()
+    Called graphsdb.amo_db.commit()
+    Called graphsdb.db.cursor()
+    Called db_cursor.execute(
+        '...SELECT os_list.name...WHERE machines.os_id = os_list.id...AND machines.name = %s...',
+        ('machine_1',))
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        '...SELECT id FROM perf_osversions...WHERE os = %s...',
+        (1,))
+    Called amo_cursor.fetchone()
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        '...INSERT INTO perf_osversions...VALUES (%s, NOW(), NOW())...',
+        (1,))
+    Called graphsdb.amo_db.insert_id()
+    Called graphsdb.amo_db.commit()
+    Called graphsdb.amo_db.cursor()
+    Called amo_cursor.execute(
+        "...INSERT INTO perf_results...VALUES (%s, %s, %s, %s, 'ts', NOW(), NOW())...",
+        ('1066', 3, 898.79999999999995, 4))
+    Called graphsdb.amo_db.commit()

@@ -23,15 +23,20 @@ class RetryConnection(object):
 
     def __init__(self, **kw):
         self._kw = kw
-        self._reconnect()
+        self._db = None
 
     def _reconnect(self):
         self._db = MySQLdb.connect(**self._kw)
 
     def cursor(self, *args, **kw):
+        if self._db is None:
+            self._reconnect()
         return RetryCursor(self, *args, **kw)
 
     def __getattr__(self, attr):
+        if self._db is None:
+            self._reconnect()
+
         def repl(*args, **kw):
             tries = 0
             while 1:
@@ -49,6 +54,8 @@ class RetryConnection(object):
         return repl
 
 db = RetryConnection(**kw)
+# For access to the AMO database (for collect_cgi) use:
+#amo_db = RetryConnection(...)
 
 
 class RetryCursor(object):
