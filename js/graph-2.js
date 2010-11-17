@@ -157,7 +157,7 @@
 
         for (var machineid in machine_runs)
         {
-            var machineName = "machine" + machineid
+            var machineName = 'machine' + machineid;
             gdata.runs.push({
                 'machine': machineName,
                 'data': machine_runs[machineid]
@@ -757,8 +757,9 @@
                 }
                 $.ajaxSetup({
                    'error': function(xhr, e, message) {
-		    error('Could not download test run data from server', e);
-                }
+                     error('Could not download test run data from server', e);
+                   }
+                });
                 $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
                           platformid: platformid}, function(data) {
                   try {
