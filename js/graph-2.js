@@ -823,8 +823,8 @@
         $('#backgroundPopup').css({
             'opacity': '0.7'
         });
-        $('#backgroundPopup').fadeIn('slow');
-        $('#add-data').fadeIn('slow');
+        $('#backgroundPopup').fadeIn('fast');
+        $('#add-data').fadeIn('fast');
 
         // center
         var windowWidth = document.documentElement.clientWidth;
@@ -840,8 +840,8 @@
 
     function disableAddDataPopup()
     {
-        $('#backgroundPopup').fadeOut('slow');
-        $('#add-data').fadeOut('slow');
+        $('#backgroundPopup').fadeOut('fast');
+        $('#add-data').fadeOut('fast');
     }
 
     $('#add-series').click(function(event) {
