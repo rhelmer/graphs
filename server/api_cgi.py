@@ -85,8 +85,14 @@ def sendJsonResponse(status, data, lastmod):
     resp.headers['Access-Control-Allow-Origin'] = '*'
     if lastmod and status != 304:
         resp.last_modified = lastmod
+
+    def convert_set(obj):
+        if isinstance(obj, set):
+            return list(obj)
+        raise TypeError
     if data:
-        data = json.dumps(data, separators=(',', ':'))
+        data = json.dumps(data, separators=(',', ':'),
+                          default=convert_set)
         resp.body = data
     return resp
 
