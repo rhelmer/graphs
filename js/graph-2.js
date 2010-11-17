@@ -755,6 +755,10 @@
                   error('Could not find data series in manifest', e);
                   return false;
                 }
+                $.ajaxSetup({
+                   'error': function(xhr, e, message) {
+		    error('Could not download test run data from server', e);
+                }
                 $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
                           platformid: platformid}, function(data) {
                   try {
