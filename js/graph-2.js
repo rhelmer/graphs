@@ -440,6 +440,7 @@
     function onAddBranches(e)
     {
         try {
+            updateAddButton();
             var value = e.target.value;
             $.each($('#tests option'), function(index, option) {
                 $(this).attr('disabled', 'disabled');
@@ -450,13 +451,14 @@
                 }
             });
         } catch (e) {
-          error('Could not build menu, constraints broken', e);
+          error('Could not build menu', e);
         }
     }
 
     function onAddTests(e)
     {
         try {
+          updateAddButton();
           var value = e.target.value;
           $.each($('#platforms option'), function(index, option) {
               $(this).attr('disabled', 'disabled');
@@ -467,7 +469,7 @@
               }
           });
         } catch (e) {
-          error('Could not build menu, constraints broken', e);
+          error('Could not build menu', e);
         }
     }
 
@@ -476,10 +478,28 @@
     function onAddPlatforms(e)
     {
         try {
-          $('#add-series-done').toggleClass('disabled', false);
+            updateAddButton();
+            $('#add-series-done').toggleClass('disabled', false);
         } catch (e) {
-          error('Could not build menu, constraints broken', e);
+            error('Could not build menu', e);
         }
+    }
+
+    function updateAddButton() 
+    {
+        var count = 0;
+        var branches = $('#branches').val() || [];
+        var tests = $('#tests').val() || [];
+        var platforms = $('#platforms').val() || [];
+        $.each(branches, function() {
+            $.each(tests, function() {
+                $.each(platforms, function() {
+                    count += 1;
+                });
+            });
+        });
+        debug(count);
+        $('#add-series-done').html('Add ' + count + ' Data Series');
     }
 
     function onShowChangesets(e)
