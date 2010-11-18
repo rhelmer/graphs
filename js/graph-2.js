@@ -198,9 +198,9 @@
         $('.show, .hide').click(onShow);
 
         $('#add-data select').unbind();
-        $('#add-data #branches').click(onAddBranches);
-        $('#add-data #tests').click(onAddTests);
-        $('#add-data #platforms').click(onAddPlatforms);
+        $('#add-data #branches').change(onAddBranches);
+        $('#add-data #tests').change(onAddTests);
+        $('#add-data #platforms').change(onAddPlatforms);
 
         $('#displayrange').unbind();
         $('#displayrange').change(onDisplayRange);
