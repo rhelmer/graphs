@@ -436,6 +436,7 @@
         updatePlot();
     }
 
+    // FIXME clear selections from test and platforms
     function onAddBranches(e)
     {
         try {
@@ -454,6 +455,7 @@
         }
     }
 
+    // FIXME clear selections from test and platforms
     function onAddTests(e)
     {
         try {
@@ -464,7 +466,11 @@
           });
           $.each($('#platforms option'), function(index, option) {
               if (value in manifest.platformMap[option.value].testIds) {
-                  $(this).attr('disabled', '');
+                  if (option.value in manifest.branchMap) {
+                      if (value in manifest.branchMap[option.value].testIds) {
+                          $(this).attr('disabled', '');
+                      }
+                  }
               }
           });
         } catch (e) {
@@ -472,7 +478,6 @@
         }
     }
 
-    // FIXME check that tests are valid for this platform
     function onAddPlatforms(e)
     {
         try {
