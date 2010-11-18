@@ -473,7 +473,6 @@
     }
 
     // FIXME check that tests are valid for this platform
-    // FIXME calculate number of series that will be loaded 
     function onAddPlatforms(e)
     {
         try {
