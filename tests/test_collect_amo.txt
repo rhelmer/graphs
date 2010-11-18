@@ -24,7 +24,7 @@ We need to patch in at least one return value for `get_os_for_machine()`::
     ...         return_row_next_time = True
     >>> def return_os_id_fetchone():
     ...     if return_row_next_time:
-    ...         return [1]
+    ...         return ['Windows 1.0']
     ...     else:
     ...         return None
     >>> graphsdb.db.cursor.mock_returns.execute.mock_returns_func = return_os_id_execute
@@ -72,13 +72,13 @@ https://wiki.mozilla.org/Buildbot/Talos/DataFormat#Schema_for_AMO_Perf_Results_S
         ('machine_1',))
     Called graphsdb.amo_db.cursor()
     Called amo_cursor.execute(
-        '...SELECT id FROM perf_osversions...WHERE os = %s...',
-        (1,))
+        '...SELECT id FROM perf_osversions...WHERE os = %s...AND version = %s...',
+        ('Windows', '1.0'))
     Called amo_cursor.fetchone()
     Called graphsdb.amo_db.cursor()
     Called amo_cursor.execute(
-        '...INSERT INTO perf_osversions...VALUES (%s, NOW(), NOW())...',
-        (1,))
+        '...INSERT INTO perf_osversions...VALUES (%s, %s, NOW(), NOW())...',
+        ('Windows', '1.0'))
     Called graphsdb.amo_db.insert_id()
     Called graphsdb.amo_db.commit()
     Called graphsdb.amo_db.cursor()
@@ -128,13 +128,13 @@ https://wiki.mozilla.org/Buildbot/Talos/DataFormat#Schema_for_AMO_Perf_Results_S
         ('machine_1',))
     Called graphsdb.amo_db.cursor()
     Called amo_cursor.execute(
-        '...SELECT id FROM perf_osversions...WHERE os = %s...',
-        (1,))
+        '...SELECT id FROM perf_osversions...WHERE os = %s...AND version = %s...',
+        ('Windows', '1.0'))
     Called amo_cursor.fetchone()
     Called graphsdb.amo_db.cursor()
     Called amo_cursor.execute(
-        '...INSERT INTO perf_osversions...VALUES (%s, NOW(), NOW())...',
-        (1,))
+        '...INSERT INTO perf_osversions...VALUES (%s, %s, NOW(), NOW())...',
+        ('Windows', '1.0'))
     Called graphsdb.amo_db.insert_id()
     Called graphsdb.amo_db.commit()
     Called graphsdb.amo_db.cursor()
