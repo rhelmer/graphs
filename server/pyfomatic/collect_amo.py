@@ -32,21 +32,21 @@ def get_appversions_id(app_name, version):
     return id
 
 
-def get_osversions_id(os_name):
+def get_osversions_id(os_name, version):
     cur = amo_db.cursor()
     cur.execute("""\
     SELECT id FROM perf_osversions
-    WHERE os = %s
-    """, (os_name,))
+    WHERE os = %s AND version = %s
+    """, (os_name, version))
     row = cur.fetchone()
     if row is not None:
         return row[0]
     cur = amo_db.cursor()
     cur.execute("""\
     INSERT INTO perf_osversions
-                (os, created, modified)
-    VALUES (%s, NOW(), NOW())
-    """, (os_name,))
+                (os, version, created, modified)
+    VALUES (%s, %s, NOW(), NOW())
+    """, (os_name, version))
     id = amo_db.insert_id()
     amo_db.commit()
     return id
@@ -61,7 +61,11 @@ def get_os_for_machine(machine):
           AND machines.name = %s
     """, (machine,))
     row = cur.fetchone()
-    return row[0]
+    if ' ' in row[0]:
+        os_name, version = row[0].split(None, 1)
+    else:
+        os_name, version = row[0], ''
+    return os_name, version
 
 
 def parse_amo_collection(fp):
@@ -89,8 +93,8 @@ def parse_amo_collection(fp):
         raise ParseError("No rows in submission")
     average = float(value_total) / value_number
     appversion_id = get_appversions_id(browser_name, browser_version)
-    os_name = get_os_for_machine(machine_name)
-    os_id = get_osversions_id(os_name)
+    os_name, os_version = get_os_for_machine(machine_name)
+    os_id = get_osversions_id(os_name, os_version)
     cur = amo_db.cursor()
     cur.execute("""\
     INSERT INTO perf_results
