@@ -57,7 +57,7 @@
 
 
     var plot, overview, ajaxSeries;
-    var zoomFrom, zoomTo;
+    var _zoomFrom, _zoomTo;
     var minT, maxT;
     var allSeries = {};
     var displayDays = 7;
@@ -72,6 +72,7 @@
         initPlot();
 
         try {
+          // TODO refactor
           var args = window.location.hash.split('=')[1];
           if (args) {
               var testruns = JSON.parse(args);
@@ -259,8 +260,8 @@
             minV = minV < series.minV ? minV : series.minV;
             maxV = maxV > series.maxV ? maxV : series.maxV;
             marginV = 0.1 * (maxV - minV);
-            minT = zoomFrom || (minT < series.minT ? minT : series.minT);
-            maxT = zoomTo || (maxT > series.maxT ? maxT : series.maxT);
+            minT = _zoomFrom || (minT < series.minT ? minT : series.minT);
+            maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
 
             var xaxis = { xaxis: { min: minT, max: maxT } },
                 yaxis = { yaxis: { min: minV - marginV, max: maxV + marginV } };
@@ -278,8 +279,8 @@
     function getZoomRange()
     {
         return {
-            from: zoomFrom || ajaxSeries.minT,
-            to: zoomTo || ajaxSeries.maxT
+            from: _zoomFrom || ajaxSeries.minT,
+            to: _zoomTo || ajaxSeries.maxT
         };
     }
 
@@ -298,7 +299,7 @@
             };
         }
 
-        zoomTo(range);
+        _zoomTo(range);
     }
 
     function zoomOut()
@@ -320,21 +321,21 @@
         range.from = Math.max(range.from + dt, ajaxSeries.minT);
         range.to = Math.min(range.to + dt, ajaxSeries.maxT);
 
-        zoomTo(range);
+        _zoomTo(range);
     }
 
     function zoomTo(range)
     {
-        zoomFrom = (range && range.from) || ajaxSeries.minT;
-        zoomTo = (range && range.to) || ajaxSeries.maxT;
+        _zoomFrom = (range && range.from) || ajaxSeries.minT;
+        _zoomTo = (range && range.to) || ajaxSeries.maxT;
 
         unlockTooltip();
         hideTooltip(true);
         updatePlot();
 
-        if (ajaxSeries.minT < zoomFrom || zoomTo < ajaxSeries.maxT) {
-            overview.setSelection({ xaxis: { from: zoomFrom,
-                                             to: zoomTo } }, true);
+        if (ajaxSeries.minT < _zoomFrom || _zoomTo < ajaxSeries.maxT) {
+            overview.setSelection({ xaxis: { from: _zoomFrom,
+                                             to: _zoomTo } }, true);
             var canZoomOut = true;
         } else {
             overview.clearSelection(true);
@@ -364,8 +365,8 @@
         maxT = new Date();
         ajaxSeries.minT = minT;
         ajaxSeries.maxT = maxT;
-        zoomFrom = null;
-        zoomTo = null;
+        _zoomFrom = null;
+        _zoomTo = null;
         updatePlot();
     }
 
@@ -510,9 +511,9 @@
         var startDate;
         var endDate;
 
-        if ((zoomFrom) && (zoomTo)) {
-            startDate = new Date(zoomFrom);
-            endDate = new Date(zoomTo);
+        if ((_zoomFrom) && (_zoomTo)) {
+            startDate = new Date(_zoomFrom);
+            endDate = new Date(_zoomTo);
         } else {
             startDate = new Date(minT);
             endDate = new Date(maxT);
@@ -529,9 +530,9 @@
         var startDate;
         var endDate;
 
-        if ((zoomFrom) && (zoomTo)) {
-            startDate = new Date(zoomFrom);
-            endDate = new Date(zoomTo);
+        if ((_zoomFrom) && (_zoomTo)) {
+            startDate = new Date(_zoomFrom);
+            endDate = new Date(_zoomTo);
         } else {
             startDate = new Date(minT);
             endDate = new Date(maxT);
@@ -590,25 +591,25 @@
 
     function onPlotSelect(e, ranges)
     {
-        zoomFrom = ranges.xaxis.from;
-        zoomTo = ranges.xaxis.to;
+        _zoomFrom = ranges.xaxis.from;
+        _zoomTo = ranges.xaxis.to;
     }
 
     function onPlotUnSelect(e, ranges)
     {
-        zoomFrom = null;
-        zoomTo = null;
+        _zoomFrom = null;
+        _zoomTo = null;
     }
 
     function onOverviewSelect(e, ranges)
     {
         plot.clearSelection(true);
-        zoomTo(ranges.xaxis);
+        _zoomTo(ranges.xaxis);
     }
 
     function onOverviewUnselect(e)
     {
-        zoomTo(null);
+        _zoomTo(null);
     }
 
     var resizeTimer = null;
