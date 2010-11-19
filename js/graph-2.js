@@ -72,13 +72,11 @@
         initPlot();
 
         try {
-          // TODO refactor
-          var args = window.location.hash.split('=')[1];
+          var args = updateLocation();
           if (args) {
-              var testruns = JSON.parse(args);
-              for (var i = 0; i < testruns.length; i++)
+              for (var i = 0; i < args.length; i++)
               {
-                  var run = testruns[i];
+                  var run = args[i];
                   var testid = run[0];
                   var branchid = run[1];
                   var platformid = run[2];
@@ -299,7 +297,7 @@
             };
         }
 
-        _zoomTo(range);
+        zoomTo(range);
     }
 
     function zoomOut()
@@ -321,7 +319,7 @@
         range.from = Math.max(range.from + dt, ajaxSeries.minT);
         range.to = Math.min(range.to + dt, ajaxSeries.maxT);
 
-        _zoomTo(range);
+        zoomTo(range);
     }
 
     function zoomTo(range)
@@ -604,12 +602,12 @@
     function onOverviewSelect(e, ranges)
     {
         plot.clearSelection(true);
-        _zoomTo(ranges.xaxis);
+        zoomTo(ranges.xaxis);
     }
 
     function onOverviewUnselect(e)
     {
-        _zoomTo(null);
+        zoomTo(null);
     }
 
     var resizeTimer = null;
@@ -946,6 +944,8 @@
           $('#' + uniqueSeries + ' .loader').show();
           $(node).append('</li>');
         } else {
+          var args = [parseInt(testid),parseInt(branchid),parseInt(platformid)];
+          updateLocation(args);
           color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
           $('#' + uniqueSeries + ' .loader').hide();
           $(node).append('<em style="background-color: ' + color + ';"></em>');
@@ -971,6 +971,49 @@
         //$('#embed').toggleClass('disabled', false);
 
         return node;
+    }
+    function updateLocation(newrun) {
+        var hash = window.location.hash.split('=');
+        var url = hash[0];
+        if  (url.indexOf('#tests') == -1) {
+            if (newrun) {
+                url += '#tests';
+            } else {
+                return false;
+            }
+        }
+        var args = hash[1];
+        newargs = [];
+        if (args) {
+            var testruns = JSON.parse(args);
+            for (var i = 0; i < testruns.length; i++)
+            {
+                var run = testruns[i];
+                var testid = run[0];
+                var branchid = run[1];
+                var platformid = run[2];
+                if (newrun) {
+                    if (JSON.stringify(run) == JSON.stringify(newrun)) {
+                        continue;
+                    }
+                }
+                newargs.push([testid,branchid,platformid]);
+            }
+            var sel = plot.getSelection();
+
+            if (sel && sel.xaxis) {
+                var range = sel.xaxis;
+                newargs.push(range);
+            }
+        }
+        if (newrun) {
+            newargs.push(newrun);
+        }
+        // TODO add displayrange to URL
+        // TODO add datatype to URL
+        // TODO add selection range to URL
+        window.location = url + '=' + JSON.stringify(newargs);
+        return newargs;
     }
 
     function error(message, e, data) {
