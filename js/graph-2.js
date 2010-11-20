@@ -60,7 +60,7 @@
     var _zoomFrom, _zoomTo;
     var minT, maxT;
     var allSeries = {};
-    var displayDays = 7;
+    var displayDays;
 
     var manifest;
     var menu;
@@ -194,6 +194,7 @@
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
         allSeries[uniqueSeries] = ajaxSeries;
+/*
         if (sel) {
             var range = {
                 from: sel.split(',')[0],
@@ -201,6 +202,7 @@
             }
             zoomTo(range);
         }
+*/
     }
 
     function updateBindings()
