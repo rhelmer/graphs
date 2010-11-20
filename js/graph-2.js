@@ -72,17 +72,26 @@
         initPlot();
 
         try {
-          var args = window.location.hash.split('=')[1];
-          if (args) {
-              args = JSON.parse(args);
-              for (var i = 0; i < args.length; i++)
+          var args = window.location.hash.split('&');
+          // FIXME probably should not assume these are positional
+          if (args.length == 0) {
+              return false;
+          }
+          var tests = args[0].split('=')[1];
+          var sel;
+          if (args.length == 2) {
+              sel = args[1].split('=')[1];
+          }
+          if (tests) {
+              tests = JSON.parse(tests);
+              for (var i = 0; i < tests.length; i++)
               {
-                  var run = args[i];
+                  var run = tests[i];
                   var testid = run[0];
                   var branchid = run[1];
                   var platformid = run[2];
 
-                  fetchData(testid, branchid, platformid);
+                  fetchData(testid, branchid, platformid, sel);
               }
           }
         } catch (e) {
@@ -174,7 +183,7 @@
         overview = $.plot($('#overview'), [], OVERVIEW_OPTIONS);
     }
 
-    function initData(testid, branchid, platformid, data)
+    function initData(testid, branchid, platformid, data, sel)
     {
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
@@ -182,6 +191,13 @@
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
         allSeries[uniqueSeries] = ajaxSeries;
+        if (sel) {
+            var range = {
+                from: sel.split(',')[0],
+                to: sel.split(',')[1]
+            }
+            zoomTo(range);
+        }
     }
 
     function updateBindings()
@@ -283,21 +299,28 @@
         };
     }
 
-    function zoomIn()
+    function getPlotRange()
     {
         var sel = plot.getSelection();
+        var range;
 
         if (sel && sel.xaxis) {
-            var range = sel.xaxis;
+            range = sel.xaxis;
             plot.clearSelection(true);
         } else {
             var oldRange = getZoomRange();
-            var range = {
+            range = {
                 from: oldRange.from + (oldRange.to - oldRange.from) / 4,
                 to: oldRange.from + 3 * (oldRange.to - oldRange.from) / 4
             };
         }
 
+        return range;
+    } 
+
+    function zoomIn()
+    {
+        var range = getPlotRange();
         zoomTo(range);
     }
 
@@ -606,6 +629,7 @@
     {
         plot.clearSelection(true);
         zoomTo(ranges.xaxis);
+        updateLocation();
     }
 
     function onOverviewUnselect(e)
@@ -751,7 +775,7 @@
 
     updateBindings();
 
-    function fetchData(testid, branchid, platformid) {
+    function fetchData(testid, branchid, platformid, sel) {
         // FIXME should not need to block downloading the manifest
         // FIXME or if we do, should not repeat so much here
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
@@ -778,7 +802,7 @@
                       error('Could not import test run data', false, data);
                       return false;
                   }
-                  initData(testid, branchid, platformid, data);
+                  initData(testid, branchid, platformid, data, sel);
                   updatePlot();
                   addSeries(testid, branchid, platformid, addSeriesNode);
 
@@ -817,7 +841,7 @@
                         error('Could not import test run data', e);
                         return false;
                     }
-                    initData(testid, branchid, platformid, data);
+                    initData(testid, branchid, platformid, data, sel);
                     updatePlot();
                     addSeries(testid, branchid, platformid, addSeriesNode);
                     updateBindings();
@@ -947,7 +971,6 @@
           $('#' + uniqueSeries + ' .loader').show();
           $(node).append('</li>');
         } else {
-          updateLocation();
           color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
           $('#' + uniqueSeries + ' .loader').hide();
           $(node).append('<em style="background-color: ' + color + ';"></em>');
@@ -959,6 +982,7 @@
                          ' href="#" title="Explode this series"></a>');
           $(node).append('<a id="' + uniqueSeries + '" class="implode"' +
                          ' href="#" title="Implode this series"></a>');
+          updateLocation();
         }
 
         $('#displayrange').toggleClass('disabled', false);
@@ -977,6 +1001,9 @@
     function updateLocation() {
         var hash = window.location.hash.split('=');
         var url = hash[0];
+        if (url.indexOf('#tests') == -1) {
+            url += '#tests';
+        }
         args = [];
         $.each(allSeries, function(index, series) {
             if ($.isEmptyObject(series)) {
@@ -988,10 +1015,19 @@
             var platformid = parseInt(uniqueSeries[3]);
             args.push([testid,branchid,platformid]);
         });
-        // TODO add selection range to URL
         // TODO add displayrange to URL
         // TODO add datatype to URL
-        window.location = url + '=' + JSON.stringify(args);
+       
+        var newLocation = url + '=' + JSON.stringify(args);
+        var range = getPlotRange();
+        if (range) {
+            window.location = newLocation +
+                              '&sel=' + range['from'] +
+                              ',' + range['to'];
+        } else {
+            window.location = newLocation;
+        }
+        
     }
 
     function error(message, e, data) {
