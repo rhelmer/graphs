@@ -79,8 +79,11 @@
           }
           var tests = args[0].split('=')[1];
           var sel;
-          if (args.length == 2) {
+          if (args.length >= 2) {
               sel = args[1].split('=')[1];
+          }
+          if (args.length >= 3) {
+              displayDays = args[2].split('=')[1];
           }
           if (tests) {
               tests = JSON.parse(tests);
@@ -127,8 +130,8 @@
         var test_runs = data['test_runs'];
         var averages = data['averages'];
 
-        gdata.minT = new Date() - (DAY * displayDays);
-        gdata.maxT = new Date();
+        gdata.minT = new Date().getTime() - (DAY * displayDays);
+        gdata.maxT = new Date().getTime();
         gdata.minV = data['min'];
         gdata.maxV = data['max'];
 
@@ -383,13 +386,14 @@
     {
         e.preventDefault();
         displayDays = e.target.value;
-        minT = new Date() - (DAY * displayDays);
-        maxT = new Date();
+        minT = new Date().getTime() - (DAY * displayDays);
+        maxT = new Date().getTime();
         ajaxSeries.minT = minT;
         ajaxSeries.maxT = maxT;
         _zoomFrom = null;
         _zoomTo = null;
         updatePlot();
+        updateLocation();
     }
 
     function onZoomInClick(e)
@@ -536,11 +540,11 @@
         var endDate;
 
         if ((_zoomFrom) && (_zoomTo)) {
-            startDate = new Date(_zoomFrom);
-            endDate = new Date(_zoomTo);
+            startDate = new Date(_zoomFrom).getTime();
+            endDate = new Date(_zoomTo).getTime();
         } else {
-            startDate = new Date(minT);
-            endDate = new Date(maxT);
+            startDate = new Date(minT).getTime();
+            endDate = new Date(maxT).getTime();
         }
 
         var url = 'http://hg.mozilla.org/mozilla-central/pushloghtml?' +
@@ -555,11 +559,11 @@
         var endDate;
 
         if ((_zoomFrom) && (_zoomTo)) {
-            startDate = new Date(_zoomFrom);
-            endDate = new Date(_zoomTo);
+            startDate = new Date(_zoomFrom).getTime();
+            endDate = new Date(_zoomTo).getTime();
         } else {
-            startDate = new Date(minT);
-            endDate = new Date(maxT);
+            startDate = new Date(minT).getTime();
+            endDate = new Date(maxT).getTime();
         }
         var url = 'http://graphs.mozilla.org/server/dumpdata.cgi?' +
                   'show=' + startDate + ',' + endDate;
@@ -1015,18 +1019,18 @@
             var platformid = parseInt(uniqueSeries[3]);
             args.push([testid,branchid,platformid]);
         });
-        // TODO add displayrange to URL
         // TODO add datatype to URL
        
         var newLocation = url + '=' + JSON.stringify(args);
-        var range = getPlotRange();
-        if (range) {
-            window.location = newLocation +
-                              '&sel=' + range['from'] +
-                              ',' + range['to'];
-        } else {
-            window.location = newLocation;
+        var selectionrange = getZoomRange();
+
+        if (selectionrange) {
+            newLocation += '&sel=' + selectionrange['from'] +
+                           ',' + selectionrange['to'];
         }
+        newLocation += '&displayrange=' + $('#displayrange select').val();
+
+        window.location = newLocation;
         
     }
 
