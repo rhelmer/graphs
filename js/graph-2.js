@@ -60,15 +60,13 @@
     var _zoomFrom, _zoomTo;
     var minT, maxT;
     var allSeries = {};
-    var displayDays;
+    var displayDays = 7;
 
     var manifest;
     var menu;
 
     function init()
     {
-        $('.selectBox').selectBox();
-
         initPlot();
 
         try {
@@ -100,6 +98,8 @@
         } catch (e) {
             error('Could not understand URL', e);
         }
+
+        $('.selectBox').selectBox();
     }
 
     // convert graphserver JSON to something flottable
