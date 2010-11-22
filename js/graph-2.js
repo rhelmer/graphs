@@ -1,6 +1,6 @@
 (function($) {
     $.fn.selectBox = function() {
-        var change = function(e) {
+        var onchange = function(e) {
             var option = $('option:selected', this).html();
             $(this).parent().find('span').html(option);
         };
