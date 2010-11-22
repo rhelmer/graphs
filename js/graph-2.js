@@ -1,8 +1,19 @@
 (function($) {
     $.fn.selectBox = function() {
+        var change = function(e) {
+            var option = $('option:selected', this).html();
+            $(this).parent().find('span').html(option);
+        };
         var sync = function(e) {
-            var sel = $('option:selected', this).html();
-            $(this).parent().find('span').html(sel);
+            var select = $(this);
+            $('option', this).each(function() {
+                if (displayDays == $(this).val()) {
+                    select.val($(this).val());
+                }
+            });
+            // FIXME remove redundancy; call change() above
+            var option = $('option:selected', this).html();
+            $(this).parent().find('span').html(option);
         };
 
         var selects = this.find('select');
@@ -10,7 +21,7 @@
         selects.each(sync);
         selects.focus(function(e) { $(this).parent().addClass('sbFocus'); });
         selects.blur(function(e) { $(this).parent().removeClass('sbFocus'); });
-        selects.change(sync);
+        selects.change(onchange);
 
         return this;
     };
