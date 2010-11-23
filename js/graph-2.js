@@ -75,6 +75,8 @@
 
     var manifest;
     var menu;
+    var downloadingManifest = false;
+    var loadSeries = [];
 
     function init()
     {
@@ -793,8 +795,6 @@
     updateBindings();
 
     function fetchData(testid, branchid, platformid, sel) {
-        // FIXME should not need to block downloading the manifest
-        // FIXME or if we do, should not repeat so much here
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
         if (allSeries.hasOwnProperty(uniqueSeries)) {
@@ -804,97 +804,67 @@
             }
         }
         if (manifest) {
-            var addSeriesNode = addSeries(testid, branchid, platformid, false);
-            $.ajaxSetup({
-              'error': function(xhr, e, message) {
-                error('Could not download test run data from server', e);
-              }
-            });
-            $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
-                                         platformid: platformid},
-                      function(data) {
-                try {
-                  data = convertData(testid, branchid, platformid, data);
-                  if (!data) {
-                      error('Could not import test run data', false, data);
-                      return false;
-                  }
-                  initData(testid, branchid, platformid, data, sel);
-                  updatePlot();
-                  addSeries(testid, branchid, platformid, addSeriesNode);
-
-                  updateBindings();
-                } catch (e) {
-                  error('Could not load data series', e);
-                }
-            });
+            downloadSeries(testid,branchid,platformid);
         } else {
-            $.ajaxSetup({
-              'error': function(xhr, e, message) {
-                error('Could not download manifest data from server', e);
-              }
-            });
-            $.getJSON('/api/test', { attribute: 'short'},
-                                     function(data) {
-                manifest = data;
-                var addSeriesNode;
-                try {
-                  addSeriesNode = addSeries(testid, branchid, platformid,
-                                            false);
-                } catch (e) {
-                  error('Could not find data series in manifest', e);
-                  return false;
-                }
-                $.ajaxSetup({
-                   'error': function(xhr, e, message) {
-                     error('Could not download test run data from server', e);
-                   }
-                });
-                $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
-                          platformid: platformid}, function(data) {
-                  try {
-                    data = convertData(testid, branchid, platformid, data);
-                    if (!data) {
-                        error('Could not import test run data', e);
-                        return false;
-                    }
-                    initData(testid, branchid, platformid, data, sel);
-                    updatePlot();
-                    addSeries(testid, branchid, platformid, addSeriesNode);
-                    updateBindings();
-                  } catch (e) {
-                    error('Could not load data series', e);
-                  }
-                });
-            });
+            if (downloadingManifest) {
+                loadSeries.push([testid,branchid,platformid,sel]);
+            } else {
+                downloadManifest();
+            }
         }
+    }
+
+    function downloadSeries(testid, branchid, platformid, sel) {
+        var addSeriesNode = addSeries(testid, branchid, platformid, false);
+        $.ajaxSetup({
+            'error': function(xhr, e, message) {
+                error('Could not download test run data from server', e);
+            }
+        });
+        $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
+                                     platformid: platformid}, function(data) {
+            try {
+                data = convertData(testid, branchid, platformid, data);
+                if (!data) {
+                    error('Could not import test run data', false, data);
+                    return false;
+                }
+                initData(testid, branchid, platformid, data, sel);
+                updatePlot();
+                addSeries(testid, branchid, platformid, addSeriesNode);
+
+                updateBindings();
+            } catch (e) {
+                error('Could not load data series', e);
+            }
+        });
+    }
+
+    function downloadManifest() {
+        downloadingManifest = true;
+        $.ajaxSetup({
+            'error': function(xhr, e, message) {
+                error('Could not download manifest data from server', e);
+            }
+        });
+        $.getJSON('/api/test', { attribute: 'short'}, function(data) {
+            manifest = data;
+            downloadingManifest = false;
+            menu = buildMenu(manifest);
+            for (var i=0; i < loadSeries.length; i++) {
+                var testid = loadSeries[i][0];
+                var branchid = loadSeries[i][1];
+                var platformid = loadSeries[i][2];
+                var sel = loadSeries[i][3];
+                downloadSeries(testid, branchid, platformid, sel);
+            }
+        });
     }
 
     function addDataPopup()
     {
         if (!manifest) {
-            $.ajaxSetup({
-              'error': function(xhr, e, message) {
-                error('Could not download manifest data from server', e);
-              }
-            });
-            $.getJSON('/api/test', {attribute: 'short'},
-                      function(data) {
-                try {
-                    manifest = data;
-                    menu = buildMenu(manifest);
-                } catch (e) {
-                    error('Could not build menu', e);
-                }
-            });
-        } else {
-          if (!menu) {
-            try {
-                menu = buildMenu(manifest);
-            } catch (e) {
-                error('Could not build menu', e);
-            }
-          }
+            downloadManifest();
         }
 
         $('#backgroundPopup').css({
