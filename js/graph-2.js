@@ -849,6 +849,7 @@
         });
         $.getJSON('/api/test', { attribute: 'short'}, function(data) {
             manifest = data;
+            $('#loading-overlay').animate({ opacity: 'hide' }, 250);
             downloadingManifest = false;
             menu = buildMenu(manifest);
             for (var i=0; i < loadSeries.length; i++) {
@@ -858,7 +859,6 @@
                 var sel = loadSeries[i][3];
                 downloadSeries(testid, branchid, platformid, sel);
             }
-            $('#loading-overlay').animate({ opacity: 'hide' }, 250);
         });
     }
 
