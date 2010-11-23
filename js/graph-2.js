@@ -841,6 +841,7 @@
 
     function downloadManifest() {
         downloadingManifest = true;
+        $('#loading-overlay').animate({ opacity: 'show' }, 250);
         $.ajaxSetup({
             'error': function(xhr, e, message) {
                 error('Could not download manifest data from server', e);
@@ -857,6 +858,7 @@
                 var sel = loadSeries[i][3];
                 downloadSeries(testid, branchid, platformid, sel);
             }
+            $('#loading-overlay').animate({ opacity: 'hide' }, 250);
         });
     }
 
