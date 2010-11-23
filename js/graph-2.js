@@ -806,9 +806,8 @@
         if (manifest) {
             downloadSeries(testid,branchid,platformid);
         } else {
-            if (downloadingManifest) {
-                loadSeries.push([testid,branchid,platformid,sel]);
-            } else {
+            loadSeries.push([testid,branchid,platformid,sel]);
+            if (!downloadingManifest) {
                 downloadManifest();
             }
         }
