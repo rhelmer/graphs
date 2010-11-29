@@ -98,7 +98,7 @@ def parse_amo_collection(fp):
     cur = amo_db.cursor()
     cur.execute("""\
     INSERT INTO perf_results
-                (addon_id, appversion_id, average, os_id, test, created, modified)
+                (addon_id, appversion_id, average, osversion_id, test, created, modified)
     VALUES (%s, %s, %s, %s, 'ts', NOW(), NOW())
     """, (addon_id, appversion_id, average, os_id))
     amo_db.commit()
