@@ -1020,11 +1020,12 @@
 
     function error(message, e, data) {
         debug(e);
+        var name = (e != null ? e.name : "");
         $('#errors').hide().css({ opacity: 1 });
         $('#errors').append('<div class="error">' +
                             '<h3>Error</h3>' +
                             '<p>' + message + '</p>' +
-                            '<p>Exception: ' + e.name + '</p>' +
+                            '<p>Exception: ' + name + '</p>' +
                             '<a class="close" href="#" title="Close"></a>' +
                             '</div>');
 
