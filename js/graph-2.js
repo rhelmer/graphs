@@ -232,9 +232,7 @@
         $('.show, .hide').click(onShow);
 
         $('#add-data select').unbind();
-        $('#add-data #branches').change(onAddBranches);
-        $('#add-data #tests').change(onAddTests);
-        $('#add-data #platforms').change(onAddPlatforms);
+        $('#add-data select').change(onSelectData);
 
         $('#displayrange').unbind();
         $('#displayrange').change(onDisplayRange);
@@ -480,53 +478,50 @@
         updatePlot();
     }
 
-    // FIXME clear selections from test and platforms
-    function onAddBranches(e)
+    function onSelectData(e)
     {
         try {
+            $('#add-series-done').toggleClass('disabled', false);
             updateAddButton();
+
             var value = e.target.value;
-            $.each($('#tests option'), function(index, option) {
+            $.each($('#tests option'), function() {
                 $(this).attr('disabled', 'disabled');
             });
-            $.each($('#tests option'), function(index, option) {
-                if (option.value in manifest.branchMap[value].testIds) {
-                    $(this).attr('disabled', '');
+            $.each($('#platforms option'), function() {
+                $(this).attr('disabled', 'disabled');
+            });
+            
+            $.each($('#branches option:selected'), function(i,branch) {
+                $.each($('#tests option'), function(j,test) {
+                    if (branch.value in manifest.testMap[test.value].branchIds) {
+                        $(this).attr('disabled', '');
+                    } else {
+                        $(this).attr('disabled', 'disabled');
+                    }
+                });
+            });
+
+            $.each($('#branches option:selected'), function(i,branch) {
+                $.each($('#tests option:selected'), function(j,test) {
+                    $.each($('#platforms option'), function(k,platform) {
+                        if ((test.value in manifest.platformMap[platform.value].testIds) &&
+                            (branch.value in manifest.platformMap[platform.value].branchIds)) {
+                            $(this).attr('disabled', '');
+                        } else {
+                            $(this).attr('disabled', 'disabled');
+                        }
+                    });
+                });
+            });
+
+            $.each($('#add-data-form option:selected'), function() {
+                // FIXME could probably do this in selector
+                if ($(this).attr('disabled')) {
+                    $(this).removeAttr('selected');
                 }
             });
-        } catch (e) {
-          error('Could not build menu', e);
-        }
-    }
 
-    // FIXME clear selections from test and platforms
-    function onAddTests(e)
-    {
-        try {
-          updateAddButton();
-          var value = e.target.value;
-          $.each($('#platforms option'), function(index, option) {
-              $(this).attr('disabled', 'disabled');
-          });
-          $.each($('#platforms option'), function(index, option) {
-              if (value in manifest.platformMap[option.value].testIds) {
-                  if (option.value in manifest.branchMap) {
-                      if (value in manifest.branchMap[option.value].testIds) {
-                          $(this).attr('disabled', '');
-                      }
-                  }
-              }
-          });
-        } catch (e) {
-          error('Could not build menu', e);
-        }
-    }
-
-    function onAddPlatforms(e)
-    {
-        try {
-            updateAddButton();
-            $('#add-series-done').toggleClass('disabled', false);
         } catch (e) {
             error('Could not build menu', e);
         }
