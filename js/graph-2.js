@@ -207,6 +207,7 @@
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
         allSeries[uniqueSeries] = ajaxSeries;
+        //TODO use selection provided by URL
 /*
         if (sel) {
             var range = {
@@ -558,7 +559,7 @@
         }
 
         var url = 'http://hg.mozilla.org/mozilla-central/pushloghtml?' +
-                  'startDate=' + startDate + '&enddate=' + endDate;
+                  'startdate=' + startDate + '&enddate=' + endDate;
         window.open(url);
     }
 
