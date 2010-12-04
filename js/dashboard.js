@@ -126,7 +126,7 @@
                     var $plot = $('#placeholder.'+platformName+'.'+testName);
                     updatePlot(data, $plot);
                     $plot.bind('plotclick', function() {
-                        window.open('http://localhost/graphs/graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=1290815772238,1291420572238&displayrange=90');
+                        window.open('/graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=1290815772238,1291420572238&displayrange=90');
                     });
         
                 } catch (e) {
