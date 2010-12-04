@@ -131,7 +131,7 @@
             $.ajaxSetup({
                 'error': function(xhr, e, message) {
                     error('Could not download test run data from server', e);
-                    $plot.html('Failed to load');
+                    $plot.html('<p class="failed">Failed</p>');
                 }
             });
 
