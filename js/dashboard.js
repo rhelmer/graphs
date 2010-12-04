@@ -260,5 +260,5 @@
     }
     $('#displayrange').change(onDisplayRange);
     refreshGraphs();
-    window.setInterval(refreshGraphs, 60 * 1000);
+    //window.setInterval(refreshGraphs, 60 * 1000);
 })(jQuery);
