@@ -576,20 +576,22 @@
             if (previous != '') {
                 var dv = (elapsed - previous).toFixed(0);
                 var dvp = (((elapsed / previous) - 1) * 100).toFixed(1);
+                var padding = '&nbsp;';
                 var color = 'red';
-                if (dv < 0) {
+                if (dvp < 0) {
                     color = 'green';
+                    padding = '';
                 }
                 delta = '<span style="color:'+color+'">' +
-                        '&Delta; ' + dv + ' ms (' + dvp + '%)'
+                        '&Delta; ' + padding  + dv + ' ms (' + dvp + '%)'
                         + '</span>';
             }
             var url = 'http://hg.mozilla.org/mozilla-central/rev/' + rev;
             previous = elapsed;
             csets
                  .append('<a href="'+url+'">'+rev+'</a> ')
-                 .append(delta+' ')
-                 .append(elapsed)
+                 .append(elapsed.toFixed(3) + ' ')
+                 .append(delta)
                  .append('<br>');
         }
 
