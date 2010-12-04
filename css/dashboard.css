@@ -48,6 +48,18 @@ a:hover {
 	background: -moz-linear-gradient(-90deg, #1f62aa, #164183);
 }
 
+table {
+	border: 1px solid black;
+}
+
+thead, table .rowhead {
+	background: -moz-linear-gradient(-90deg, #f8f8f8, #e7e7e7);
+}
+
+.rowhead p {
+	-moz-transform: rotate(90deg);
+}
+
 #toolbar {
 	background: -moz-linear-gradient(-90deg, #f8f8f8, #e7e7e7);
 	border-bottom-color: #d0d0d0;
