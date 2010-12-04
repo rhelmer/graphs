@@ -26,7 +26,7 @@
         return this;
     };
 
-    var displayDays = 90;
+    var displayDays = 30;
     var DAY = 86400000;
     $('.selectBox').selectBox();
     $('#displayrange').toggleClass('disabled', false);
@@ -147,7 +147,7 @@
                     updatePlot(data, $plot);
                     $plot.unbind();
                     $plot.bind('plotclick', function() {
-                        window.open('graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=1290815772238,1291420572238&displayrange=90');
+                        window.open('graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=none&displayrange='+displayDays);
                     });
                     $plot.css({ cursor: 'pointer' });
         
