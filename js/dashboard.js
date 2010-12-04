@@ -116,15 +116,18 @@
             var testName = id[1][0];
             var branchName = id[1][1];
             var platformName = id[1][2];
-            $.ajaxSetup({
-                'error': function(xhr, e, message) {
-                    error('Could not download test run data from server', e);
-                }
-            });
 
             var $plot = $('#placeholder.'+platformName+'.'+testName);
             $plot.html('<small class="loader" title="Series is loading">' +
                          'Loading</small>');
+
+            $.ajaxSetup({
+                'error': function(xhr, e, message) {
+                    error('Could not download test run data from server', e);
+                    $plot.html('Failed to load');
+                }
+            });
+
         
             $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
                                          platformid: platformid}, function(data) {
