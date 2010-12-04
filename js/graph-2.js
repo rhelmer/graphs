@@ -1,55 +1,4 @@
 (function($) {
-    $.fn.selectBox = function() {
-        var onchange = function(e) {
-            var option = $('option:selected', this).html();
-            $(this).parent().find('span').html(option);
-        };
-        var sync = function(e) {
-            var select = $(this);
-            $('option', this).each(function() {
-                if (displayDays == $(this).val()) {
-                    select.val($(this).val());
-                }
-            });
-            // FIXME remove redundancy; call change() above
-            var option = $('option:selected', this).html();
-            $(this).parent().find('span').html(option);
-        };
-
-        var selects = this.find('select');
-        this.prepend('<span></span>');
-        selects.each(sync);
-        selects.focus(function(e) { $(this).parent().addClass('sbFocus'); });
-        selects.blur(function(e) { $(this).parent().removeClass('sbFocus'); });
-        selects.change(onchange);
-
-        return this;
-    };
-
-
-    var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
-                  '#bf5c41', '#e7454c'];
-    var LIGHT_COLORS = $.map(COLORS, function(color) {
-        return $.color.parse(color).add('a', -.5).toString();
-    });
-
-    var DAY = 86400000;
-
-    var PLOT_OPTIONS = {
-        xaxis: { mode: 'time' },
-        selection: { mode: 'x', color: '#97c6e5' },
-        /* crosshair: { mode: 'xy', color: '#cdd6df', lineWidth: 1 }, */
-        series: { shadowSize: 0 },
-        lines: { show: true },
-        grid: {
-            color: '#cdd6df',
-            borderWidth: 2,
-            backgroundColor: '#fff',
-            hoverable: true,
-            clickable: true,
-            autoHighlight: false
-        }
-    };
 
     var OVERVIEW_OPTIONS = {
         xaxis: { mode: 'time' },
@@ -81,6 +30,7 @@
     function init()
     {
         initPlot();
+        updateBindings();
 
         try {
           var args = window.location.hash.split('&');
@@ -735,37 +685,6 @@
         }
     }
 
-    function parseSeries(seriesIn, i, weight, explodedWeight)
-    {
-        if (!seriesIn.exploded) {
-            var color = COLORS[i % COLORS.length];
-            var datasets = [{ data: seriesIn.mean }];
-            var lineWidth = seriesIn.visible ? weight : 0;
-        }
-
-        else {
-            var color = LIGHT_COLORS[i % LIGHT_COLORS.length];
-            var datasets = seriesIn.runs;
-            var lineWidth = seriesIn.visible ? explodedWeight : 0;
-        }
-
-        return $.map(datasets, function(d) {
-            return {
-                lines: { lineWidth: lineWidth },
-                color: color,
-                data: $.map(d.data, function(p) { return [[p.t, p.v]]; }),
-                etc: {
-                    branch: seriesIn.branch,
-                    test: seriesIn.test,
-                    platform: seriesIn.platform,
-                    machine: d.machine,
-                    changesets: $.map(d.data, function(p) {return p.changeset;})
-                }
-            };
-        });
-    }
-
-
     var ttHideTimer = null,
         ttLocked = false;
 
@@ -865,8 +784,6 @@
         console.log(JSON.stringify(message));
       }
     }
-
-    updateBindings();
 
     function fetchData(testid, branchid, platformid, sel) {
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
