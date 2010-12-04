@@ -122,6 +122,10 @@
                 }
             });
 
+            var $plot = $('#placeholder.'+platformName+'.'+testName);
+            $plot.html('<small class="loader" title="Series is loading">' +
+                         'Loading</small>');
+        
             $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
                                          platformid: platformid}, function(data) {
                 try {
@@ -130,7 +134,6 @@
                         error('Could not import test run data', false, data);
                         return false;
                     }
-                    var $plot = $('#placeholder.'+platformName+'.'+testName);
                     updatePlot(data, $plot);
                     $plot.unbind();
                     $plot.bind('plotclick', function() {
