@@ -49,11 +49,18 @@ a:hover {
 }
 
 table {
-	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+table, th, td {
+	border: 1px solid lightgrey;
+	padding: 5px;
 }
 
 thead, table .rowhead {
 	background: -moz-linear-gradient(-90deg, #f8f8f8, #e7e7e7);
+	font-size: 14px;
+	text-align: center;
 }
 
 .rowhead p {
@@ -117,6 +124,8 @@ thead, table .rowhead {
 }
 .loader {
 	position: relative;
+	left: 45%;
+	top: 50%;
 	width: 16px;
 	height: 16px;
 	background: url(loading-small.gif) no-repeat left top;

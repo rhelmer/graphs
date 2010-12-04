@@ -125,8 +125,8 @@
             var platformName = id[1][2];
 
             var $plot = $('#placeholder.'+platformName+'.'+testName);
-            $plot.html('<small class="loader" title="Series is loading">' +
-                         'Loading</small>');
+            $plot.html('<p class="loader" title="Series is loading">' +
+                         '</p>');
 
             $.ajaxSetup({
                 'error': function(xhr, e, message) {
