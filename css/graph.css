@@ -412,12 +412,13 @@ a:hover {
 	display: none;
 	position: fixed;
 	height: 384px;
-	width: 900px;
+	width: 680px;
 	background: #FFFFFF;
 	border: 2px solid #cecece;
 	z-index: 2;
 	padding: 12px;
 	font-size: 13px;
+	-moz-border-radius: 15px;
 }
 
 #link-overlay {
@@ -430,6 +431,7 @@ a:hover {
 	z-index: 2;
 	padding: 12px;
 	font-size: 13px;
+	-moz-border-radius: 15px;
 }
 
 #backgroundPopup{  
