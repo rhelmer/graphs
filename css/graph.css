@@ -423,8 +423,8 @@ a:hover {
 #link-overlay {
 	display: none;
 	position: fixed;
-	height: 100px;
-	width: 250px;
+	height: 50px;
+	width: 220px;
 	background: #FFFFFF;
 	border: 2px solid #cecece;
 	z-index: 2;
