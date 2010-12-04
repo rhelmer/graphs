@@ -821,9 +821,16 @@
         }
     }
 
-    function lockTooltip() { ttLocked = true; $('#tooltip').addClass('locked');}
-    function unlockTooltip() { ttLocked = false;
-                               $('#tooltip').removeClass('locked'); }
+    function lockTooltip() { 
+        ttLocked = true; 
+        $('#tooltip').addClass('locked');
+        $('#tt-help').html('');
+    }
+    function unlockTooltip() { 
+        ttLocked = false;
+        $('#tooltip').removeClass('locked'); 
+        $('#tt-help').html('Click to lock');
+    }
 
     function isTooltipLocked() { return ttLocked; }
 
