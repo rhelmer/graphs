@@ -104,9 +104,9 @@ a:hover {
 	-moz-border-radius: 2px;
 }
 .loader {
-	position: absolute;
-	right: 10px;
-	bottom: 10px;
+	position: relative;
+	right: 50%;
+	bottom: 50%;
 	width: 16px;
 	height: 16px;
 	background: url(loading-small.gif) no-repeat left top;
