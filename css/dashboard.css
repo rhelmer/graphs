@@ -112,6 +112,14 @@ a:hover {
 		font-size: 9px;
 		-moz-border-radius: 2px;
 	}
+.loader {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	width: 16px;
+	height: 16px;
+	background: url(loading-small.gif) no-repeat left top;
+}
 
 #legend {
 	font-size: 11px;
