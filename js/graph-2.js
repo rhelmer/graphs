@@ -547,22 +547,65 @@
     function onShowChangesets(e)
     {
         e.preventDefault();
-        var startDate;
-        var endDate;
 
-        if ((_zoomFrom) && (_zoomTo)) {
-            startDate = new Date(_zoomFrom).getTime();
-            endDate = new Date(_zoomTo).getTime();
-        } else {
-            startDate = new Date(minT).getTime();
-            endDate = new Date(maxT).getTime();
+        // find changes which match this range
+        var changes = {};
+        var range = getZoomRange();
+        $.each(allSeries, function(i, series) {
+            $.each(series.runs, function(j, run) {
+                $.each(run.data, function(k, data) {
+                    var time = parseInt(data.t);
+                    var from = parseInt(range.from);
+                    var to = parseInt(range.to);
+                    if (time >= from && time <= to) {
+                        changes[time] = data.changeset;
+                    }
+                });
+            });
+        });
+
+        changes = sortObject(changes);
+
+        var links = [];
+
+        for (var time in changes) {
+            var url = 'http://hg.mozilla.org/mozilla-central/rev/' + changes[time];
+            links.push(url);
         }
 
-        var url = 'http://hg.mozilla.org/mozilla-central/pushloghtml?' +
-                  'startdate=' + startDate + '&enddate=' + endDate;
-        window.open(url);
+        debug(links);
     }
 
+    // http://stackoverflow.com/questions/1359761/sorting-a-json-object-in-javascript
+    function sortObject(o) {
+        var sorted = {},
+        key, a = [];
+    
+        for (key in o) {
+            if (o.hasOwnProperty(key)) {
+                    a.push(key);
+            }
+        }
+    
+        a.sort();
+    
+        for (key = 0; key < a.length; key++) {
+            sorted[a[key]] = o[a[key]];
+        }
+        return sorted;
+    }
+
+    /* use a function for the exact format desired... */
+    function ISODateString(d){
+       function pad(n){return n<10 ? '0'+n : n}
+       return d.getUTCFullYear()+'-'
+           + pad(d.getUTCMonth()+1)+'-'
+           + pad(d.getUTCDate())+'+'
+           + pad(d.getUTCHours())+':'
+           + pad(d.getUTCMinutes())+':'
+           + pad(d.getUTCSeconds())
+    }
+    
     function onExportCSV(e)
     {
         e.preventDefault();
@@ -570,14 +613,14 @@
         var endDate;
 
         if ((_zoomFrom) && (_zoomTo)) {
-            startDate = new Date(_zoomFrom).getTime();
-            endDate = new Date(_zoomTo).getTime();
+            startDate = new Date(_zoomFrom);
+            endDate = new Date(_zoomTo);
         } else {
-            startDate = new Date(minT).getTime();
-            endDate = new Date(maxT).getTime();
+            startDate = new Date(minT);
+            endDate = new Date(maxT);
         }
         var url = 'http://graphs.mozilla.org/server/dumpdata.cgi?' +
-                  'show=' + startDate + ',' + endDate;
+                  'show=' + startDate.getTime() + ',' + endDate.getTime();
         // FIXME fix server!
         window.open(url);
     }
@@ -585,6 +628,8 @@
     function onLink(e)
     {
         e.preventDefault();
+        $('#link-overlay').html(window.location);
+        linkPopup();
     }
 
     function onEmbed(e)
@@ -858,6 +903,32 @@
         });
     }
 
+    function linkPopup()
+    {
+        $('#backgroundPopup').css({
+            'opacity': '0.7'
+        });
+        $('#backgroundPopup').fadeIn('fast');
+        $('#link-overlay').fadeIn('fast');
+
+        // center
+        var windowWidth = document.documentElement.clientWidth;
+        var windowHeight = document.documentElement.clientHeight;
+        var popupHeight = $('#link-overlay').height();
+        var popupWidth = $('#link-overlay').width();
+        $('#link-overlay').css({
+            'position': 'absolute',
+            'top': windowHeight / 2 - popupHeight / 2,
+            'left': windowWidth / 2 - popupWidth / 2
+        });
+    }
+
+    function disableLinkPopup()
+    {
+        $('#backgroundPopup').fadeOut('fast');
+        $('#add-data').fadeOut('fast');
+    }
+
     function addDataPopup()
     {
         if (!manifest) {
@@ -973,10 +1044,11 @@
         // TODO add datatype feature
         //$('#datatype').toggleClass('disabled', false);
         $('#zoomin').toggleClass('disabled', false);
-        $('#showchangesets').toggleClass('disabled', false);
+        // TODO implement show changes
+        //$('#showchangesets').toggleClass('disabled', false);
         $('#exportcsv').toggleClass('disabled', false);
         // TODO add link feature
-        //$('#link').toggleClass('disabled', false);
+        $('#link').toggleClass('disabled', false);
         // TODO add embed feature
         //$('#embed').toggleClass('disabled', false);
 
