@@ -48,9 +48,16 @@
         }
     };
 
+    function debug(message)
+    {
+      if (typeof(console) !== 'undefined' && console != null) {
+        console.log(message);
+        console.log(JSON.stringify(message));
+      }
+    }
 
     function error(message, e, data) {
-        console.log(e);
+        debug(e);
         var name = (e != null ? e.name : "");
         $('#errors').hide().css({ opacity: 1 });
         $('#errors').append('<div class="error">' +
