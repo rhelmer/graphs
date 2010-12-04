@@ -131,6 +131,14 @@ thead, table .rowhead {
 	background: url(loading-small.gif) no-repeat left top;
 }
 
+.failed {
+	position: relative;
+	left: 45%;
+	top: 50%;
+	width: 16px;
+	height: 16px;
+}
+
 #errors {
 	display: none;
 	position: absolute;
