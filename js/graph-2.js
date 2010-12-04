@@ -558,23 +558,36 @@
                     var from = parseInt(range.from);
                     var to = parseInt(range.to);
                     if (time >= from && time <= to) {
-                        changes[time] = data.changeset;
+                        changes[time] = [data.changeset,data.v];
                     }
+                    previous = data.v;
                 });
             });
         });
 
         changes = sortObject(changes);
 
-        var links = [];
-
         var csets = $('#showchangesets-overlay #changesets')
+        var previous = '';
         for (var time in changes) {
-            var rev = changes[time];
-            var url = 'http://hg.mozilla.org/mozilla-central/rev/' + changes[time];
-            links.push(url);
-            csets.prepend('<a href="'+url+'">'+rev+'</a>')
-                 .prepend('<br>');
+            var rev = changes[time][0];
+            var elapsed = changes[time][1];
+            var delta = '';
+            if (previous != '') {
+                var dv = (elapsed - previous).toFixed(0);
+                var color = 'red';
+                if (dv < 0) {
+                    color = 'green';
+                }
+                delta = '<span style="color:'+color+'">&Delta; ' + (elapsed - previous).toFixed(0)+'</span>';
+            }
+            var url = 'http://hg.mozilla.org/mozilla-central/rev/' + rev;
+            previous = elapsed;
+            csets
+                 .append('<a href="'+url+'">'+rev+'</a> ')
+                 .append(delta+' ')
+                 .append(elapsed)
+                 .append('<br>');
         }
 
         showChangesetsPopup();
