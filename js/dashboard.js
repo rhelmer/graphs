@@ -9,7 +9,11 @@
         [[36,1,12], ['tp','firefox','windows7']],
         [[36,1,1], ['tp','firefox','windowsxp']],
         [[36,1,3], ['tp','firefox','macosx']],
-        [[36,1,14], ['tp','firefox','linux']]
+        [[36,1,14], ['tp','firefox','linux']],
+        [[21,1,12], ['ss','firefox','windows7']],
+        [[21,1,1], ['ss','firefox','windowsxp']],
+        [[21,1,3], ['ss','firefox','macosx']],
+        [[21,1,14], ['ss','firefox','linux']]
     ];
     
     function updatePlot(series, plot)
