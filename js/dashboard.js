@@ -142,6 +142,7 @@
                     $plot.bind('plotclick', function() {
                         window.open('graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=1290815772238,1291420572238&displayrange=90');
                     });
+                    $plot.css({ cursor: 'pointer' });
         
                 } catch (e) {
                     error('Could not load data series', e);
