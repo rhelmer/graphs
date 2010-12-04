@@ -575,11 +575,14 @@
             var delta = '';
             if (previous != '') {
                 var dv = (elapsed - previous).toFixed(0);
+                var dvp = (((elapsed / previous) - 1) * 100).toFixed(1);
                 var color = 'red';
                 if (dv < 0) {
                     color = 'green';
                 }
-                delta = '<span style="color:'+color+'">&Delta; ' + (elapsed - previous).toFixed(0)+'</span>';
+                delta = '<span style="color:'+color+'">' +
+                        '&Delta; ' + dv + ' ms (' + dvp + '%)'
+                        + '</span>';
             }
             var url = 'http://hg.mozilla.org/mozilla-central/rev/' + rev;
             previous = elapsed;
