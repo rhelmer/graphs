@@ -574,16 +574,17 @@
             var elapsed = changes[time][1];
             var delta = '';
             if (previous != '') {
-                var dv = (elapsed - previous).toFixed(0);
-                var dvp = (((elapsed / previous) - 1) * 100).toFixed(1);
+                var dv = (elapsed - previous);
+                var dvp = (((elapsed / previous) - 1) * 100);
                 var padding = '&nbsp;';
                 var color = 'red';
                 if (dvp < 0) {
                     color = 'green';
                     padding = '';
                 }
-                delta = '<span style="color:'+color+'">' +
-                        '&Delta; ' + padding  + dv + ' ms (' + dvp + '%)'
+                delta = '<span style="color:'+color+'">'
+                        + '&Delta; ' + padding  + dv.toFixed(0) 
+                        + ' ms (' + dvp.toFixed(1) + '%)'
                         + '</span>';
             }
             var url = 'http://hg.mozilla.org/mozilla-central/rev/' + rev;
