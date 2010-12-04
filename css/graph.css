@@ -434,6 +434,24 @@ a:hover {
 	-moz-border-radius: 15px;
 }
 
+#showchangesets-overlay {
+	display: none;
+	position: fixed;
+	height: 480px;
+	width: 600px;
+	background: #FFFFFF;
+	border: 2px solid #cecece;
+	z-index: 2;
+	padding: 12px;
+	font-size: 13px;
+	-moz-border-radius: 15px;
+}
+
+#changesets {
+	height: 400px;
+	overflow: auto;
+}
+
 #backgroundPopup{  
 	display:none;  
 	position:fixed;  

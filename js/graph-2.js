@@ -568,12 +568,17 @@
 
         var links = [];
 
+        var csets = $('#showchangesets-overlay #changesets')
         for (var time in changes) {
+            var rev = changes[time];
             var url = 'http://hg.mozilla.org/mozilla-central/rev/' + changes[time];
             links.push(url);
+            csets.prepend('<a href="'+url+'">'+rev+'</a>')
+                 .prepend('<br>');
         }
 
-        debug(links);
+        showChangesetsPopup();
+        $('#showchangesets-done').click(disableShowChangesetsPopup);
     }
 
     // http://stackoverflow.com/questions/1359761/sorting-a-json-object-in-javascript
@@ -940,6 +945,34 @@
         $('#link-copy').remove();
     }
 
+    function showChangesetsPopup()
+    {
+        $('#backgroundPopup').css({
+            'opacity': '0.7'
+        });
+        $('#backgroundPopup').fadeIn('fast');
+        $('#showchangesets-overlay').fadeIn('fast');
+
+        // center
+        var windowWidth = document.documentElement.clientWidth;
+        var windowHeight = document.documentElement.clientHeight;
+        var popupHeight = $('#showchangesets-overlay').height();
+        var popupWidth = $('#showchangesets-overlay').width();
+        $('#showchangesets-overlay').css({
+            'position': 'absolute',
+            'top': windowHeight / 2 - popupHeight / 2,
+            'left': windowWidth / 2 - popupWidth / 2
+        });
+    }
+
+    function disableShowChangesetsPopup(e)
+    {
+        e.preventDefault();
+        $('#backgroundPopup').fadeOut('fast');
+        $('#showchangesets-overlay').fadeOut('fast');
+        $('#showchangesets-overlay #changesets').html('');
+    }
+
     function addDataPopup()
     {
         if (!manifest) {
@@ -1055,10 +1088,8 @@
         // TODO add datatype feature
         //$('#datatype').toggleClass('disabled', false);
         $('#zoomin').toggleClass('disabled', false);
-        // TODO implement show changes
-        //$('#showchangesets').toggleClass('disabled', false);
+        $('#showchangesets').toggleClass('disabled', false);
         $('#exportcsv').toggleClass('disabled', false);
-        // TODO add link feature
         $('#link').toggleClass('disabled', false);
         // TODO add embed feature
         //$('#embed').toggleClass('disabled', false);
