@@ -105,8 +105,6 @@ a:hover {
 }
 .loader {
 	position: relative;
-	right: 50%;
-	bottom: 50%;
 	width: 16px;
 	height: 16px;
 	background: url(loading-small.gif) no-repeat left top;
