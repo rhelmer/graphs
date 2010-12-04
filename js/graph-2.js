@@ -628,8 +628,10 @@
     function onLink(e)
     {
         e.preventDefault();
-        $('#link-overlay').html(window.location);
+        $('#link-overlay').prepend('<input id="link-copy" type="text" value='+window.location+'>');
         linkPopup();
+        $('#link-copy').focus().select();
+        $('#link-done').click(disableLinkPopup);
     }
 
     function onEmbed(e)
@@ -923,10 +925,12 @@
         });
     }
 
-    function disableLinkPopup()
+    function disableLinkPopup(e)
     {
+        e.preventDefault();
         $('#backgroundPopup').fadeOut('fast');
-        $('#add-data').fadeOut('fast');
+        $('#link-overlay').fadeOut('fast');
+        $('#link-copy').remove();
     }
 
     function addDataPopup()
