@@ -502,6 +502,9 @@
         var changes = {};
         var range = getZoomRange();
         $.each(allSeries, function(i, series) {
+            if (series.runs === undefined) {
+                return true;
+            };
             $.each(series.runs, function(j, run) {
                 $.each(run.data, function(k, data) {
                     var time = parseInt(data.t);
