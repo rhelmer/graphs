@@ -254,6 +254,8 @@
             overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS,
                                        overview_xaxis, yaxis);
         });
+        unlockTooltip();
+        hideTooltip(true);
         plot = $.plot($('#plot'), plotData, plotOptions);
         overview = $.plot($('#overview'), overviewData, overviewOptions);
     }
@@ -357,6 +359,7 @@
         _zoomFrom = null;
         _zoomTo = null;
         updatePlot();
+        zoomOut();
         updateLocation();
     }
 
@@ -1062,9 +1065,7 @@
                            ',' + selectionrange['to'];
         }
         newLocation += '&displayrange=' + $('#displayrange select').val();
-
         window.location = newLocation;
-        
     }
 
     function error(message, e, data) {
