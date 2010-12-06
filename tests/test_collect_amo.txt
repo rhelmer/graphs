@@ -40,7 +40,7 @@ https://wiki.mozilla.org/Buildbot/Talos/DataFormat#Schema_for_AMO_Perf_Results_S
 
     >>> pageload_example = StringIO('''\
     ... Firefox,3.6,1066
-    ... machine_1, tp4, branch_1, changeset_1, 13, 1229477017
+    ... machine_1, ts, branch_1, changeset_1, 13, 1229477017
     ... 1,1.0,page_01
     ... 2,2.0,page_02
     ... 3,3.0,page_03
@@ -83,8 +83,8 @@ https://wiki.mozilla.org/Buildbot/Talos/DataFormat#Schema_for_AMO_Perf_Results_S
     Called graphsdb.amo_db.commit()
     Called graphsdb.amo_db.cursor()
     Called amo_cursor.execute(
-        "...INSERT INTO perf_results...VALUES (%s, %s, %s, %s, 'ts', NOW(), NOW())...",
-        ('1066', 1, 2.0, 2))
+        '...REPLACE INTO perf_results...VALUES (%s, %s, %s, %s, %s, NOW(), NOW())...',
+        ('1066', 1, 2.0, 2, 'ts'))
     Called graphsdb.amo_db.commit()
     >>> startup_example = StringIO('''\
     ... Firefox,3.6,1066
@@ -139,6 +139,6 @@ https://wiki.mozilla.org/Buildbot/Talos/DataFormat#Schema_for_AMO_Perf_Results_S
     Called graphsdb.amo_db.commit()
     Called graphsdb.amo_db.cursor()
     Called amo_cursor.execute(
-        "...INSERT INTO perf_results...VALUES (%s, %s, %s, %s, 'ts', NOW(), NOW())...",
-        ('1066', 3, 898.79999999999995, 4))
+        '...REPLACE INTO perf_results...VALUES (%s, %s, %s, %s, %s, NOW(), NOW())...',
+        ('1066', 3, 898.79999999999995, 4, 'ts'))
     Called graphsdb.amo_db.commit()
