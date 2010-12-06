@@ -56,6 +56,11 @@ table, th, td {
 	padding: 5px;
 }
 
+tbody td {
+	width: 360px;
+	height: 240px;
+}
+
 thead, table .rowhead {
 	background: -moz-linear-gradient(-90deg, #f8f8f8, #e7e7e7);
 	font-size: 14px;
