@@ -13,7 +13,10 @@ sys.path.append(server_path)
 
 
 def main():
-    doctest.testfile('test_collect_amo.txt', optionflags=doctest.ELLIPSIS)
+    optionflags = doctest.ELLIPSIS
+    if '-u' in sys.argv:
+        optionflags |= doctest.REPORT_UDIFF
+    doctest.testfile('test_collect_amo.txt', optionflags=optionflags)
 
 if __name__ == '__main__':
     main()
