@@ -280,8 +280,12 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
         dataSetType = inputStream.readline().strip().upper()
         #responseList.append('line 2: "%s"' % dataSetType)
         if dataSetType == 'AMO':
-            from pyfomatic.collect_amo import parse_amo_collection
-            parse_amo_collection(inputStream)
+            from pyfomatic.collect_amo import parse_amo_collection, ParseError
+            try:
+                parse_amo_collection(inputStream)
+            except ParseError, e:
+                return Response(content_type='text/plain', body=str(e),
+                                status='400 Bad Request')
             return Response(content_type='text/plain', body='Return\tsuccess')
 
         if dataSetType not in ('VALUES', 'AVERAGE'):
