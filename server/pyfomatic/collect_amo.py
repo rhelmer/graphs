@@ -73,6 +73,10 @@ def parse_amo_collection(fp):
     browser_name, browser_version, addon_id = reader.next()
     (machine_name, test_name, branch_name, ref_changeset,
      ref_build_id, date_run) = reader.next()
+    test_name = test_name.lower().strip()
+    if test_name != 'ts':
+        raise ParseError('Only the ts test is supported now (%r provided)'
+                         % test_name)
     value_total = 0
     value_number = 0
     while 1:
@@ -97,8 +101,8 @@ def parse_amo_collection(fp):
     os_id = get_osversions_id(os_name, os_version)
     cur = amo_db.cursor()
     cur.execute("""\
-    INSERT INTO perf_results
+    REPLACE INTO perf_results
                 (addon_id, appversion_id, average, osversion_id, test, created, modified)
-    VALUES (%s, %s, %s, %s, 'ts', NOW(), NOW())
-    """, (addon_id, appversion_id, average, os_id))
+    VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
+    """, (addon_id, appversion_id, average, os_id, test_name))
     amo_db.commit()
