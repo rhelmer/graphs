@@ -263,7 +263,7 @@
 	display: none;
 	position: fixed;
 	height: 50px;
-	width: 220px;
+	width: 260px;
 	background: #FFFFFF;
 	border: 2px solid #cecece;
 	z-index: 2;
@@ -378,7 +378,7 @@
 	display: block;
 	text-align: right;
 }
-#add-overlay button {
+#add-overlay button, #showchangesets-overlay button, #link-overlay button {
 	padding: .25em 1em;
 	border: 1px solid #d0d0d0;
 	margin-left: .5em;
