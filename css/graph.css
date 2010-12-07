@@ -291,35 +291,132 @@
 	overflow: auto;
 }
 
-#backgroundPopup{  
-	display:none;  
-	position:fixed;  
-	height:100%;  
-	width:100%;  
-	top:0;  
-	left:0;  
-	background:#000000;  
-	border:1px solid #cecece;  
-	z-index:1;  
-}  
+#add-overlay {
+	display: none;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,.25);
+	text-align: center;
+	vertical-align: middle;
+	z-index: 1000;
+}
 
-#add-data-form select {
-	height:300px; 
+#add-overlay > div {
+	display: table-cell;
+	vertical-align: middle;
 }
-#add-data-branches {
-	float: left;
-	width: 180px;
+#add-overlay form {
+	display: inline-block;
+	padding: 20px;
+	border: 5px solid #154183;
+	border-radius: 10px;
+	background: #fff;
+	color: #333;
+	text-align: left;
+	-moz-box-shadow: 0 2px 0 #0a2040,
+	                 0 2px 4px rgba();
 }
-#add-data-tests {
-	float: left;
-	width: 250px;
+#add-overlay h2 {
+	font-size: 24px;
+	color: #164183;
 }
-#add-data-platforms {
-	float: left;
-	width: 250px;
+#add-overlay fieldset {
+	margin: 20px 0;
 }
-#add-data-controls {
-	clear: both;
-	float: right;
+#add-overlay fieldset div {
+	display: inline-block;
+	margin-left: 20px;
+}
+#add-overlay fieldset div:first-child {
+	margin-left: 0;
+}
+#add-overlay label {
+	display: block;
+	margin-bottom: .5em;
+	font-weight: bold;
+}
+#add-overlay label.disabled {
+	opacity: .5;
+}
+#add-overlay fieldset select {
+	display: block;
+	width: 18em;
+	height: 16em;
+	border: 1px solid #0b1f3b;
+	font-family: inherit;
+	font-size: inherit;
+}
+#add-overlay fieldset,
+#add-overlay fieldset optgroup,
+#add-overlay fieldset option {
+	font: inherit;
+}
+#add-overlay fieldset optgroup {
+	padding: .5em 0;
+	border-top: 1px solid #cdd6df;
+}
+#add-overlay fieldset optgroup:first-child {
+	border-top: 0;
+}
+#add-overlay fieldset optgroup.primary {
+	font-size: 14px;
+}
+#add-overlay fieldset option {
+	padding: .25em .5em;
+}
+#add-overlay fieldset select:disabled {
+	background: #fff;
+	border-color: #d0d0d0;
+}
+#add-overlay fieldset select:disabled optgroup {
+	opacity: .5;
+}
+#add-overlay footer {
+	display: block;
+	text-align: right;
+}
+#add-overlay button {
+	padding: .25em 1em;
+	border: 1px solid #d0d0d0;
+	margin-left: .5em;
+	font-size: 14px;
+	color: #333;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	background: -moz-linear-gradient(#ffffff, #ededed);
+	cursor: pointer;
+}
+#add-overlay button:hover,
+#add-overlay button:focus,
+#add-overlay button:active {
+	border-color: #808080;
+}
+#add-overlay button:active {
+	-moz-box-shadow: inset 0 1px 1px rgba(0,0,0,.2);
+}
+#add-overlay button:active span {
+	position: relative;
+	top: 1px;
+}
+#add-overlay button[type="submit"] {
+	background: -moz-linear-gradient(#4b83c1, #426ca6);
+	border-color: #273f6c;
+	color: #fff;
+}
+#add-overlay button[type="submit"]:hover,
+#add-overlay button[type="submit"]:focus,
+#add-overlay button[type="submit"]:active {
+	box-shadow: inset 0 0 2px #fff;
+}
+#add-overlay button[type="submit"]:active {
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.5);
+}
+#add-overlay button[type="submit"]:disabled {
+	border-color: #d0d0d0;
+	background: -moz-linear-gradient(#ffffff, #ededed);
+	color: #ccc;
 }
 

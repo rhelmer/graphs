@@ -91,29 +91,31 @@
     <div class="tip"></div>
 </div>
 
-<div id="add-data">
-    <form id="add-data-form">
-        <div id="add-data-branches">
-            Select Branches:
-            <select id="branches" multiple="true">
-            </select>
-        </div>
-        <div id="add-data-tests">
-            Select Tests:
-            <select id="tests" multiple="true">
-            </select>
-        </div>
-        <div id="add-data-platforms">
-            Select Platforms:
-            <select id="platforms" multiple="true">
-            </select>
-        </div>
-        <div id="add-data-controls">
-            <a class="button" id="add-series-cancel" href="#">Cancel</a>
-            <button class="button disabled" id="add-series-done" href="#">Add (n) Data Series</button>
-        </div>
-    </form>
-</div>
+<section id="add-overlay">
+    <div>
+        <form id="add-data-form">
+            <h2>Add Test Data</h2>
+            <fieldset>
+                <div>
+                    <label for="add-branches">Select Branches:</label>
+                    <select id="add-branches" multiple="multiple"></select>
+                </div>
+                <div>
+                    <label for="add-tests">Select Tests:</label>
+                    <select id="add-tests" multiple="multiple"></select>
+                </div>
+                <div>
+                    <label for="add-platforms">Select Platforms:</label>
+                    <select id="add-platforms" multiple="multiple"></select>
+                </div>
+            </fieldset>
+            <footer>
+                <button id="add-data-cancel" href="#">Cancel</button>
+                <button class="disabled" id="add-series-done" type="submit">Add 0 Data Series</button>
+            </footer>
+        </form>
+    </div>
+</section>
 
 <div id="link-overlay">
     <a class="button" id="link-done" href="#">Done</a>
