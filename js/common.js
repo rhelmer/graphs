@@ -87,12 +87,8 @@ $.fn.selectBox = function() {
 };
 
 // FIXME perhaps graphserver should send us data in this format instead
-function convertData(testid, branchid, platformid, data)
+function convertData(testName, branchName, platformName, data)
 {
-    var testName = testid;
-    var branchName = branchid;
-    var platformName = platformid;
-
     var gdata =
     {
         'branch': branchName,
