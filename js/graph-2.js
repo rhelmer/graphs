@@ -16,6 +16,8 @@
     };
 
 
+    var suggested_graphs = 7;
+
     var plot, overview, ajaxSeries;
     var _zoomFrom, _zoomTo;
     var minT, maxT;
@@ -48,6 +50,11 @@
           }
           if (tests) {
               tests = JSON.parse(tests);
+              if (tests.length > suggested_graphs) {
+                  if (!confirmTooMuchData(tests.length)) {
+                      return false;
+                  }
+              }
               for (var i = 0; i < tests.length; i++)
               {
                   var run = tests[i];
@@ -961,6 +968,24 @@
         var branches = $('#branches').val();
         var tests = $('#tests').val();
         var platforms = $('#platforms').val();
+        var count = 0;
+        $.each(branches, function() {
+            $.each(tests, function() {
+                $.each(platforms, function() {
+                    count += 1;
+                });
+            });
+        });
+        $.each(allSeries, function(i, series) {
+            if (!$.isEmptyObject(series)) {
+                count += 1;
+            }
+        });
+        if (count > suggested_graphs) {
+            if (!confirmTooMuchData(count)) {
+                return false;
+            }
+        }
         $.each($(branches), function(i, branch) {
             $.each($(tests), function(j, test) {
                 $.each($(platforms), function(k, platform) {
@@ -1094,6 +1119,14 @@
     });
 
   return false;
+}
+
+function confirmTooMuchData(count)
+{
+    var msg = 'WARNING: You are about to load ' + count + ' data series.\n' +
+              'Loading more than ' + suggested_graphs + ' is not recommended.\n' +
+              'Do it anyway?';
+    return window.confirm(msg);
 }
 
 $(init);
