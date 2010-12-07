@@ -100,7 +100,6 @@ function convertData(testid, branchid, platformid, data)
         'minT': undefined,
         'maxV': undefined,
         'minV': undefined,
-        'mean': [],
         'platform': platformName,
         'runs': [],
         'test': testName,
