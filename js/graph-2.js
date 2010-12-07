@@ -749,7 +749,10 @@
         $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
                                      platformid: platformid}, function(data) {
             try {
-                data = convertData(testid, branchid, platformid, data);
+                var testName = manifest.testMap[testid].name;
+                var branchName = manifest.branchMap[branchid].name;
+                var platformName = manifest.platformMap[platformid].name;
+                data = convertData(testName, branchName, platformName, data);
                 if (!data) {
                     error('Could not import test run data', false, data);
                     return false;
