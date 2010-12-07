@@ -132,9 +132,9 @@ thead, table .rowhead {
 	position: relative;
 	left: 45%;
 	top: 50%;
-	width: 16px;
-	height: 16px;
-	background: url(loading-small.gif) no-repeat left top;
+	width: 64px;
+	height: 64px;
+	background: url(dashboard-loading.gif) no-repeat left top;
 }
 
 .failed {
