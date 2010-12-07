@@ -32,6 +32,13 @@ a:hover {
 	border: 0 solid #000;
 }
 
+#logo {
+	position: absolute;
+	top: 15px;
+	left: 10px;
+	color: #FFF;
+}
+
 #header { left: 0; right: 0; }
 #options { left: 0; width: 231px; border-right-width: 1px; }
 #toolbar, #charts { left: 230px; right: 0; }
@@ -46,6 +53,18 @@ a:hover {
 	background: -moz-linear-gradient(-90deg, #1f62aa, #164183);
 }
 
+#dashboard {
+	position: absolute;
+	top: 15px;
+	right: 120px;
+}
+
+#chart {
+	position: absolute;
+	top: 15px;
+	right: 30px;
+	color: #FFF;
+}
 
 #options {
 	padding: 10px;

@@ -3,6 +3,8 @@ html {
 	font-size: 12px;
 	background: #eff6fd url(bg.png);
 	margin: 20px;
+	margin-left: 220px;
+	overflow: hidden;
 }
 
 a {
@@ -41,14 +43,35 @@ a:hover {
 #header { top: 0; height: 49px; border-bottom-width: 1px; }
 #options { top: 49px; bottom: 0; }
 #toolbar { top: 49px; height: 37px; border-bottom-width: 1px; }
-#charts { top: 86px; bottom: 0; }
+#charts { top: 86px; bottom: 0; overflow: auto;}
 
 #header {
 	background: -moz-linear-gradient(-90deg, #1f62aa, #164183);
 }
 
+#logo {
+	position: absolute;
+	top: 15px;
+	left: 10px;
+	color: #FFF;
+}
+
+#dashboard {
+	position: absolute;
+	top: 15px;
+	right: 120px;
+	color: #FFF;
+}
+
+#chart {
+	position: absolute;
+	top: 15px;
+	right: 30px;
+}
+
 table {
 	border-collapse: collapse;
+	overflow: auto;
 }
 
 table, th, td {
