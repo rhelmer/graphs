@@ -130,8 +130,8 @@ thead, table .rowhead {
 }
 .loader {
 	position: relative;
-	left: 45%;
-	top: 50%;
+	left: 40%;
+	top: 30%;
 	width: 64px;
 	height: 64px;
 	background: url(dashboard-loading.gif) no-repeat left top;
