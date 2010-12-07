@@ -743,6 +743,7 @@
         $.ajaxSetup({
             'error': function(xhr, e, message) {
                 error('Could not download test run data from server', e);
+                addSeries(testid, branchid, platformid, addSeriesNode, true);
             }
         });
         $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
@@ -924,7 +925,7 @@
         return true;
     }
 
-    function addSeries(testid, branchid, platformid, node) {
+    function addSeries(testid, branchid, platformid, node, failed) {
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
         var testName = manifest.testMap[testid].name;
@@ -944,6 +945,9 @@
           $('.remove').click(onRemove);
           $('#' + uniqueSeries + ' .loader').show();
           $(node).append('</li>');
+        } else if (failed == true) {
+          $('#' + uniqueSeries + ' .loader').hide();
+          $(node).append('Failed');
         } else {
           color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
           $('#' + uniqueSeries + ' .loader').hide();
