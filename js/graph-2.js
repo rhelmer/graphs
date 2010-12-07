@@ -111,8 +111,8 @@
         $('.show, .hide').unbind();
         $('.show, .hide').click(onShow);
 
-        $('#add-data select').unbind();
-        $('#add-data select').change(onSelectData);
+        $('#add-data-form select').unbind();
+        $('#add-data-form select').change(onSelectData);
 
         $('#displayrange').unbind();
         $('#displayrange').change(onDisplayRange);
@@ -136,7 +136,6 @@
         $('#embed').click(onEmbed);
 
         $(document).keydown(onPageKeyDown);
-
         $(window).resize(onResize);
     }
 
@@ -368,15 +367,15 @@
             updateAddButton();
 
             var value = e.target.value;
-            $.each($('#tests option'), function() {
+            $.each($('#add-tests option'), function() {
                 $(this).attr('disabled', 'disabled');
             });
-            $.each($('#platforms option'), function() {
+            $.each($('#add-platforms option'), function() {
                 $(this).attr('disabled', 'disabled');
             });
             
-            $.each($('#branches option:selected'), function(i,branch) {
-                $.each($('#tests option'), function(j,test) {
+            $.each($('#add-branches option:selected'), function(i,branch) {
+                $.each($('#add-tests option'), function(j,test) {
                     if (branch.value in manifest.testMap[test.value].branchIds) {
                         $(this).attr('disabled', '');
                     } else {
@@ -385,9 +384,9 @@
                 });
             });
 
-            $.each($('#branches option:selected'), function(i,branch) {
-                $.each($('#tests option:selected'), function(j,test) {
-                    $.each($('#platforms option'), function(k,platform) {
+            $.each($('#add-branches option:selected'), function(i,branch) {
+                $.each($('#add-tests option:selected'), function(j,test) {
+                    $.each($('#add-platforms option'), function(k,platform) {
                         if ((test.value in manifest.platformMap[platform.value].testIds) &&
                             (branch.value in manifest.platformMap[platform.value].branchIds)) {
                             $(this).attr('disabled', '');
@@ -413,9 +412,9 @@
     function updateAddButton() 
     {
         var count = 0;
-        var branches = $('#branches').val() || [];
-        var tests = $('#tests').val() || [];
-        var platforms = $('#platforms').val() || [];
+        var branches = $('#add-branches').val() || [];
+        var tests = $('#add-tests').val() || [];
+        var platforms = $('#add-platforms').val() || [];
         $.each(branches, function() {
             $.each(tests, function() {
                 $.each(platforms, function() {
@@ -847,52 +846,36 @@
         $('#showchangesets-overlay #changesets').html('');
     }
 
-    function addDataPopup()
-    {
-        if (!manifest) {
+	
+    $('#add-series').click(function (e) {
+        if(!manifest) {
             downloadManifest();
         }
-
-        $('#backgroundPopup').css({
-            'opacity': '0.7'
-        });
-        $('#backgroundPopup').fadeIn('fast');
-        $('#add-data').fadeIn('fast');
-
-        // center
-        var windowWidth = document.documentElement.clientWidth;
-        var windowHeight = document.documentElement.clientHeight;
-        var popupHeight = $('#add-data').height();
-        var popupWidth = $('#add-data').width();
-        $('#add-data').css({
-            'position': 'absolute',
-            'top': windowHeight / 2 - popupHeight / 2,
-            'left': windowWidth / 2 - popupWidth / 2
-        });
-    }
-
-    function disableAddDataPopup()
-    {
-        $('#backgroundPopup').fadeOut('fast');
-        $('#add-data').fadeOut('fast');
-    }
-
-    $('#add-series').click(function(event) {
-        event.preventDefault();
-        addDataPopup();
+    	$('#add-overlay')
+    		.css({ opacity: 0, display: 'table' })
+    		.animate({ opacity: 1 }, 250);
+    	return false;
+    });
+    
+    $('#add-overlay').click(function (e) {
+    	//if ($(e.target).closest('#add-data').length == 0) {
+    	//	$(this).animate({ opacity: 'hide' }, 250);
+    	//	return false;
+    	//}
+    });
+    
+    $('#add-data-cancel').click(function (e) {
+    	$('#add-data').get(0).reset();
+    	$('#add-overlay').animate({ opacity: 'hide' }, 250);
+    	return false;
     });
 
-    $('#add-series-cancel').click(function(event) {
+    $('#add-data-form').submit(function (event) {
+    	$('#add-overlay').animate({ opacity: 'hide' }, 250);
         event.preventDefault();
-        disableAddDataPopup();
-    });
-
-    $('#add-data-form').submit(function(event) {
-        event.preventDefault();
-        disableAddDataPopup();
-        var branches = $('#branches').val();
-        var tests = $('#tests').val();
-        var platforms = $('#platforms').val();
+        var branches = $('#add-branches').val();
+        var tests = $('#add-tests').val();
+        var platforms = $('#add-platforms').val();
         var count = 0;
         $.each(branches, function() {
             $.each(tests, function() {
@@ -923,19 +906,19 @@
     function buildMenu(data) {
         for (var index in data.branchMap) {
             var value = data.branchMap[index];
-            $('#branches').append('<option name="' + value.name + '" value="' +
-                                  index + '">' + value.name + '</option>');
+            $('#add-branches').append('<option name="' + value.name + '" value="' +
+                                      index + '">' + value.name + '</option>');
         }
         for (var index in data.testMap) {
             var value = data.testMap[index];
-            $('#tests').append('<option id="' + value.name + '" value="' +
-                               index + '" disabled>' + value.name +
-                               '</option>');
+            $('#add-tests').append('<option id="' + value.name + '" value="' +
+                                   index + '" disabled>' + value.name +
+                                   '</option>');
         }
         for (var index in data.platformMap) {
             var value = data.platformMap[index];
-            $('#platforms').append('<option value="' + index + '" disabled>' +
-                                   value.name + '</option>');
+            $('#add-platforms').append('<option value="' + index + '" disabled>' +
+                                       value.name + '</option>');
         }
 
         return true;
