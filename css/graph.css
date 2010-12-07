@@ -420,3 +420,6 @@
 	color: #ccc;
 }
 
+option[disabled] {
+	display: none;
+}
