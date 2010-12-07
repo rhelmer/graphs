@@ -36,6 +36,18 @@
         $.plot(plot, plotData, plotOptions);
     }
 
+    function updateLocation() {
+        var hash = window.location.hash.split('#');
+        var url = hash[0];
+       
+        var newLocation = url;
+
+        newLocation += '#displayrange=' + $('#displayrange select').val();
+        newLocation += '&product=' + $('#product select').val();
+        newLocation += '&test=' + $('#test select').val();
+        window.location = newLocation;
+    }
+
     function refreshGraphs() 
     {
         $.each(ids, function(index, id) {
@@ -86,12 +98,14 @@
         e.preventDefault();
         displayDays = e.target.value;
         refreshGraphs();
-        // TODO update URL
-        //updateLocation();
+        updateLocation();
     }
 
     $('.selectBox').selectBox();
     $('#displayrange').change(onDisplayRange);
     $('#displayrange').toggleClass('disabled', false);
+
     refreshGraphs();
+    updateLocation();
+
 })(jQuery);

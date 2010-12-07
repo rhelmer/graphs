@@ -1063,6 +1063,7 @@
 
         return node;
     }
+
     function updateLocation() {
         var hash = window.location.hash.split('=');
         var url = hash[0];
