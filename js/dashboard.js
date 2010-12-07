@@ -18,16 +18,16 @@
     
     function updatePlot(series, plot)
     {
-        var minV, maxV, marginV;
+        var minV, maxV, marginV, minT, maxT;
         series.exploded = false;
         series.visible = true;
         var plotData = parseSeries(series, 0, 3, 1);
     
-        minV = minV < series.minV ? minV : series.minV;
-        maxV = maxV > series.maxV ? maxV : series.maxV;
+        minV = series.minV;
+        maxV = series.maxV;
         marginV = 0.1 * (maxV - minV);
-        minT = (minT < series.minT ? minT : series.minT);
-        maxT = (maxT > series.maxT ? maxT : series.maxT);
+        minT = series.minT;
+        maxT = series.maxT;
     
         var xaxis = { xaxis: { min: minT, max: maxT } },
             yaxis = { yaxis: { min: minV - marginV, max: maxV + marginV } };
