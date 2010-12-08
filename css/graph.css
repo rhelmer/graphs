@@ -269,6 +269,7 @@
 	z-index: 2;
 	padding: 12px;
 	font-size: 13px;
+	border: 5px solid #154183;
 }
 
 #link-overlay {
@@ -296,6 +297,7 @@
 	font-size: 13px;
 	font-family: monospace;
 	overflow: auto;
+	border: 5px solid #154183;
 }
 
 #showchangesets-overlay {
