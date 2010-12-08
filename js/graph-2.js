@@ -123,14 +123,8 @@
         $('#zoomout').unbind();
         $('#zoomout').click(onZoomOutClick);
 
-        $('#showchangesets').unbind();
-        $('#showchangesets').click(onShowChangesets);
-
         $('#exportcsv').unbind();
         $('#exportcsv').click(onExportCSV);
-
-        $('#link').unbind();
-        $('#link').click(onLink);
 
         $('#embed').unbind();
         $('#embed').click(onEmbed);
@@ -425,64 +419,6 @@
         $('#add-series-done').html('Add ' + count + ' Data Series');
     }
 
-    function onShowChangesets(e)
-    {
-        e.preventDefault();
-
-        // find changes which match this range
-        var changes = {};
-        var range = getZoomRange();
-        $.each(allSeries, function(i, series) {
-            if (series.runs === undefined) {
-                return true;
-            };
-            $.each(series.runs, function(j, run) {
-                $.each(run.data, function(k, data) {
-                    var time = parseInt(data.t);
-                    var from = parseInt(range.from);
-                    var to = parseInt(range.to);
-                    if (time >= from && time <= to) {
-                        changes[time] = [data.changeset,data.v];
-                    }
-                    previous = data.v;
-                });
-            });
-        });
-
-        changes = sortObject(changes);
-
-        var csets = $('#showchangesets-overlay #changesets')
-        var previous = '';
-        for (var time in changes) {
-            var rev = changes[time][0];
-            var elapsed = changes[time][1];
-            var delta = '';
-            if (previous != '') {
-                var dv = (elapsed - previous);
-                var dvp = (((elapsed / previous) - 1) * 100);
-                var padding = '&nbsp;';
-                var color = 'red';
-                if (dvp < 0) {
-                    color = 'green';
-                    padding = '';
-                }
-                delta = '<span style="color:'+color+'">'
-                        + '&Delta; ' + padding  + dv.toFixed(0) 
-                        + ' ms (' + dvp.toFixed(1) + '%)'
-                        + '</span>';
-            }
-            var url = 'http://hg.mozilla.org/mozilla-central/rev/' + rev;
-            previous = elapsed;
-            csets
-                 .append('<a href="'+url+'">'+rev+'</a> ')
-                 .append(elapsed.toFixed(3) + ' ')
-                 .append(delta)
-                 .append('<br>');
-        }
-
-        showChangesetsPopup();
-        $('#showchangesets-done').click(disableShowChangesetsPopup);
-    }
 
     // http://stackoverflow.com/questions/1359761/sorting-a-json-object-in-javascript
     function sortObject(o) {
@@ -533,14 +469,6 @@
         window.open(url);
     }
 
-    function onLink(e)
-    {
-        e.preventDefault();
-        $('#link-overlay').prepend('<input id="link-copy" type="text" value='+window.location+'>');
-        linkPopup();
-        $('#link-copy').focus().select();
-        $('#link-done').click(disableLinkPopup);
-    }
 
     function onEmbed(e)
     {
@@ -791,61 +719,89 @@
         });
     }
 
-    function linkPopup()
-    {
-        $('#backgroundPopup').css({
-            'opacity': '0.7'
-        });
-        $('#backgroundPopup').fadeIn('fast');
-        $('#link-overlay').fadeIn('fast');
-
-        // center
-        var windowWidth = document.documentElement.clientWidth;
-        var windowHeight = document.documentElement.clientHeight;
-        var popupHeight = $('#link-overlay').height();
-        var popupWidth = $('#link-overlay').width();
-        $('#link-overlay').css({
-            'position': 'absolute',
-            'top': windowHeight / 2 - popupHeight / 2,
-            'left': windowWidth / 2 - popupWidth / 2
-        });
-    }
-
-    function disableLinkPopup(e)
-    {
+    $('#link').click(function (e) {
         e.preventDefault();
-        $('#backgroundPopup').fadeOut('fast');
-        $('#link-overlay').fadeOut('fast');
-        $('#link-copy').remove();
-    }
+    	$('#link-overlay')
+    		.css({ opacity: 0, display: 'table' })
+    		.animate({ opacity: 1 }, 250);
+        $('#link-contents').prepend('<input id="link-copy" type="text" value='+window.location+'>');
+        $('#link-copy').focus().select();
+    });
 
-    function showChangesetsPopup()
-    {
-        $('#backgroundPopup').css({
-            'opacity': '0.7'
-        });
-        $('#backgroundPopup').fadeIn('fast');
-        $('#showchangesets-overlay').fadeIn('fast');
+    $('#link-overlay').click(function (e) {
+    	if ($(e.target).closest('#link-contents').length == 0) {
+    		$(this).animate({ opacity: 'hide' }, 250);
+                $('#showchangesets-overlay #changesets').html('');
+    		return false;
+    	}
+    });
 
-        // center
-        var windowWidth = document.documentElement.clientWidth;
-        var windowHeight = document.documentElement.clientHeight;
-        var popupHeight = $('#showchangesets-overlay').height();
-        var popupWidth = $('#showchangesets-overlay').width();
-        $('#showchangesets-overlay').css({
-            'position': 'absolute',
-            'top': windowHeight / 2 - popupHeight / 2,
-            'left': windowWidth / 2 - popupWidth / 2
-        });
-    }
-
-    function disableShowChangesetsPopup(e)
-    {
+    $('#showchangesets').click(function(e) {
         e.preventDefault();
-        $('#backgroundPopup').fadeOut('fast');
-        $('#showchangesets-overlay').fadeOut('fast');
-        $('#showchangesets-overlay #changesets').html('');
-    }
+
+        // find changes which match this range
+        var changes = {};
+        var range = getZoomRange();
+        $.each(allSeries, function(i, series) {
+            if (series.runs === undefined) {
+                return true;
+            };
+            $.each(series.runs, function(j, run) {
+                $.each(run.data, function(k, data) {
+                    var time = parseInt(data.t);
+                    var from = parseInt(range.from);
+                    var to = parseInt(range.to);
+                    if (time >= from && time <= to) {
+                        changes[time] = [data.changeset,data.v];
+                    }
+                    previous = data.v;
+                });
+            });
+        });
+
+        changes = sortObject(changes);
+
+        var csets = $('#showchangesets-overlay #changesets')
+        var previous = '';
+        for (var time in changes) {
+            var rev = changes[time][0];
+            var elapsed = changes[time][1];
+            var delta = '';
+            if (previous != '') {
+                var dv = (elapsed - previous);
+                var dvp = (((elapsed / previous) - 1) * 100);
+                var padding = '&nbsp;';
+                var color = 'red';
+                if (dvp < 0) {
+                    color = 'green';
+                    padding = '';
+                }
+                delta = '<span style="color:'+color+'">'
+                        + '&Delta; ' + padding  + dv.toFixed(0) 
+                        + ' ms (' + dvp.toFixed(1) + '%)'
+                        + '</span>';
+            }
+            var url = 'http://hg.mozilla.org/mozilla-central/rev/' + rev;
+            previous = elapsed;
+            csets
+                 .append('<a href="'+url+'">'+rev+'</a> ')
+                 .append(elapsed.toFixed(3) + ' ')
+                 .append(delta)
+                 .append('<br>');
+        }
+
+        $('#showchangesets-overlay')
+            .css({ opacity: 0, display: 'table' })
+            .animate({ opacity: 1 }, 250);
+    });
+
+    $('#showchangesets-overlay').click(function (e) {
+    	if ($(e.target).closest('#changesets').length == 0) {
+    		$(this).animate({ opacity: 'hide' }, 250);
+                $('#showchangesets-overlay #changesets').html('');
+    		return false;
+    	}
+    });
 
 	
     $('#add-series').click(function (e) {
@@ -859,10 +815,10 @@
     });
     
     $('#add-overlay').click(function (e) {
-    	//if ($(e.target).closest('#add-data').length == 0) {
-    	//	$(this).animate({ opacity: 'hide' }, 250);
-    	//	return false;
-    	//}
+    	if ($(e.target).closest('#add-data-form').length == 0) {
+    		$(this).animate({ opacity: 'hide' }, 250);
+    		return false;
+    	}
     });
     
     $('#add-data-cancel').click(function (e) {
