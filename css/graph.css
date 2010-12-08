@@ -262,7 +262,7 @@
 	position: fixed;
 	height: 50px;
 	width: 260px;
-        left: 150px;
+        left: 450px;
         top: 150px;
 	background: #FFFFFF;
 	border: 2px solid #cecece;
@@ -286,17 +286,16 @@
 
 #changesets {
 	position: fixed;
-	height: 480px;
-	width: 600px;
-        left: 150px;
+	height: 280px;
+	width: 500px;
+        left: 350px;
         top: 150px;
 	background: #FFFFFF;
-	border: 2px solid #cecece;
 	z-index: 2;
 	padding: 12px;
 	font-size: 13px;
 	font-family: monospace;
-	-moz-border-radius: 15px;
+	overflow: auto;
 }
 
 #showchangesets-overlay {
@@ -310,11 +309,6 @@
 	text-align: left;
 	vertical-align: middle;
 	z-index: 1000;
-}
-
-#changesets {
-	height: 400px;
-	overflow: auto;
 }
 
 #add-overlay {
@@ -404,7 +398,7 @@
 	display: block;
 	text-align: right;
 }
-#add-overlay button, #showchangesets-overlay button, #link-overlay button {
+#add-overlay button {
 	padding: .25em 1em;
 	border: 1px solid #d0d0d0;
 	margin-left: .5em;
