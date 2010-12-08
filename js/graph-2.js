@@ -654,6 +654,10 @@
                 return false;
             }
         }
+        if ($('#'+ uniqueSeries).length > 0) {
+                // already failed to load, don't bother
+                return false;
+        }
         if (manifest) {
             downloadSeries(testid,branchid,platformid);
         } else {
