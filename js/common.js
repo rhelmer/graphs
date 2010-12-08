@@ -2,7 +2,7 @@ var displayDays = 30;
 var DAY = 86400000;
 
 var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
-              '#bf5c41', '#e7454c'];
+              '#bf5c41'];
 
 var LIGHT_COLORS = $.map(COLORS, function(color) {
     return $.color.parse(color).add('a', -.5).toString();
