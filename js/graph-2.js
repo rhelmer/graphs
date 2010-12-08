@@ -822,7 +822,6 @@
     });
     
     $('#add-data-cancel').click(function (e) {
-    	$('#add-data').get(0).reset();
     	$('#add-overlay').animate({ opacity: 'hide' }, 250);
     	return false;
     });
