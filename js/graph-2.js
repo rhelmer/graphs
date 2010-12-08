@@ -908,7 +908,6 @@
           $(node).append('Failed');
         } else {
           color = COLORS[allSeries[uniqueSeries].count];
-          console.log(COLORS[allSeries[uniqueSeries].count]);
           $('#' + uniqueSeries + ' .loader').hide();
           $(node).append('<em style="background-color: ' + color + ';"></em>');
           $(node).append('<a id="' + uniqueSeries + '" class="show" href="#"' +
