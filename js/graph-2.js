@@ -16,7 +16,7 @@
     };
 
 
-    var suggested_graphs = 7;
+    var suggested_graphs = 6;
 
     var plot, overview, ajaxSeries;
     var _zoomFrom, _zoomTo;
