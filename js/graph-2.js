@@ -464,7 +464,6 @@
         }
         var url = 'http://graphs.mozilla.org/server/dumpdata.cgi?' +
                   'show=' + startDate.getTime() + ',' + endDate.getTime();
-        // FIXME fix server!
         window.open(url);
     }
 
@@ -923,7 +922,8 @@
         //$('#datatype').toggleClass('disabled', false);
         $('#zoomin').toggleClass('disabled', false);
         $('#showchangesets').toggleClass('disabled', false);
-        $('#exportcsv').toggleClass('disabled', false);
+        // TODO fix server
+        //$('#exportcsv').toggleClass('disabled', false);
         $('#link').toggleClass('disabled', false);
         // TODO add embed feature
         //$('#embed').toggleClass('disabled', false);
