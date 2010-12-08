@@ -1,4 +1,4 @@
-var displayDays = 90;
+var displayDays = 30;
 var DAY = 86400000;
 
 var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
