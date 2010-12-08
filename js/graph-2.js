@@ -850,6 +850,9 @@
         });
         if (count > suggested_graphs) {
             if (!confirmTooMuchData(count)) {
+    	        $('#add-overlay')
+                    .css({ opacity: 0, display: 'table' })
+                    .animate({ opacity: 1 }, 250);
                 return false;
             }
         }
