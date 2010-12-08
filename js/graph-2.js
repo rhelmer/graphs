@@ -731,6 +731,7 @@
     $('#link-overlay').click(function (e) {
     	if ($(e.target).closest('#link-contents').length == 0) {
     		$(this).animate({ opacity: 'hide' }, 250);
+                $('#link-contents').html('');
                 $('#showchangesets-overlay #changesets').html('');
     		return false;
     	}
