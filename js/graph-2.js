@@ -675,7 +675,8 @@
             'error': function(xhr, e, message) {
                 error('Could not download test run data from server', e);
                 addSeries(testid, branchid, platformid, addSeriesNode, true);
-            }
+            },
+            'cache': true
         });
         $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
                                      platformid: platformid}, function(data) {
@@ -705,7 +706,8 @@
         $.ajaxSetup({
             'error': function(xhr, e, message) {
                 error('Could not download manifest data from server', e);
-            }
+            },
+            'cache': true
         });
         $.getJSON('/api/test', { attribute: 'short'}, function(data) {
             manifest = data;
