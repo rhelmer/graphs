@@ -4,15 +4,15 @@
     var ids = [
         [[16,1,12], ['ts','firefox','windows7']],
         [[16,1,1], ['ts','firefox','windowsxp']],
-        [[16,1,3], ['ts','firefox','macosx']],
+        [[16,1,13], ['ts','firefox','macosx']],
         [[16,1,14], ['ts','firefox','linux']],
         [[38,1,12], ['tp','firefox','windows7']],
         [[38,1,1], ['tp','firefox','windowsxp']],
-        [[38,1,3], ['tp','firefox','macosx']],
+        [[38,1,13], ['tp','firefox','macosx']],
         [[38,1,14], ['tp','firefox','linux']],
         [[25,1,12], ['ss','firefox','windows7']],
         [[25,1,1], ['ss','firefox','windowsxp']],
-        [[25,1,3], ['ss','firefox','macosx']],
+        [[25,1,13], ['ss','firefox','macosx']],
         [[25,1,14], ['ss','firefox','linux']]
     ];
     
