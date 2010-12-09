@@ -381,7 +381,8 @@
                 $.each($('#add-tests option:selected'), function(j,test) {
                     $.each($('#add-platforms option'), function(k,platform) {
                         if (($.inArray(parseInt(test.value), manifest.branchMap[branch.value].testIds) != -1) &&
-                            ($.inArray(parseInt(platform.value), manifest.branchMap[branch.value].platformIds) != -1)) {
+                            ($.inArray(parseInt(platform.value), manifest.branchMap[branch.value].platformIds) != -1) &&
+                            ($.inArray(parseInt(platform.value), manifest.testMap[test.value].platformIds) != -1)) {
                             $(this).attr('disabled', '');
                         } else {
                             $(this).attr('disabled', 'disabled');
