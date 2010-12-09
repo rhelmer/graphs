@@ -61,7 +61,7 @@
 
             var $plot = $('#placeholder.'+platformName+'.'+testName);
             $plot.html('<p class="loader" title="Series is loading">' +
-                         '</p>');
+                         '<img src="css/dashboard-loading.gif"</p>');
 
             $plot.unbind();
             $plot.bind('plotclick', function() {
