@@ -380,8 +380,8 @@
             $.each($('#add-branches option:selected'), function(i,branch) {
                 $.each($('#add-tests option:selected'), function(j,test) {
                     $.each($('#add-platforms option'), function(k,platform) {
-                        if ((test.value in manifest.platformMap[platform.value].testIds) &&
-                            (branch.value in manifest.platformMap[platform.value].branchIds)) {
+                        if (($.inArray(parseInt(test.value), manifest.branchMap[branch.value].testIds) != -1) &&
+                            ($.inArray(parseInt(platform.value), manifest.branchMap[branch.value].platformIds) != -1)) {
                             $(this).attr('disabled', '');
                         } else {
                             $(this).attr('disabled', 'disabled');
