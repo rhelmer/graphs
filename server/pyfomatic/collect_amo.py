@@ -98,7 +98,9 @@ def parse_amo_collection(fp):
             value_max = value_number
     if not value_number:
         raise ParseError("No rows in submission")
-    average = float(value_total) - max_result / value_number
+    average = float(value_total)
+    if (value_number > 1):
+        average = float(value_total) - max_result / value_number
     appversion_id = get_appversions_id(browser_name, browser_version)
     os_name, os_version = get_os_for_machine(machine_name)
     os_id = get_osversions_id(os_name, os_version)
