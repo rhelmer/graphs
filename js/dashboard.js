@@ -35,7 +35,6 @@
         var plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
     
         $.plot($plot, plotData, plotOptions);
-        $plot.css({ cursor: 'pointer' });
     }
 
     function updateLocation() {
@@ -68,9 +67,11 @@
             $plot.bind('plotclick', function() {
                 window.open('graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=none&displayrange='+displayDays);
             });
+            $plot.css({ cursor: 'pointer' });
 
             if (cache[id]) {
-                updatePlot(cache[id], $plot);
+                var data = convertData(testid, branchid, platformid, cache[id]);
+                updatePlot(data, $plot);
                 return true;
             }
 
@@ -85,13 +86,13 @@
             $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
                                          platformid: platformid}, function(data) {
                 try {
+                    cache[id] = data;
                     data = convertData(testid, branchid, platformid, data);
                     if (!data) {
                         error('Could not import test run data', false, data);
                         return false;
                     }
                     updatePlot(data, $plot);
-                    cache[id] = data;
         
                 } catch (e) {
                     error('Could not load data series', e);
