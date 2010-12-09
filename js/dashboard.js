@@ -15,8 +15,9 @@
         [[25,1,13], ['ss','firefox','macosx']],
         [[25,1,14], ['ss','firefox','linux']]
     ];
+    var cache = {};
     
-    function updatePlot(series, plot)
+    function updatePlot(series, $plot)
     {
         var minV, maxV, marginV, minT, maxT;
         series.exploded = false;
@@ -33,7 +34,12 @@
             yaxis = { yaxis: { min: minV - marginV, max: maxV + marginV } };
         var plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
     
-        $.plot(plot, plotData, plotOptions);
+        $.plot($plot, plotData, plotOptions);
+        $plot.unbind();
+        $plot.bind('plotclick', function() {
+            window.open('graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=none&displayrange='+displayDays);
+        });
+        $plot.css({ cursor: 'pointer' });
     }
 
     function updateLocation() {
@@ -62,6 +68,10 @@
             $plot.html('<p class="loader" title="Series is loading">' +
                          '</p>');
 
+            if (cache[id]) {
+                updatePlot(cache[id], $plot);
+            }
+
             $.ajaxSetup({
                 'error': function(xhr, e, message) {
                     error('Could not download test run data from server', e);
@@ -79,11 +89,7 @@
                         return false;
                     }
                     updatePlot(data, $plot);
-                    $plot.unbind();
-                    $plot.bind('plotclick', function() {
-                        window.open('graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=none&displayrange='+displayDays);
-                    });
-                    $plot.css({ cursor: 'pointer' });
+                    cache[id] = data;
         
                 } catch (e) {
                     error('Could not load data series', e);
