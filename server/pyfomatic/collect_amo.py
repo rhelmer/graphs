@@ -79,6 +79,7 @@ def parse_amo_collection(fp):
                          % test_name)
     value_total = 0
     value_number = 0
+    value_max = None
     while 1:
         try:
             row = reader.next()
@@ -93,9 +94,11 @@ def parse_amo_collection(fp):
         interval, value, page_name = row
         value_total += float(value)
         value_number += 1
+        if value_max == None or value_number > value_max:
+            value_max = value_number
     if not value_number:
         raise ParseError("No rows in submission")
-    average = float(value_total) / value_number
+    average = float(value_total) - max_result / value_number
     appversion_id = get_appversions_id(browser_name, browser_version)
     os_name, os_version = get_os_for_machine(machine_name)
     os_id = get_osversions_id(os_name, os_version)
