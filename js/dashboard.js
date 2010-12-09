@@ -71,6 +71,7 @@
 
             if (cache[id]) {
                 updatePlot(cache[id], $plot);
+                return true;
             }
 
             $.ajaxSetup({
