@@ -2,18 +2,18 @@
 
     // FIXME hardcode popular values, for now
     var ids = [
-        [[12,1,12], ['ts','firefox','windows7']],
-        [[12,1,1], ['ts','firefox','windowsxp']],
-        [[12,1,3], ['ts','firefox','macosx']],
-        [[12,1,14], ['ts','firefox','linux']],
-        [[36,1,12], ['tp','firefox','windows7']],
-        [[36,1,1], ['tp','firefox','windowsxp']],
-        [[36,1,3], ['tp','firefox','macosx']],
-        [[36,1,14], ['tp','firefox','linux']],
-        [[21,1,12], ['ss','firefox','windows7']],
-        [[21,1,1], ['ss','firefox','windowsxp']],
-        [[21,1,3], ['ss','firefox','macosx']],
-        [[21,1,14], ['ss','firefox','linux']]
+        [[16,1,12], ['ts','firefox','windows7']],
+        [[16,1,1], ['ts','firefox','windowsxp']],
+        [[16,1,3], ['ts','firefox','macosx']],
+        [[16,1,14], ['ts','firefox','linux']],
+        [[38,1,12], ['tp','firefox','windows7']],
+        [[38,1,1], ['tp','firefox','windowsxp']],
+        [[38,1,3], ['tp','firefox','macosx']],
+        [[38,1,14], ['tp','firefox','linux']],
+        [[25,1,12], ['ss','firefox','windows7']],
+        [[25,1,1], ['ss','firefox','windowsxp']],
+        [[25,1,3], ['ss','firefox','macosx']],
+        [[25,1,14], ['ss','firefox','linux']]
     ];
     
     function updatePlot(series, plot)
