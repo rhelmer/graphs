@@ -35,10 +35,6 @@
         var plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
     
         $.plot($plot, plotData, plotOptions);
-        $plot.unbind();
-        $plot.bind('plotclick', function() {
-            window.open('graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=none&displayrange='+displayDays);
-        });
         $plot.css({ cursor: 'pointer' });
     }
 
@@ -67,6 +63,11 @@
             var $plot = $('#placeholder.'+platformName+'.'+testName);
             $plot.html('<p class="loader" title="Series is loading">' +
                          '</p>');
+
+            $plot.unbind();
+            $plot.bind('plotclick', function() {
+                window.open('graph.html#tests=[['+testid+','+branchid+','+platformid+']]&sel=none&displayrange='+displayDays);
+            });
 
             if (cache[id]) {
                 updatePlot(cache[id], $plot);
