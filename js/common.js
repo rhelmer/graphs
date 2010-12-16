@@ -12,6 +12,7 @@ var LIGHT_COLORS = $.map(COLORS, function(color) {
 
 var PLOT_OPTIONS = {
     xaxis: { mode: 'time' },
+    yaxis: { min: 0 },
     selection: { mode: 'x', color: '#97c6e5' },
     /* crosshair: { mode: 'xy', color: '#cdd6df', lineWidth: 1 }, */
     series: { shadowSize: 0 },

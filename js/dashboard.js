@@ -31,7 +31,7 @@
         maxT = series.maxT;
     
         var xaxis = { xaxis: { min: minT, max: maxT } },
-            yaxis = { yaxis: { min: minV - marginV, max: maxV + marginV } };
+            yaxis = { yaxis: { min: 0, max: maxV + marginV } };
         var plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
     
         $.plot($plot, plotData, plotOptions);

@@ -2,6 +2,7 @@
 
     var OVERVIEW_OPTIONS = {
         xaxis: { mode: 'time' },
+        yaxis: { min: 0 },
         selection: { mode: 'x', color: '#97c6e5' },
         series: {
             lines: { show: true, lineWidth: 1 },
@@ -167,7 +168,7 @@
             maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
 
             var xaxis = { xaxis: { min: minT, max: maxT } },
-                yaxis = { yaxis: { min: minV - marginV, max: maxV + marginV } };
+                yaxis = { yaxis: { min: 0, max: maxV + marginV } };
             var overview_xaxis = { xaxis: { min: new Date() -
                                                  (DAY * displayDays),
                                             max: new Date() } };
