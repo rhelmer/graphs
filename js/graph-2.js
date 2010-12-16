@@ -678,7 +678,7 @@
             },
             'cache': true
         });
-        $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
+        $.getJSON(SERVER + '/api/test/runs', {id: testid, branchid: branchid,
                                      platformid: platformid}, function(data) {
             try {
                 var testName = manifest.testMap[testid].name;
@@ -709,7 +709,7 @@
             },
             'cache': true
         });
-        $.getJSON('/api/test', { attribute: 'short'}, function(data) {
+        $.getJSON(SERVER + '/api/test', { attribute: 'short'}, function(data) {
             manifest = data;
             $('#loading-overlay').animate({ opacity: 'hide' }, 250);
             downloadingManifest = false;
