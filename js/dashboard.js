@@ -84,7 +84,7 @@
             });
 
         
-            $.getJSON('/api/test/runs', {id: testid, branchid: branchid,
+            $.getJSON(SERVER + '/api/test/runs', {id: testid, branchid: branchid,
                                          platformid: platformid}, function(data) {
                 try {
                     cache[id] = data;
