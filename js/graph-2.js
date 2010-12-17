@@ -440,17 +440,6 @@
         return sorted;
     }
 
-    /* use a function for the exact format desired... */
-    function ISODateString(d){
-       function pad(n){return n<10 ? '0'+n : n}
-       return d.getUTCFullYear()+'-'
-           + pad(d.getUTCMonth()+1)+'-'
-           + pad(d.getUTCDate())+'+'
-           + pad(d.getUTCHours())+':'
-           + pad(d.getUTCMinutes())+':'
-           + pad(d.getUTCSeconds())
-    }
-    
     function onExportCSV(e)
     {
         e.preventDefault();
