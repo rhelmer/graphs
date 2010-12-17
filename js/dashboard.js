@@ -106,17 +106,18 @@
     }
 
 
-    function onDisplayRange(e)
-    {
+    $('.selectBox').selectBox();
+    $('#displayrange').change(function(e) {
         e.preventDefault();
         displayDays = e.target.value;
         refreshGraphs();
         updateLocation();
-    }
+    });
 
-    $('.selectBox').selectBox();
-    $('#displayrange').change(onDisplayRange);
     $('#displayrange').toggleClass('disabled', false);
+    $('#product').toggleClass('disabled', false);
+    $('#platform').toggleClass('disabled', false);
+    $('#test').toggleClass('disabled', false);
 
     refreshGraphs();
     updateLocation();
