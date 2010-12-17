@@ -980,9 +980,6 @@
         return window.confirm(msg);
     }
 
-  return false;
-}
-
 $(init);
 
 })(jQuery);
