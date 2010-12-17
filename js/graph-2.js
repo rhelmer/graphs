@@ -972,40 +972,15 @@
         window.location = newLocation;
     }
 
-    function error(message, e, data) {
-        debug(e);
-        var name = (e != null ? e.name : "");
-        $('#errors').hide().css({ opacity: 1 });
-        $('#errors').append('<div class="error">' +
-                            '<h3>Error</h3>' +
-                            '<p>' + message + '</p>' +
-                            '<p>Exception: ' + name + '</p>' +
-                            '<a class="close" href="#" title="Close"></a>' +
-                            '</div>');
-
-        $('#errors').show();
-
-        $('#errors .error .close').click(function() {
-        $(this).closest('.error').animate({ opacity: 0 }, 250)
-                                 .animate({ height: 'hide' }, 250);
-        return false;
-    });
-
-    var delay = 0;
-    $('#errors .error').each(function() {
-        $(this).delay(delay).animate({ opacity: 'show' }, 500);
-        delay += 500;
-    });
+    function confirmTooMuchData(count)
+    {
+        var msg = 'WARNING: You are about to load ' + count + ' data series.\n' +
+                  'Loading more than ' + suggested_graphs + ' is not recommended.\n' +
+                  'Do it anyway?';
+        return window.confirm(msg);
+    }
 
   return false;
-}
-
-function confirmTooMuchData(count)
-{
-    var msg = 'WARNING: You are about to load ' + count + ' data series.\n' +
-              'Loading more than ' + suggested_graphs + ' is not recommended.\n' +
-              'Do it anyway?';
-    return window.confirm(msg);
 }
 
 $(init);
