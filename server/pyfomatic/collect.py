@@ -247,8 +247,13 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
       raise ImproperFormatException("input stream did not begin with 'START'")
     dataSetType = inputStream.readline().strip().upper()
     #responseList.append('line 2: "%s"' % dataSetType)
-    if dataSetType not in ('VALUES', 'AVERAGE'):
-      raise ImproperFormatException("data set type was not 'VALUES' or 'AVERAGE'")
+    if dataSetType == 'AMO':
+      from pyfomatic.collect_amo import parse_amo_collection
+      parse_amo_collection(inputStream)
+      responseList.append('RETURN\tsuccess')
+    else:
+      if dataSetType not in ('VALUES', 'AVERAGE'):
+        raise ImproperFormatException("data set type was not 'VALUES' or 'AVERAGE'")
 
     databaseCursor = databaseConnection.cursor()
 
