@@ -92,22 +92,49 @@ def parse_amo_collection(fp):
                 'Expected "interval,value,page_name", got %r'
                 % row)
         interval, value, page_name = row
-        value_total += float(value)
+        cur_value = float(value)
+        value_total += cur_value
         value_number += 1
-        if value_max == None or value_number > value_max:
-            value_max = value_number
+        if value_max == None or cur_value > value_max:
+            value_max = cur_value
     if not value_number:
         raise ParseError("No rows in submission")
-    average = float(value_total)
     if (value_number > 1):
-        average = float(value_total) - value_max / value_number - 1
+        average = round((value_total - value_max) / (value_number - 1), 2)
+    else:
+        average = round(value_total, 2)
     appversion_id = get_appversions_id(browser_name, browser_version)
     os_name, os_version = get_os_for_machine(machine_name)
     os_id = get_osversions_id(os_name, os_version)
-    cur = amo_db.cursor()
-    cur.execute("""\
-    REPLACE INTO perf_results
-                (addon_id, appversion_id, average, osversion_id, test, created, modified)
-    VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
-    """, (addon_id, appversion_id, average, os_id, test_name))
-    amo_db.commit()
+    if addon_id <> 'NULL':
+        cur = amo_db.cursor()
+        cur.execute("""\
+        REPLACE INTO perf_results
+                    (addon_id, appversion_id, average, osversion_id, test, created, modified)
+        VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
+        """, (addon_id, appversion_id, average, os_id, test_name))
+        amo_db.commit()
+    else:
+        cur = amo_db.cursor()
+        cur.execute("""\
+        SELECT id FROM perf_results
+        WHERE appversion_id = %s AND osversion_id  = %s AND test = %s AND addon_id is NULL
+        """, (appversion_id, os_id, test_name))
+        row = cur.fetchone()
+        if row is not None:
+            cur_addon_id = row[0]
+            cur = amo_db.cursor()
+            cur.execute("""\
+            UPDATE perf_results
+            SET average = %s, created = NOW(), modified = NOW()
+            WHERE id = %s
+            """, (average, cur_addon_id))
+            amo_db.commit()
+        else: 
+            cur = amo_db.cursor()
+            cur.execute("""\
+            REPLACE INTO perf_results
+                        (addon_id, appversion_id, average, osversion_id, test, created, modified)
+            VALUES (NULL, %s, %s, %s, %s, NOW(), NOW())
+            """, (appversion_id, average, os_id, test_name))
+            amo_db.commit()
