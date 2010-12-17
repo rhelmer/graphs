@@ -207,7 +207,7 @@
         }
 
         return range;
-    } 
+    }
 
     function zoomIn()
     {
@@ -367,9 +367,9 @@
             $.each($('#add-platforms option'), function() {
                 $(this).attr('disabled', 'disabled');
             });
-            
-            $.each($('#add-branches option:selected'), function(i,branch) {
-                $.each($('#add-tests option'), function(j,test) {
+
+            $.each($('#add-branches option:selected'), function(i, branch) {
+                $.each($('#add-tests option'), function(j, test) {
                     if (branch.value in manifest.testMap[test.value].branchIds) {
                         $(this).attr('disabled', '');
                     } else {
@@ -378,9 +378,9 @@
                 });
             });
 
-            $.each($('#add-branches option:selected'), function(i,branch) {
-                $.each($('#add-tests option:selected'), function(j,test) {
-                    $.each($('#add-platforms option'), function(k,platform) {
+            $.each($('#add-branches option:selected'), function(i, branch) {
+                $.each($('#add-tests option:selected'), function(j, test) {
+                    $.each($('#add-platforms option'), function(k, platform) {
                         if (($.inArray(parseInt(test.value), manifest.branchMap[branch.value].testIds) != -1) &&
                             ($.inArray(parseInt(platform.value), manifest.branchMap[branch.value].platformIds) != -1) &&
                             ($.inArray(parseInt(platform.value), manifest.testMap[test.value].platformIds) != -1)) {
@@ -425,15 +425,15 @@
     function sortObject(o) {
         var sorted = {},
         key, a = [];
-    
+
         for (key in o) {
             if (o.hasOwnProperty(key)) {
                     a.push(key);
             }
         }
-    
+
         a.sort();
-    
+
         for (key = 0; key < a.length; key++) {
             sorted[a[key]] = o[a[key]];
         }
@@ -615,14 +615,14 @@
         }
     }
 
-    function lockTooltip() { 
-        ttLocked = true; 
+    function lockTooltip() {
+        ttLocked = true;
         $('#tooltip').addClass('locked');
         $('#tt-help').html('');
     }
-    function unlockTooltip() { 
+    function unlockTooltip() {
         ttLocked = false;
-        $('#tooltip').removeClass('locked'); 
+        $('#tooltip').removeClass('locked');
         $('#tt-help').html('Click to lock');
     }
 
@@ -645,14 +645,14 @@
                 return false;
             }
         }
-        if ($('#'+ uniqueSeries).length > 0) {
+        if ($('#' + uniqueSeries).length > 0) {
                 // already failed to load, don't bother
                 return false;
         }
         if (manifest) {
-            downloadSeries(testid,branchid,platformid);
+            downloadSeries(testid, branchid, platformid);
         } else {
-            loadSeries.push([testid,branchid,platformid,sel]);
+            loadSeries.push([testid, branchid, platformid, sel]);
             if (!downloadingManifest) {
                 downloadManifest();
             }
@@ -704,7 +704,7 @@
             $('#loading-overlay').animate({ opacity: 'hide' }, 250);
             downloadingManifest = false;
             menu = buildMenu(manifest);
-            for (var i=0; i < loadSeries.length; i++) {
+            for (var i = 0; i < loadSeries.length; i++) {
                 var testid = loadSeries[i][0];
                 var branchid = loadSeries[i][1];
                 var platformid = loadSeries[i][2];
@@ -714,22 +714,22 @@
         });
     }
 
-    $('#link').click(function (e) {
+    $('#link').click(function(e) {
         e.preventDefault();
-    	$('#link-overlay')
-    		.css({ opacity: 0, display: 'table' })
-    		.animate({ opacity: 1 }, 250);
-        $('#link-contents').prepend('<input id="link-copy" type="text" value='+window.location+'>');
+        $('#link-overlay')
+            .css({ opacity: 0, display: 'table' })
+            .animate({ opacity: 1 }, 250);
+        $('#link-contents').prepend('<input id="link-copy" type="text" value=' + window.location + '>');
         $('#link-copy').focus().select();
     });
 
-    $('#link-overlay').click(function (e) {
-    	if ($(e.target).closest('#link-contents').length == 0) {
-    		$(this).animate({ opacity: 'hide' }, 250);
+    $('#link-overlay').click(function(e) {
+        if ($(e.target).closest('#link-contents').length == 0) {
+                $(this).animate({ opacity: 'hide' }, 250);
                 $('#link-contents').html('');
                 $('#showchangesets-overlay #changesets').html('');
-    		return false;
-    	}
+                return false;
+        }
     });
 
     $('#showchangesets').click(function(e) {
@@ -741,14 +741,14 @@
         $.each(allSeries, function(i, series) {
             if (series.runs === undefined) {
                 return true;
-            };
+            }
             $.each(series.runs, function(j, run) {
                 $.each(run.data, function(k, data) {
                     var time = parseInt(data.t);
                     var from = parseInt(range.from);
                     var to = parseInt(range.to);
                     if (time >= from && time <= to) {
-                        changes[time] = [data.changeset,data.v];
+                        changes[time] = [data.changeset, data.v];
                     }
                     previous = data.v;
                 });
@@ -757,7 +757,7 @@
 
         changes = sortObject(changes);
 
-        var csets = $('#showchangesets-overlay #changesets')
+        var csets = $('#showchangesets-overlay #changesets');
         var previous = '';
         for (var time in changes) {
             var rev = changes[time][0];
@@ -772,15 +772,15 @@
                     color = 'green';
                     padding = '';
                 }
-                delta = '<span style="color:'+color+'">'
-                        + '&Delta; ' + padding  + dv.toFixed(0) 
-                        + ' ms (' + dvp.toFixed(1) + '%)'
-                        + '</span>';
+                delta = '<span style="color:' + color + '">' +
+                        '&Delta; ' + padding + dv.toFixed(0) +
+                        ' ms (' + dvp.toFixed(1) + '%)' +
+                        '</span>';
             }
             var url = 'http://hg.mozilla.org/mozilla-central/rev/' + rev;
             previous = elapsed;
             csets
-                 .append('<a href="'+url+'">'+rev+'</a> ')
+                 .append('<a href="' + url + '">' + rev + '</a> ')
                  .append(elapsed.toFixed(3) + ' ')
                  .append(delta)
                  .append('<br>');
@@ -791,39 +791,39 @@
             .animate({ opacity: 1 }, 250);
     });
 
-    $('#showchangesets-overlay').click(function (e) {
-    	if ($(e.target).closest('#changesets').length == 0) {
-    		$(this).animate({ opacity: 'hide' }, 250);
-                $('#showchangesets-overlay #changesets').html('');
-    		return false;
-    	}
+    $('#showchangesets-overlay').click(function(e) {
+        if ($(e.target).closest('#changesets').length == 0) {
+            $(this).animate({ opacity: 'hide' }, 250);
+            $('#showchangesets-overlay #changesets').html('');
+            return false;
+        }
     });
 
-	
-    $('#add-series').click(function (e) {
-        if(!manifest) {
+
+    $('#add-series').click(function(e) {
+        if (!manifest) {
             downloadManifest();
         }
-    	$('#add-overlay')
-    		.css({ opacity: 0, display: 'table' })
-    		.animate({ opacity: 1 }, 250);
-    	return false;
-    });
-    
-    $('#add-overlay').click(function (e) {
-    	if ($(e.target).closest('#add-data-form').length == 0) {
-    		$(this).animate({ opacity: 'hide' }, 250);
-    		return false;
-    	}
-    });
-    
-    $('#add-data-cancel').click(function (e) {
-    	$('#add-overlay').animate({ opacity: 'hide' }, 250);
-    	return false;
+        $('#add-overlay')
+            .css({ opacity: 0, display: 'table' })
+            .animate({ opacity: 1 }, 250);
+        return false;
     });
 
-    $('#add-data-form').submit(function (event) {
-    	$('#add-overlay').animate({ opacity: 'hide' }, 250);
+    $('#add-overlay').click(function(e) {
+        if ($(e.target).closest('#add-data-form').length == 0) {
+            $(this).animate({ opacity: 'hide' }, 250);
+            return false;
+        }
+    });
+
+    $('#add-data-cancel').click(function(e) {
+        $('#add-overlay').animate({ opacity: 'hide' }, 250);
+        return false;
+    });
+
+    $('#add-data-form').submit(function(event) {
+        $('#add-overlay').animate({ opacity: 'hide' }, 250);
         event.preventDefault();
         var branches = $('#add-branches').val();
         var tests = $('#add-tests').val();
@@ -843,7 +843,7 @@
         });
         if (count > suggested_graphs) {
             if (!confirmTooMuchData(count)) {
-    	        $('#add-overlay')
+                $('#add-overlay')
                     .css({ opacity: 0, display: 'table' })
                     .animate({ opacity: 1 }, 250);
                 return false;
@@ -861,7 +861,8 @@
     function buildMenu(data) {
         for (var index in data.branchMap) {
             var value = data.branchMap[index];
-            $('#add-branches').append('<option name="' + value.name + '" value="' +
+            $('#add-branches').append('<option name="' +
+                                      value.name + '" value="' +
                                       index + '">' + value.name + '</option>');
         }
         for (var index in data.testMap) {
@@ -872,7 +873,8 @@
         }
         for (var index in data.platformMap) {
             var value = data.platformMap[index];
-            $('#add-platforms').append('<option value="' + index + '" disabled>' +
+            $('#add-platforms').append('<option value="' +
+                                       index + '" disabled>' +
                                        value.name + '</option>');
         }
 
@@ -946,10 +948,10 @@
             var testid = parseInt(uniqueSeries[1]);
             var branchid = parseInt(uniqueSeries[2]);
             var platformid = parseInt(uniqueSeries[3]);
-            args.push([testid,branchid,platformid]);
+            args.push([testid, branchid, platformid]);
         });
         // TODO add datatype to URL
-       
+
         var newLocation = url + '=' + JSON.stringify(args);
         var selectionrange = getZoomRange();
 
@@ -963,8 +965,10 @@
 
     function confirmTooMuchData(count)
     {
-        var msg = 'WARNING: You are about to load ' + count + ' data series.\n' +
-                  'Loading more than ' + suggested_graphs + ' is not recommended.\n' +
+        var msg = 'WARNING: You are about to load ' + count +
+                  ' data series.\n' +
+                  'Loading more than ' + suggested_graphs +
+                  ' is not recommended.\n' +
                   'Do it anyway?';
         return window.confirm(msg);
     }
