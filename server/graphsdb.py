@@ -7,4 +7,5 @@ from databases import mysql as MySQLdb
 
 
 db = MySQLdb.connect("localhost","root","","graphserver")
+amo_db = MySQLdb.connect("localhost","root","","addonserver")
 
