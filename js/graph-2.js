@@ -36,7 +36,7 @@
 
         try {
           var args = window.location.hash.split('&');
-          // FIXME probably should not assume these are positional
+          // FIXME order should not matter
           if (args.length == 0) {
               return false;
           }
@@ -64,6 +64,8 @@
 
                   fetchData(testid, branchid, platformid, sel);
               }
+          } else {
+              addMoreTestData();
           }
         } catch (e) {
             error('Could not understand URL', e);
@@ -800,7 +802,7 @@
     });
 
 
-    $('#add-series').click(function(e) {
+    function addMoreTestData() {
         if (!manifest) {
             downloadManifest();
         }
@@ -808,7 +810,9 @@
             .css({ opacity: 0, display: 'table' })
             .animate({ opacity: 1 }, 250);
         return false;
-    });
+    }
+
+    $('#add-series').click(addMoreTestData);
 
     $('#add-overlay').click(function(e) {
         if ($(e.target).closest('#add-data-form').length == 0) {
