@@ -50,8 +50,8 @@
     </div>
 
     <div class="group">
-        <a id="link" class="button disabled" href="#">Link</a>
-        <a id="embed" class="button disabled" href="#">Embed</a>
+        <a id="chart-link" class="button disabled" href="#" title="Create a short link to this chart">Link</a>
+        <a id="chart-embed" class="button disabled" href="#" title="Generate code to embed this chart">Embed</a>
     </div>
 </div>
 
@@ -117,9 +117,27 @@
     </div>
 </section>
 
-<div id="link-overlay">
-    <div id="link-contents"></div>
-</div>
+
+<section id="link-overlay" class="bubble-overlay">
+    <form class="bubble-wrap"><div class="bubble">
+        <span class="stem"></span>
+        <div class="content">
+            <label>Link to this chart:</label>
+            <input id="link-url" type="text" readonly value="" />
+        </div>
+    </div></form>
+</section>
+
+
+<section id="embed-overlay" class="bubble-overlay">
+    <form class="bubble-wrap"><div class="bubble">
+        <span class="stem"></span>
+        <div class="content">
+            <label>Use this code to embed this chart:</label>
+            <textarea id="embed-code" rows="3" readonly></textarea>
+        </div>
+    </div></form>
+</section>
 
 <div id="showchangesets-overlay">
     <div id="changesets"></div>
