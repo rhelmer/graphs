@@ -177,8 +177,9 @@
         var plotData = [];
         var overviewData = [];
         var plotOptions, overviewOptions;
-        var maxV, marginV;
-        var minV = 0;
+        var maxV = 0,
+            marginV = 0,
+            minV = 0;
         var count = 0;
         $.each(allSeries, function(index, series) {
             if ($.isEmptyObject(series)) {
@@ -192,42 +193,27 @@
             for (var i = 0; i < allPlots.length; i++) {
                 var plot = allPlots[i];
                 if (datatype != 'running') {
-                    var newSeries = [];
-                    var previous;
-                    $.each(plot.data, function() {
-                       var datetime = $(this)[0];
-                       var elapsed = $(this)[1];
-                       var newV;
-                       if (previous) { 
-                           if (datatype == 'delta') {
-                               var newV = (elapsed - previous);
-                           } else if (datatype == 'deltapercent') {
-                               var newV = (((elapsed / previous) - 1) * 100);
-                           } else {
-                               error("Unknown datatype");
-                               return false;
-                           } 
-                           newSeries.push([datetime, newV]);
-                           maxV = maxV > newV ? maxV : newV;
-                           minV = minV < newV ? minV : newV;
-                       }
-                       previous = elapsed;
-                    });
-                    plot.data = newSeries;
+                    plot = deltaPlot(plot);
+                    maxV = plot.maxV > maxV ? plot.maxV : maxV;
+                    minV = plot.minV < minV ? plot.minV : minV;
+                } else {
+                    maxV = maxV > series.maxV ? maxV : series.maxV;
+                    minV = minV < series.minV ? minV : series.minV;
                 }
                 plotData.push(plot);
             }
+
             var allOverviews = parseSeries(series, count, 1, .5);
             for (var i = 0; i < allOverviews.length; i++) {
                 var overview = allOverviews[i];
+                if (datatype != 'running') {
+                    overview = deltaPlot(overview);
+                }
                 overviewData.push(overview);
             }
 
             count++;
             
-            if (datatype == 'running') {
-                maxV = maxV > series.maxV ? maxV : series.maxV;
-            }
             marginV = 0.1 * (maxV - minV);
             minT = _zoomFrom || (minT < series.minT ? minT : series.minT);
             maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
@@ -245,6 +231,35 @@
         hideTooltip(true);
         plot = $.plot($('#plot'), plotData, plotOptions);
         overview = $.plot($('#overview'), overviewData, overviewOptions);
+    }
+
+    function deltaPlot(plot)
+    {
+        var newPlot = [];
+        var previous;
+        plot.maxV = 0;       
+        plot.minV = 0;
+        $.each(plot.data, function() {
+           var datetime = $(this)[0];
+           var elapsed = $(this)[1];
+           var newV;
+           if (previous) { 
+               if (datatype == 'delta') {
+                   newV = (elapsed - previous);
+               } else if (datatype == 'deltapercent') {
+                   newV = (((elapsed / previous) - 1) * 100);
+               } else {
+                   error("Unknown datatype");
+                   return false;
+               } 
+               newPlot.push([datetime, newV]);
+               plot.maxV = plot.maxV > newV ? plot.maxV : newV;
+               plot.minV = plot.minV < newV ? plot.minV : newV;
+           }
+           previous = elapsed;
+        });
+        plot.data = newPlot;
+        return plot;
     }
 
     function getZoomRange()
