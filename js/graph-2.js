@@ -803,9 +803,9 @@
 
     $('#showchangesets').click(function(e) {
         e.preventDefault();
-
+      
         // find changes which match this range
-        var changes = {};
+        var csets = [];
         var range = getZoomRange();
         $.each(allSeries, function(i, series) {
             if (series.runs === undefined) {
@@ -817,55 +817,13 @@
                     var from = parseInt(range.from);
                     var to = parseInt(range.to);
                     if (time >= from && time <= to) {
-                        changes[time] = [data.changeset, data.v];
+                        csets.push(data.changeset);
                     }
-                    previous = data.v;
                 });
             });
         });
 
-        changes = sortObject(changes);
-
-        var csets = $('#showchangesets-overlay #changesets');
-        var previous = '';
-        for (var time in changes) {
-            var rev = changes[time][0];
-            var elapsed = changes[time][1];
-            var delta = '';
-            if (previous != '') {
-                var dv = (elapsed - previous);
-                var dvp = (((elapsed / previous) - 1) * 100);
-                var padding = '&nbsp;';
-                var color = 'red';
-                if (dvp < 0) {
-                    color = 'green';
-                    padding = '';
-                }
-                delta = '<span style="color:' + color + '">' +
-                        '&Delta; ' + padding + dv.toFixed(0) +
-                        ' ms (' + dvp.toFixed(1) + '%)' +
-                        '</span>';
-            }
-            var url = 'http://hg.mozilla.org/mozilla-central/rev/' + rev;
-            previous = elapsed;
-            csets
-                 .append('<a href="' + url + '">' + rev + '</a> ')
-                 .append(elapsed.toFixed(3) + ' ')
-                 .append(delta)
-                 .append('<br>');
-        }
-
-        $('#showchangesets-overlay')
-            .css({ opacity: 0, display: 'table' })
-            .animate({ opacity: 1 }, 250);
-    });
-
-    $('#showchangesets-overlay').click(function(e) {
-        if ($(e.target).closest('#changesets').length == 0) {
-            $(this).animate({ opacity: 'hide' }, 250);
-            $('#showchangesets-overlay #changesets').html('');
-            return false;
-        }
+        window.open('http://hg.mozilla.org/mozilla-central/pushloghtml?changeset=' + csets.join('&changeset='));
     });
 
 

@@ -259,34 +259,6 @@
 	-moz-border-radius: 15px;
 }
 
-#changesets {
-	position: fixed;
-	height: 450px;
-	width: 500px;
-        left: 350px;
-        top: 120px;
-	background: #FFFFFF;
-	z-index: 2;
-	padding: 12px;
-	font-size: 13px;
-	font-family: monospace;
-	overflow: auto;
-	border: 5px solid #154183;
-}
-
-#showchangesets-overlay {
-	display: none;
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0,0,0,.25);
-	text-align: left;
-	vertical-align: middle;
-	z-index: 1000;
-}
-
 #add-overlay {
 	display: none;
 	position: absolute;
