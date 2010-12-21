@@ -82,6 +82,9 @@
           if (args.length >= 3) {
               displayDays = args[2].split('=')[1];
           }
+          if (args.length >= 4) {
+              datatype = args[3].split('=')[1];
+          }
           if (tests) {
               tests = JSON.parse(tests);
               if (tests.length > suggested_graphs) {
@@ -174,7 +177,8 @@
         var plotData = [];
         var overviewData = [];
         var plotOptions, overviewOptions;
-        var minV, maxV, marginV;
+        var maxV, marginV;
+        var minV = 0;
         var count = 0;
         $.each(allSeries, function(index, series) {
             if ($.isEmptyObject(series)) {
@@ -187,6 +191,30 @@
             var allPlots = parseSeries(series, count, 3, 1);
             for (var i = 0; i < allPlots.length; i++) {
                 var plot = allPlots[i];
+                if (datatype != 'running') {
+                    var newSeries = [];
+                    var previous;
+                    $.each(plot.data, function() {
+                       var datetime = $(this)[0];
+                       var elapsed = $(this)[1];
+                       var newV;
+                       if (previous) { 
+                           if (datatype == 'delta') {
+                               var newV = (elapsed - previous);
+                           } else if (datatype == 'deltapercent') {
+                               var newV = (((elapsed / previous) - 1) * 100);
+                           } else {
+                               error("Unknown datatype");
+                               return false;
+                           } 
+                           newSeries.push([datetime, newV]);
+                           maxV = maxV > newV ? maxV : newV;
+                           minV = minV < newV ? minV : newV;
+                       }
+                       previous = elapsed;
+                    });
+                    plot.data = newSeries;
+                }
                 plotData.push(plot);
             }
             var allOverviews = parseSeries(series, count, 1, .5);
@@ -196,15 +224,16 @@
             }
 
             count++;
-
-            minV = minV < series.minV ? minV : series.minV;
-            maxV = maxV > series.maxV ? maxV : series.maxV;
+            
+            if (datatype == 'running') {
+                maxV = maxV > series.maxV ? maxV : series.maxV;
+            }
             marginV = 0.1 * (maxV - minV);
             minT = _zoomFrom || (minT < series.minT ? minT : series.minT);
             maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
 
             var xaxis = { xaxis: { min: minT, max: maxT } },
-                yaxis = { yaxis: { min: 0, max: maxV + marginV } };
+                yaxis = { yaxis: { min: minV, max: maxV + marginV } };
             var overview_xaxis = { xaxis: { min: new Date() -
                                                  (DAY * displayDays),
                                             max: new Date() } };
@@ -320,6 +349,13 @@
         zoomOut();
         updateLocation();
     }
+
+    $('#datatype').click(function (e) {
+        e.preventDefault();
+        datatype = e.target.value;
+        updatePlot();
+        updateLocation();
+    });
 
     function onZoomInClick(e)
     {
@@ -940,8 +976,7 @@
         }
 
         $('#displayrange').toggleClass('disabled', false);
-        // TODO add datatype feature
-        //$('#datatype').toggleClass('disabled', false);
+        $('#datatype').toggleClass('disabled', false);
         $('#zoomin').toggleClass('disabled', false);
         $('#showchangesets').toggleClass('disabled', false);
         // TODO fix server
@@ -970,7 +1005,6 @@
             var platformid = parseInt(uniqueSeries[3]);
             args.push([testid, branchid, platformid]);
         });
-        // TODO add datatype to URL
 
         var newLocation = url + '=' + JSON.stringify(args);
         var selectionrange = getZoomRange();
@@ -980,6 +1014,7 @@
                            ',' + selectionrange['to'];
         }
         newLocation += '&displayrange=' + $('#displayrange select').val();
+        newLocation += '&datatype=' + $('#datatype select').val();
         window.location = newLocation;
     }
 
