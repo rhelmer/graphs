@@ -911,6 +911,25 @@ insert into machines values (NULL,18,0,NULL,"Linux_x86-64_birch_leak_test",1,uni
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_jaegermonkey",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_jaegermonkey_leak_test",1,unix_timestamp());
 
+--SeaMonkey
+insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.1",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-central-trunk",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-central-trunk_leak_test_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-1.9.1",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-central-trunk",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-central-trunk_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-1.9.1",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-central",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-central-trunk_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6_comm-central-trunk",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6_comm-central-trunk_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-1.9.1",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-central-trunk",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-central-trunk_leak_test",1,unix_timestamp());
+
 --mobile
 insert into machines values (NULL,9,0,NULL,"maemo-n810-01",1,unix_timestamp());
 insert into machines values (NULL,9,0,NULL,"maemo-n810-02",1,unix_timestamp());
