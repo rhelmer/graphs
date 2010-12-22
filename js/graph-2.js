@@ -648,9 +648,19 @@
 
         $('#tt-series').html(test + ' (' + branch + ')');
         $('#tt-series2').html(platform + ' (' + machine + ')');
-        $('#tt-v').html(parseInt(v) + ' ms');
-        $('#tt-dv').html('&Delta; ' + dv.toFixed(0) +
-                         ' ms (' + (100 * dvp).toFixed(1) + '%)');
+        if (datatype == 'running') {
+            $('#tt-v').html(parseInt(v) + ' ms');
+            $('#tt-dv').html('&Delta; ' + dv.toFixed(0) +
+                             ' ms (' + (100 * dvp).toFixed(1) + '%)');
+        } else if (datatype == 'delta') {
+            $('#tt-v').html('&Delta; ' + parseInt(v) + ' ms');
+            $('#tt-dv').html('');
+        } else if (datatype == 'deltapercent') {
+            $('#tt-v').html('&Delta; ' + parseInt(v) + '%');
+            $('#tt-dv').html('');
+        } else {
+            error('Unknown datatype');
+        }
         // FIXME need a map of branches to mercurial repos...
         var url = 'http://hg.mozilla.org/mozilla-central/rev/';
         $('#tt-cset').html(changeset).attr('href', url + changeset);
