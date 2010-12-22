@@ -653,10 +653,10 @@
             $('#tt-dv').html('&Delta; ' + dv.toFixed(0) +
                              ' ms (' + (100 * dvp).toFixed(1) + '%)');
         } else if (datatype == 'delta') {
-            $('#tt-v').html('&Delta; ' + parseInt(v) + ' ms');
+            $('#tt-v').html('&Delta; ' + v.toFixed(3) + ' ms');
             $('#tt-dv').html('');
         } else if (datatype == 'deltapercent') {
-            $('#tt-v').html('&Delta; ' + parseInt(v) + '%');
+            $('#tt-v').html('&Delta; ' + v.toFixed(3) + '%');
             $('#tt-dv').html('');
         } else {
             error('Unknown datatype');
