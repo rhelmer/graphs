@@ -17,26 +17,6 @@
     ];
     var cache = {};
 
-    function updatePlot(series, $plot)
-    {
-        var minV, maxV, marginV, minT, maxT;
-        series.exploded = false;
-        series.visible = true;
-        var plotData = parseSeries(series, 0, 3, 1);
-
-        minV = series.minV;
-        maxV = series.maxV;
-        marginV = 0.1 * (maxV - minV);
-        minT = series.minT;
-        maxT = series.maxT;
-
-        var xaxis = { xaxis: { min: minT, max: maxT } },
-            yaxis = { yaxis: { min: 0, max: maxV + marginV } };
-        var plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
-
-        $.plot($plot, plotData, plotOptions);
-    }
-
     function updateLocation() {
         var hash = window.location.hash.split('#');
         var url = hash[0];
@@ -80,8 +60,12 @@
     });
 
     $('#displayrange').toggleClass('disabled', false);
-    $('#product').toggleClass('disabled', false);
-    $('#platform').toggleClass('disabled', false);
-    $('#test').toggleClass('disabled', false);
+    /* TODO implement
+     $('#product').toggleClass('disabled', false);
+     $('#platform').toggleClass('disabled', false);
+     $('#test').toggleClass('disabled', false);
+    */
+
+    // TODO honor incoming URL settings
 
 })(jQuery);
