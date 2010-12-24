@@ -52,6 +52,7 @@
 
 
     var suggested_graphs = 6;
+    var suggested_csets = 100;
 
     var plot, overview, ajaxSeries;
     var _zoomFrom, _zoomTo;
@@ -87,11 +88,11 @@
           }
           if (tests) {
               tests = JSON.parse(tests);
-              if (tests.length > suggested_graphs) {
-                  if (!confirmTooMuchData(tests.length)) {
-                      return false;
-                  }
+              if (!confirmTooMuchData(tests.length, suggested_graphs, 
+                                      'data series')) {
+                  return false;
               }
+                
               for (var i = 0; i < tests.length; i++)
               {
                   var run = tests[i];
@@ -833,6 +834,9 @@
             });
         });
 
+        if (!confirmTooMuchData(csets.length, suggested_csets, 'changesets')) {
+            return false;
+        }
         window.open('http://hg.mozilla.org/mozilla-central/pushloghtml?changeset=' + csets.join('&changeset='));
     });
 
@@ -862,7 +866,6 @@
     });
 
     $('#add-data-form').submit(function(event) {
-        $('#add-overlay').animate({ opacity: 'hide' }, 250);
         event.preventDefault();
         var branches = $('#add-branches').val();
         var tests = $('#add-tests').val();
@@ -880,14 +883,11 @@
                 count += 1;
             }
         });
-        if (count > suggested_graphs) {
-            if (!confirmTooMuchData(count)) {
-                $('#add-overlay')
-                    .css({ opacity: 0, display: 'table' })
-                    .animate({ opacity: 1 }, 250);
-                return false;
-            }
+        if (!confirmTooMuchData(count, suggested_graphs, 'data series')) {
+            addMoreTestData();
+            return false;
         }
+        $('#add-overlay').animate({ opacity: 'hide' }, 250);
         $.each($(branches), function(i, branch) {
             $.each($(tests), function(j, test) {
                 $.each($(platforms), function(k, platform) {
@@ -1001,14 +1001,17 @@
         window.location = newLocation;
     }
 
-    function confirmTooMuchData(count)
+    function confirmTooMuchData(count, suggested, name)
     {
-        var msg = 'WARNING: You are about to load ' + count +
-                  ' data series.\n' +
-                  'Loading more than ' + suggested_graphs +
+        if (count > suggested) {
+            var msg = 'WARNING: You are about to load ' + count +
+                  ' ' + name + '\n' +
+                  'Loading more than ' + suggested +
                   ' is not recommended.\n' +
                   'Do it anyway?';
-        return window.confirm(msg);
+            return window.confirm(msg);
+        }
+        return true;
     }
 
     $('#chart-link').click(function() {
