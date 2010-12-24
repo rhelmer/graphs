@@ -225,6 +225,7 @@ flot_text.onload = function() {
     }
 
     refreshGraphs(7);
+    refreshGraphs(30);
     refreshGraphs(90);
     refreshGraphs(365);
 };
