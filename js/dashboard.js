@@ -119,7 +119,7 @@
     $('#platform').toggleClass('disabled', false);
     $('#test').toggleClass('disabled', false);
 
-    refreshGraphs();
-    updateLocation();
+    //refreshGraphs();
+    //updateLocation();
 
 })(jQuery);
