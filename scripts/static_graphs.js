@@ -1,3 +1,6 @@
+/**
+ * Generate static dashboard images using node, flot, jsdom, and node-canvas
+ */
 var document = require("jsdom").jsdom(),
     window = document.createWindow(),
     jQuery = require('jquery').create(window),
@@ -11,7 +14,6 @@ flot.onload = function() {
     flot_text.src = 'http://localhost/jq/jquery.flot.text.js';
 };
 flot_text.onload = function() {
-    var displayDays = 7;
     var DAY = 86400000;
     
     var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
@@ -58,7 +60,7 @@ flot_text.onload = function() {
         [[25, 1, 14], ['ss', 'firefox', 'linux']]
     ];
 
-    function updatePlot(series)
+    function updatePlot(series, displayDays)
     {
         var minV, maxV, marginV, minT, maxT;
         series.exploded = false;
@@ -83,7 +85,8 @@ flot_text.onload = function() {
             node_canvas = plot.getCanvas(),
             ctx = node_canvas.getContext('2d'),
             out = fs.createWriteStream('./images/dashboard/flot-' + 
-                testid + '-' + branchid + '-' + platformid + '.png');
+                testid + '-' + branchid + '-' + platformid + 
+                '-' + displayDays + '.png');
             stream = node_canvas.createPNGStream();
     
         stream.on('data', function ( chunk ) {
@@ -91,7 +94,7 @@ flot_text.onload = function() {
         });
     }
 
-    function refreshGraphs() 
+    function refreshGraphs(displayDays) 
     {
         jQuery.each(ids, function(index, id) {
             var testid = id[0][0];
@@ -115,14 +118,15 @@ flot_text.onload = function() {
                 });
                 response.on('end', function() {
                     var data = JSON.parse(responseBody);
-                    data = convertData(testid, branchid, platformid, data);
-                    updatePlot(data);
+                    data = convertData(testid, branchid, platformid, data,
+                                       displayDays);
+                    updatePlot(data, displayDays);
                 });
             });
         });
     }
     // FIXME perhaps graphserver should send us data in this format instead
-    function convertData(testName, branchName, platformName, data)
+    function convertData(testName, branchName, platformName, data, displayDays)
     {
         var gdata =
         {
@@ -220,5 +224,7 @@ flot_text.onload = function() {
         });
     }
 
-    refreshGraphs();
+    refreshGraphs(7);
+    refreshGraphs(90);
+    refreshGraphs(365);
 };
