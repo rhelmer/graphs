@@ -59,49 +59,14 @@
             var branchName = id[1][1];
             var platformName = id[1][2];
 
-            var $plot = $('#placeholder.' + platformName + '.' + testName);
-            $plot.html('<p class="loader" title="Series is loading">' +
-                         '<img src="css/dashboard-loading.gif"</p>');
-
-            $plot.unbind();
-            $plot.bind('plotclick', function() {
-                window.open('graph.html#tests=[[' +
-                    testid + ',' + branchid + ',' + platformid +
-                    ']]&sel=none&displayrange=' + displayDays);
-            });
-            $plot.css({ cursor: 'pointer' });
-
-            if (cache[id]) {
-                var data = convertData(testid, branchid, platformid, cache[id]);
-                updatePlot(data, $plot);
-                return true;
-            }
-
-            $.ajaxSetup({
-                'error': function(xhr, e, message) {
-                    error('Could not download test run data from server', e);
-                    $plot.html('<p class="failed">Failed</p>');
-                },
-                'cache': true
-            });
-
-
-            $.getJSON(SERVER + '/api/test/runs',
-                {id: testid, branchid: branchid,
-                 platformid: platformid}, function(data) {
-                try {
-                    cache[id] = data;
-                    data = convertData(testid, branchid, platformid, data);
-                    if (!data) {
-                        error('Could not import test run data', false, data);
-                        return false;
-                    }
-                    updatePlot(data, $plot);
-
-                } catch (e) {
-                    error('Could not load data series', e);
-                }
-            });
+            var a = $('.' + platformName + '.' + testName + ' a');
+            var img = $('.' + platformName + '.' + testName + ' img');
+            var tests = [[testid, branchid, platformid]];
+            a.attr('href', 'graph.html#tests=' + JSON.stringify(tests) +
+                             '&sel=none&displayrange=' + displayDays);
+            img.attr('src', 'images/dashboard/flot-' + testid +
+                             '-' + branchid + '-' + platformid +
+                             '_' + displayDays + '.png');
         });
     }
 
@@ -118,8 +83,5 @@
     $('#product').toggleClass('disabled', false);
     $('#platform').toggleClass('disabled', false);
     $('#test').toggleClass('disabled', false);
-
-    //refreshGraphs();
-    //updateLocation();
 
 })(jQuery);
