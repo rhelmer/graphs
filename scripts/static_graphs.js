@@ -41,8 +41,8 @@ flot_text.onload = function() {
             autoHighlight: false,
             canvasText: { show: true }
         },
-        width:380,
-        height:250
+        width:360,
+        height:240
     };
     // FIXME hardcode popular values, for now
     var ids = [
