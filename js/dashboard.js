@@ -59,11 +59,11 @@
             var branchName = id[1][1];
             var platformName = id[1][2];
 
-            var a = $('.' + platformName + '.' + testName + ' a');
+            var a = $('a.' + platformName + '.' + testName);
             var img = $('.' + platformName + '.' + testName + ' img');
             var tests = [[testid, branchid, platformid]];
             a.attr('href', 'graph.html#tests=' + JSON.stringify(tests) +
-                             '&sel=none&displayrange=' + displayDays);
+                           '&sel=none&displayrange=' + displayDays);
             img.attr('src', 'images/dashboard/flot-' + testid +
                              '-' + branchid + '-' + platformid +
                              '_' + displayDays + '.png');
