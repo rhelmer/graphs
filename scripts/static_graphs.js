@@ -86,7 +86,7 @@ flot_text.onload = function() {
             ctx = node_canvas.getContext('2d'),
             out = fs.createWriteStream('./images/dashboard/flot-' + 
                 testid + '-' + branchid + '-' + platformid + 
-                '-' + displayDays + '.png');
+                '_' + displayDays + '.png');
             stream = node_canvas.createPNGStream();
     
         stream.on('data', function ( chunk ) {
