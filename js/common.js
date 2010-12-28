@@ -281,7 +281,8 @@ function processArgs()
         error('Could not understand URL', e);
     }
 
-    return [tests, sel, displayDays, datatype];
+    return {'tests': tests, 'sel': sel, 'displayDays': displayDays, 
+            'datatype': datatype};
 }
 function confirmTooMuchData(count, suggested, name)
 {

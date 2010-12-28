@@ -12,7 +12,11 @@
     {
         initPlot();
         updateBindings();
-        var [tests, sel, displayDays, datatype] = processArgs();
+        var args = processArgs();
+        var tests = args['tests'],
+            sel = args['sel'],
+            displayDays = args['displayDays'],
+            datatype = args['datatype'];
         if (tests) {
             for (var i = 0; i < tests.length; i++) {
                 var run = tests[i];
