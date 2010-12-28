@@ -82,9 +82,6 @@
         $('#exportcsv').unbind();
         $('#exportcsv').click(onExportCSV);
 
-        $('#embed').unbind();
-        $('#embed').click(onEmbed);
-
         $(document).keydown(onPageKeyDown);
         $(window).resize(onResize);
     }
@@ -594,8 +591,7 @@
         // TODO fix server
         //$('#exportcsv').toggleClass('disabled', false);
         $('#chart-link').toggleClass('disabled', false);
-        // TODO add embed feature
-        //$('#chart-embed').toggleClass('disabled', false);
+        $('#chart-embed').toggleClass('disabled', false);
 
         return node;
     }
@@ -642,6 +638,15 @@
 
     $('#chart-embed').click(function() {
         $('#embed-overlay').showBubble(this);
+        var hostname = window.location.hostname;
+        var pathname = window.location.pathname;
+        var hash = window.location.hash;
+        pathname = pathname.replace('graph.html', 'embed.html');
+
+        $('#embed-code').html('<iframe type="text/html"' +
+                        ' width="480" height="390"' +
+                        ' src="http://' + hostname + pathname + hash + '"' +
+                        ' frameborder="0"></iframe>');
         $('#embed-code').focus().select();
         return false;
     });

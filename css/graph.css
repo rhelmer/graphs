@@ -1,3 +1,7 @@
+html {
+	background: #eff6fd url(bg.png);
+}
+
 #toolbar, #charts { left: 230px; right: 0; }
 
 #legend {
