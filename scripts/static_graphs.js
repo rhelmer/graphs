@@ -44,7 +44,8 @@ flot_text.onload = function() {
         width:360,
         height:240
     };
-    // FIXME hardcode popular values, for now
+
+    // FIXME server should store "popular" values
     var ids = [
         [[16, 1, 12], ['ts', 'firefox', 'windows7']],
         [[16, 1, 1], ['ts', 'firefox', 'windowsxp']],
@@ -57,7 +58,31 @@ flot_text.onload = function() {
         [[25, 1, 12], ['ss', 'firefox', 'windows7']],
         [[25, 1, 1], ['ss', 'firefox', 'windowsxp']],
         [[25, 1, 13], ['ss', 'firefox', 'macosx']],
-        [[25, 1, 14], ['ss', 'firefox', 'linux']]
+        [[25, 1, 14], ['ss', 'firefox', 'linux']],
+        [[16, 4, 12], ['ts', 'tracemonkey', 'windows7']],
+        [[16, 4, 1], ['ts', 'tracemonkey', 'windowsxp']],
+        [[16, 4, 13], ['ts', 'tracemonkey', 'macosx']],
+        [[16, 4, 14], ['ts', 'tracemonkey', 'linux']],
+        [[38, 4, 12], ['tp', 'tracemonkey', 'windows7']],
+        [[38, 4, 1], ['tp', 'tracemonkey', 'windowsxp']],
+        [[38, 4, 13], ['tp', 'tracemonkey', 'macosx']],
+        [[38, 4, 14], ['tp', 'tracemonkey', 'linux']],
+        [[25, 4, 12], ['ss', 'tracemonkey', 'windows7']],
+        [[25, 4, 1], ['ss', 'tracemonkey', 'windowsxp']],
+        [[25, 4, 13], ['ss', 'tracemonkey', 'macosx']],
+        [[25, 4, 14], ['ss', 'tracemonkey', 'linux']],
+        [[16, 8, 12], ['ts', 'places', 'windows7']],
+        [[16, 8, 1], ['ts', 'places', 'windowsxp']],
+        [[16, 8, 13], ['ts', 'places', 'macosx']],
+        [[16, 8, 14], ['ts', 'places', 'linux']],
+        [[38, 8, 12], ['tp', 'places', 'windows7']],
+        [[38, 8, 1], ['tp', 'places', 'windowsxp']],
+        [[38, 8, 13], ['tp', 'places', 'macosx']],
+        [[38, 8, 14], ['tp', 'places', 'linux']],
+        [[25, 8, 12], ['ss', 'places', 'windows7']],
+        [[25, 8, 1], ['ss', 'places', 'windowsxp']],
+        [[25, 8, 13], ['ss', 'places', 'macosx']],
+        [[25, 8, 14], ['ss', 'places', 'linux']]
     ];
 
     function updatePlot(series, displayDays)
