@@ -1,7 +1,6 @@
 (function($) {
 
     var minT, maxT;
-    var allSeries = {};
 
     var manifest;
     var menu;
@@ -62,51 +61,6 @@
         $('#plot').bind('plothover', onPlotHover);
         $('#plot').bind('plotclick', onPlotClick);
         $('#plot').bind('plotselected', onPlotSelect);
-    }
-
-    function updatePlot()
-    {
-        var plotData = [];
-        var plotOptions;
-        var maxV = 0,
-            marginV = 0,
-            minV = 0;
-        var count = 0;
-        $.each(allSeries, function(index, series) {
-            if ($.isEmptyObject(series)) {
-                // purposely deleted, keep colors consistent
-                count++;
-                return true;
-            }
-            allSeries[index].count = count;
-
-            var allPlots = parseSeries(series, count, 3, 1);
-            for (var i = 0; i < allPlots.length; i++) {
-                var plot = allPlots[i];
-                if (datatype != 'running') {
-                    plot = deltaPlot(plot);
-                    maxV = plot.maxV > maxV ? plot.maxV : maxV;
-                    minV = plot.minV < minV ? plot.minV : minV;
-                } else {
-                    maxV = maxV > series.maxV ? maxV : series.maxV;
-                    minV = minV < series.minV ? minV : series.minV;
-                }
-                plotData.push(plot);
-            }
-
-            count++;
-            
-            marginV = 0.1 * (maxV - minV);
-            minT = _zoomFrom || (minT < series.minT ? minT : series.minT);
-            maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
-
-            var xaxis = { xaxis: { min: minT, max: maxT } },
-                yaxis = { yaxis: { min: minV, max: maxV + marginV } };
-            plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
-        });
-        unlockTooltip();
-        hideTooltip(true);
-        plot = $.plot($('#plot'), plotData, plotOptions);
     }
 
     function fetchData(testid, branchid, platformid, sel) {

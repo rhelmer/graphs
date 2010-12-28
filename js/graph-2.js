@@ -1,7 +1,6 @@
 (function($) {
 
     var minT, maxT;
-    var allSeries = {};
 
     var manifest;
     var menu;
@@ -90,66 +89,6 @@
         $(window).resize(onResize);
     }
 
-    function updatePlot()
-    {
-        var plotData = [];
-        var overviewData = [];
-        var plotOptions, overviewOptions;
-        var maxV = 0,
-            marginV = 0,
-            minV = 0;
-        var count = 0;
-        $.each(allSeries, function(index, series) {
-            if ($.isEmptyObject(series)) {
-                // purposely deleted, keep colors consistent
-                count++;
-                return true;
-            }
-            allSeries[index].count = count;
-
-            var allPlots = parseSeries(series, count, 3, 1);
-            for (var i = 0; i < allPlots.length; i++) {
-                var plot = allPlots[i];
-                if (datatype != 'running') {
-                    plot = deltaPlot(plot);
-                    maxV = plot.maxV > maxV ? plot.maxV : maxV;
-                    minV = plot.minV < minV ? plot.minV : minV;
-                } else {
-                    maxV = maxV > series.maxV ? maxV : series.maxV;
-                    minV = minV < series.minV ? minV : series.minV;
-                }
-                plotData.push(plot);
-            }
-
-            var allOverviews = parseSeries(series, count, 1, .5);
-            for (var i = 0; i < allOverviews.length; i++) {
-                var overview = allOverviews[i];
-                if (datatype != 'running') {
-                    overview = deltaPlot(overview);
-                }
-                overviewData.push(overview);
-            }
-
-            count++;
-            
-            marginV = 0.1 * (maxV - minV);
-            minT = _zoomFrom || (minT < series.minT ? minT : series.minT);
-            maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
-
-            var xaxis = { xaxis: { min: minT, max: maxT } },
-                yaxis = { yaxis: { min: minV, max: maxV + marginV } };
-            var overview_xaxis = { xaxis: { min: new Date() -
-                                                 (DAY * displayDays),
-                                            max: new Date() } };
-            plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
-            overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS,
-                                       overview_xaxis, yaxis);
-        });
-        unlockTooltip();
-        hideTooltip(true);
-        plot = $.plot($('#plot'), plotData, plotOptions);
-        overview = $.plot($('#overview'), overviewData, overviewOptions);
-    }
 
     function onPageKeyDown(e)
     {
