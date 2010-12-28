@@ -38,18 +38,18 @@
             [[25, 4, 13], ['ss', 'tracemonkey', 'macosx']],
             [[25, 4, 14], ['ss', 'tracemonkey', 'linux']]
         ], 'places': [
-            [[16, 11, 12], ['ts', 'places', 'windows7']],
-            [[16, 11, 1], ['ts', 'places', 'windowsxp']],
-            [[16, 11, 13], ['ts', 'places', 'macosx']],
-            [[16, 11, 14], ['ts', 'places', 'linux']],
-            [[38, 11, 12], ['tp', 'places', 'windows7']],
-            [[38, 11, 1], ['tp', 'places', 'windowsxp']],
-            [[38, 11, 13], ['tp', 'places', 'macosx']],
-            [[38, 11, 14], ['tp', 'places', 'linux']],
-            [[25, 11, 12], ['ss', 'places', 'windows7']],
-            [[25, 11, 1], ['ss', 'places', 'windowsxp']],
-            [[25, 11, 13], ['ss', 'places', 'macosx']],
-            [[25, 11, 14], ['ss', 'places', 'linux']]
+            [[16, 8, 12], ['ts', 'places', 'windows7']],
+            [[16, 8, 1], ['ts', 'places', 'windowsxp']],
+            [[16, 8, 13], ['ts', 'places', 'macosx']],
+            [[16, 8, 14], ['ts', 'places', 'linux']],
+            [[38, 8, 12], ['tp', 'places', 'windows7']],
+            [[38, 8, 1], ['tp', 'places', 'windowsxp']],
+            [[38, 8, 13], ['tp', 'places', 'macosx']],
+            [[38, 8, 14], ['tp', 'places', 'linux']],
+            [[25, 8, 12], ['ss', 'places', 'windows7']],
+            [[25, 8, 1], ['ss', 'places', 'windowsxp']],
+            [[25, 8, 13], ['ss', 'places', 'macosx']],
+            [[25, 8, 14], ['ss', 'places', 'linux']]
         ]};
         return ids[branch];
     }
