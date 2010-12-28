@@ -77,7 +77,7 @@
             var branchName = id[1][1];
             var platformName = id[1][2];
 
-            var a = $('a.' + platformName + '.' + testName);
+            var a = $('.' + platformName + '.' + testName + ' a');
             var img = $('.' + platformName + '.' + testName + ' img');
             var tests = [[testid, branchid, platformid]];
             a.attr('href', 'graph.html#tests=' + JSON.stringify(tests) +
