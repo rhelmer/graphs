@@ -633,3 +633,33 @@ function updatePlot()
         overview = $.plot($('#overview'), overviewData, overviewOptions);
     }
 }
+
+function updateLocation() {
+    var hash = window.location.hash.split('=');
+    var url = hash[0];
+    if (url.indexOf('#tests') == -1) {
+        url += '#tests';
+    }
+    args = [];
+    $.each(allSeries, function(index, series) {
+        if ($.isEmptyObject(series)) {
+            return true;
+        }
+        var uniqueSeries = index.split('_');
+        var testid = parseInt(uniqueSeries[1]);
+        var branchid = parseInt(uniqueSeries[2]);
+        var platformid = parseInt(uniqueSeries[3]);
+        args.push([testid, branchid, platformid]);
+    });
+
+    var newLocation = url + '=' + JSON.stringify(args);
+    var selectionrange = getZoomRange();
+
+    if (selectionrange) {
+        newLocation += '&sel=' + selectionrange['from'] +
+                       ',' + selectionrange['to'];
+    }
+    newLocation += '&displayrange=' + $('#displayrange select').val();
+    newLocation += '&datatype=' + $('#datatype select').val();
+    window.location = newLocation;
+}
