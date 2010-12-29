@@ -11,12 +11,22 @@
     {
         initPlot();
         updateBindings();
-        var args = processArgs();
-        var tests = args['tests'],
-            sel = args['sel'],
-            displayDays = args['displayDays'],
-            datatype = args['datatype'];
+        var args = getUrlVars();
+        var tests = args['tests'];
+        sel = args['sel'];
+        datatype = args['datatype'];
+        displayDays = args['displayrange'];
         if (tests) {
+            try {
+                tests = JSON.parse(tests);
+            } catch(e) {
+                error('Could not understand URL', e);
+                return false;
+            }
+            if (!confirmTooMuchData(tests.length, MAX_GRAPHS, 'data series')) {
+                return false;
+            }
+
             for (var i = 0; i < tests.length; i++) {
                 var run = tests[i];
                 var testid = run[0];

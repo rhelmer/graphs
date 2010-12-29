@@ -21,7 +21,7 @@ var LIGHT_COLORS = $.map(COLORS, function(color) {
     return $.color.parse(color).add('a', -.5).toString();
 });
 
-// FIXME server this from the server instead of hardcoding
+// FIXME get this from the server instead of hardcoding
 var HGWEB = 'http://hg.mozilla.org'
 function repoMap(branch)
 {
@@ -270,39 +270,22 @@ function parseSeries(seriesIn, i, weight, explodedWeight)
         };
     });
 }
-function processArgs() 
-{
-    try {
-      var args = window.location.hash.split('&');
-      // FIXME order should not matter
-      if (args.length == 0) {
-          return false;
-      }
-      var tests = args[0].split('=')[1];
-      var sel;
-      if (args.length >= 2) {
-          sel = args[1].split('=')[1];
-      }
-      if (args.length >= 3) {
-          displayDays = args[2].split('=')[1];
-      }
-      if (args.length >= 4) {
-          datatype = args[3].split('=')[1];
-      }
-      if (tests) {
-          tests = JSON.parse(tests);
-          if (!confirmTooMuchData(tests.length, MAX_GRAPHS, 
-                                  'data series')) {
-              return false;
-          }
-      }
-    } catch (e) {
-        error('Could not understand URL', e);
-    }
 
-    return {'tests': tests, 'sel': sel, 'displayDays': displayDays, 
-            'datatype': datatype};
+ // based on http://jquery-howto.blogspot.com/2009/09/get-url-parameters-values-with-jquery.html
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('#') +
+                                            1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
 }
+
 function confirmTooMuchData(count, suggested, name)
 {
     if (count > suggested) {
