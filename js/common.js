@@ -1,5 +1,6 @@
 var displayDays = 7;
 var datatype = 'running';
+var branch, platform, test;
 
 var _zoomFrom, _zoomTo;
 var plot, overview, ajaxSeries;
@@ -117,11 +118,12 @@ $.fn.selectBox = function() {
         var select = $(this);
         // FIXME need to pay attention to name here
         $('option', this).each(function() {
-            if (displayDays == $(this).val()) {
-                select.val($(this).val());
-            }
-            if (datatype == $(this).val()) {
-                select.val($(this).val());
+            if ((displayDays == $(this).val()) ||
+                (datatype == $(this).val())    ||
+                (branch == $(this).val())      ||
+                (platform == $(this).val())    ||
+                (test == $(this).val())) {
+                    select.val($(this).val());
             }
         });
         // FIXME remove redundancy; call change() above
