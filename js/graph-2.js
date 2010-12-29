@@ -387,10 +387,12 @@
         // find changes which match this range
         var csets = [];
         var range = getZoomRange();
+        var branches = [];
         $.each(allSeries, function(i, series) {
             if (series.runs === undefined) {
                 return true;
             }
+            branches.push(series['branch']);
             $.each(series.runs, function(j, run) {
                 $.each(run.data, function(k, data) {
                     var time = parseInt(data.t);
@@ -406,7 +408,12 @@
         if (!confirmTooMuchData(csets.length, MAX_CSETS, 'changesets')) {
             return false;
         }
-        window.open('http://hg.mozilla.org/mozilla-central/pushloghtml?changeset=' + csets.join('&changeset='));
+        $.each(branches, function() {
+            var branch = this;
+            var url = repoMap(branch);
+            window.open(url + '/pushloghtml?changeset=' + 
+                        csets.join('&changeset='));
+        });
     });
 
 
