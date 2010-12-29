@@ -21,6 +21,24 @@ var LIGHT_COLORS = $.map(COLORS, function(color) {
     return $.color.parse(color).add('a', -.5).toString();
 });
 
+// FIXME server this from the server instead of hardcoding
+var HGWEB = 'http://hg.mozilla.org'
+function repoMap(branch)
+{
+    branch = branch.toLowerCase();
+
+    var map =  {
+        'firefox': 'mozilla-central',
+        'tracemonkey': 'tracemonkey'
+    }
+
+    if (branch in map) {
+        return HGWEB + '/' + map[branch] + '/';
+    } else {
+        return HGWEB + '/projects/' + branch + '/';
+    }
+}
+
 var PLOT_OPTIONS = {
     xaxis: { mode: 'time' },
     yaxis: { min: 0 },
@@ -507,8 +525,7 @@ function updateTooltip(item)
     } else {
         error('Unknown datatype');
     }
-    // FIXME need a map of branches to mercurial repos...
-    var url = 'http://hg.mozilla.org/mozilla-central/rev/';
+    var url = repoMap(branch);
     $('#tt-cset').html(changeset).attr('href', url + changeset);
     $('#tt-t').html($.plot.formatDate(new Date(t), '%b %d, %y %H:%M'));
 
