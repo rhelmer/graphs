@@ -33,9 +33,9 @@ function repoMap(branch)
     }
 
     if (branch in map) {
-        return HGWEB + '/' + map[branch] + '/';
+        return HGWEB + '/' + map[branch];
     } else {
-        return HGWEB + '/projects/' + branch + '/';
+        return HGWEB + '/projects/' + branch;
     }
 }
 
@@ -526,7 +526,7 @@ function updateTooltip(item)
         error('Unknown datatype');
     }
     var url = repoMap(branch);
-    $('#tt-cset').html(changeset).attr('href', url + changeset);
+    $('#tt-cset').html(changeset).attr('href', url + '/rev/' + changeset);
     $('#tt-t').html($.plot.formatDate(new Date(t), '%b %d, %y %H:%M'));
 
     plot.unhighlight();
