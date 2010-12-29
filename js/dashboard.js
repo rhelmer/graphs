@@ -5,9 +5,11 @@
         DEFAULT_PLATFORM = ['windows7', 'windowsxp', 'macosx', 'linux'],
         DEFAULT_TEST = ['ts', 'tp', 'ss'];
 
-    var branch = DEFAULT_BRANCH,
-        platform = DEFAULT_PLATFORM,
-        test = DEFAULT_TEST;
+    var args = getUrlVars();
+    displayDays = args['displayrange'] ? args['displayrange'] : displayDays;
+    branch = args['branch'] ? args['branch'] : DEFAULT_BRANCH;
+    platform = args['platform'] ? JSON.parse(decodeURIComponent(args['platform'])) : DEFAULT_PLATFORM;
+    test = args['test'] ? JSON.parse(decodeURIComponent(args['test'])) : DEFAULT_TEST;
 
     function getIds(branch)
     {
@@ -60,10 +62,13 @@
 
         var newLocation = url;
 
-        newLocation += '#displayrange=' + $('#displayrange select').val();
-        newLocation += '&branch=' + $('#branch select').val();
-        newLocation += '&platform=' + $('#platform select').val();
-        newLocation += '&test=' + $('#test select').val();
+        var params = $.param({
+            displayrange: displayDays,
+            branch: branch,
+            platform: JSON.stringify(platform),
+            test: JSON.stringify(test)
+        });
+        newLocation += '#' + params;
         window.location = newLocation;
     }
 
@@ -80,8 +85,11 @@
             var a = $('.' + platformName + '.' + testName + ' a');
             var img = $('.' + platformName + '.' + testName + ' img');
             var tests = [[testid, branchid, platformid]];
-            a.attr('href', 'graph.html#tests=' + JSON.stringify(tests) +
-                           '&sel=none&displayrange=' + displayDays);
+            var params = { tests: JSON.stringify(tests),
+                           sel: 'none',
+                           displayrange: displayDays,
+                           datatype: datatype };
+            a.attr('href', 'graph.html#' + $.param(params));
             img.attr('src', 'images/dashboard/flot-' + testid +
                              '-' + branchid + '-' + platformid +
                              '_' + displayDays + '.png');
@@ -102,6 +110,7 @@
                 rowhead += '.rowhead.' + test[j] + ',';
             }
         }
+        debug(selector);
         $(selector).show();
         $(colhead).show();
         $(rowhead).show();
@@ -111,7 +120,6 @@
     }
 
 
-    $('.selectBox').selectBox();
     $('#displayrange').change(function(e) {
         e.preventDefault();
         displayDays = e.target.value;
@@ -151,6 +159,8 @@
     $('#platform').toggleClass('disabled', false);
     $('#test').toggleClass('disabled', false);
 
-    // TODO honor incoming URL settings
+    refreshGraphs(getIds(branch));
+    restrictDisplay();
+    $('.selectBox').selectBox();
 
 })(jQuery);

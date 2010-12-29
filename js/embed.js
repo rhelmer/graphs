@@ -13,12 +13,12 @@
         updateBindings();
         var args = getUrlVars();
         var tests = args['tests'];
-        sel = args['sel'];
-        datatype = args['datatype'];
-        displayDays = args['displayrange'];
+        sel = args['sel'] ? args['sel'] : 'none';
+        displayDays = args['displayrange'] ? args['displayrange'] : displayDays;
+        datatype = args['datatype'] ? args['datatype'] : 'running';
         if (tests) {
             try {
-                tests = JSON.parse(tests);
+                tests = JSON.parse(decodeURIComponent(tests));
             } catch(e) {
                 error('Could not understand URL', e);
                 return false;
