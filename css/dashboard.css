@@ -13,18 +13,19 @@ html {
 	background: url(dashboard-loading.gif) no-repeat left top;
 }
 
+.placeholder {
+	width:360px;
+	height:240px;
+	top: 30%;
+}
+
+
 .failed {
 	position: relative;
 	left: 45%;
 	top: 50%;
 	width: 16px;
 	height: 16px;
-}
-
-#placeholder {
-	width:360px;
-	height:240px;
-	top: 30%;
 }
 
 table {
