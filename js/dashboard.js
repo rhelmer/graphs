@@ -86,7 +86,7 @@
             var platformName = id[1][2];
 
             var td = $('td .' + platformName + '.' + testName);
-            td.html('<p class="loader">');
+            td.html('<div class="placeholder"><p class="loader">');
             var tests = [[testid, branchid, platformid]];
             var params = { tests: JSON.stringify(tests),
                            sel: 'none',
