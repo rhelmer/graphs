@@ -8,8 +8,11 @@
     var args = getUrlVars();
     displayDays = args['displayrange'] ? args['displayrange'] : displayDays;
     branch = args['branch'] ? args['branch'] : DEFAULT_BRANCH;
-    platform = args['platform'] ? JSON.parse(decodeURIComponent(args['platform'])) : DEFAULT_PLATFORM;
-    test = args['test'] ? JSON.parse(decodeURIComponent(args['test'])) : DEFAULT_TEST;
+    platform = args['platform'] ?
+               JSON.parse(decodeURIComponent(args['platform'])) :
+               DEFAULT_PLATFORM;
+    test = args['test'] ? JSON.parse(decodeURIComponent(args['test'])) :
+                          DEFAULT_TEST;
 
     function getIds(branch)
     {

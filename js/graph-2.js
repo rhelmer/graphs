@@ -519,8 +519,8 @@
               $(node).append('<strong>' + testName + '</strong>');
               $(node).append('<span>' + branchName + '</span>');
               $(node).append('<span>' + platformName + '</span>');
-              $(node).append('<small class="loader" title="Series is loading">' +
-                             '</small>');
+              $(node).append('<small class="loader"' + 
+                             'title="Series is loading"></small>');
               $(node).append('<a id="' + uniqueSeries + '" class="remove"' +
                              ' href="#" title="Remove this series"></a>');
               $('.remove').click(onRemove);
@@ -532,10 +532,13 @@
             } else {
               color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
               $('#' + uniqueSeries + ' .loader').hide();
-              $(node).append('<em style="background-color: ' + color + ';"></em>');
-              $(node).append('<a id="' + uniqueSeries + '" class="show" href="#"' +
+              $(node).append('<em style="background-color: ' +
+                             color + ';"></em>');
+              $(node).append('<a id="' + uniqueSeries +
+                             '" class="show" href="#"' +
                              ' title="Show this series"></a>');
-              $(node).append('<a id="' + uniqueSeries + '" class="hide" href="#"' +
+              $(node).append('<a id="' + uniqueSeries +
+                             '" class="hide" href="#"' +
                              ' title="Hide this series"></a>');
               $(node).append('<a id="' + uniqueSeries + '" class="explode"' +
                              ' href="#" title="Explode this series"></a>');

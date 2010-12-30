@@ -273,7 +273,7 @@ function parseSeries(seriesIn, i, weight, explodedWeight)
     });
 }
 
- // based on http://jquery-howto.blogspot.com/2009/09/get-url-parameters-values-with-jquery.html
+//  http://jquery-howto.blogspot.com/2009/09/get-url-parameters-values-with-jquery.html
 function getUrlVars()
 {
     var vars = [], hash;
