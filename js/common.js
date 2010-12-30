@@ -23,15 +23,15 @@ var LIGHT_COLORS = $.map(COLORS, function(color) {
 });
 
 // FIXME get this from the server instead of hardcoding
-var HGWEB = 'http://hg.mozilla.org'
+var HGWEB = 'http://hg.mozilla.org';
 function repoMap(branch)
 {
     branch = branch.toLowerCase();
 
-    var map =  {
+    var map = {
         'firefox': 'mozilla-central',
         'tracemonkey': 'tracemonkey'
-    }
+    };
 
     if (branch in map) {
         return HGWEB + '/' + map[branch];
@@ -119,9 +119,9 @@ $.fn.selectBox = function() {
         // FIXME need to pay attention to name here
         $('option', this).each(function() {
             if ((displayDays == $(this).val()) ||
-                (datatype == $(this).val())    ||
-                (branch == $(this).val())      ||
-                (platform == $(this).val())    ||
+                (datatype == $(this).val()) ||
+                (branch == $(this).val()) ||
+                (platform == $(this).val()) ||
                 (test == $(this).val())) {
                     select.val($(this).val());
             }
@@ -147,21 +147,21 @@ $.fn.selectBox = function() {
             h = anchor.outerHeight(),
             bubbleWrap = this.find('.bubble-wrap');
 
-        bubbleWrap.css({ left: offset.left+w/2, top: offset.top+h });
+        bubbleWrap.css({ left: offset.left + w / 2, top: offset.top + h });
 
         return this.bind('click.bubble', onClickBubble)
                    .bind('copy.bubble', onCopyBubble)
                    .show();
 
         function onClickBubble(e) {
-            if (bubbleWrap.has(e.target).length == 0 ) {
+            if (bubbleWrap.has(e.target).length == 0) {
                 $(this).hideBubble();
                 return false;
             }
         }
 
         function onCopyBubble(e) {
-            if ( $(e.target).closest('input,textarea').length ) {
+            if ($(e.target).closest('input,textarea').length) {
                 var self = $(this);
                 setTimeout(function() { self.hideBubble(); }, 100);
             }
@@ -279,7 +279,7 @@ function getUrlVars()
     var vars = [], hash;
     var hashes = window.location.href.slice(window.location.href.indexOf('#') +
                                             1).split('&');
-    for(var i = 0; i < hashes.length; i++)
+    for (var i = 0; i < hashes.length; i++)
     {
         hash = hashes[i].split('=');
         vars.push(hash[0]);
@@ -304,13 +304,13 @@ function deltaPlot(plot)
 {
     var newPlot = [];
     var previous;
-    plot.maxV = 0;       
+    plot.maxV = 0;
     plot.minV = 0;
     $.each(plot.data, function() {
        var datetime = $(this)[0];
        var elapsed = $(this)[1];
        var newV;
-       if (previous) { 
+       if (previous) {
            if (datatype == 'delta') {
                newV = (elapsed - previous);
            } else if (datatype == 'deltapercent') {
@@ -318,7 +318,7 @@ function deltaPlot(plot)
            } else {
                error('Unknown datatype');
                return false;
-           } 
+           }
            newPlot.push([datetime, newV]);
            plot.maxV = plot.maxV > newV ? plot.maxV : newV;
            plot.minV = plot.minV < newV ? plot.minV : newV;
@@ -614,7 +614,7 @@ function updatePlot()
         }
 
         count++;
-        
+
         marginV = 0.1 * (maxV - minV);
         minT = _zoomFrom || (minT < series.minT ? minT : series.minT);
         maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
