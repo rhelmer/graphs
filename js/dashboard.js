@@ -85,17 +85,19 @@
             var branchName = id[1][1];
             var platformName = id[1][2];
 
-            var a = $('.' + platformName + '.' + testName + ' a');
-            var img = $('.' + platformName + '.' + testName + ' img');
+            var td = $('td .' + platformName + '.' + testName);
+            td.html('<p class="loader">');
             var tests = [[testid, branchid, platformid]];
             var params = { tests: JSON.stringify(tests),
                            sel: 'none',
                            displayrange: displayDays,
                            datatype: datatype };
-            a.attr('href', 'graph.html#' + $.param(params));
-            img.attr('src', 'images/dashboard/flot-' + testid +
-                             '-' + branchid + '-' + platformid +
-                             '_' + displayDays + '.png');
+            var img = 'images/dashboard/flot-' + testid +
+                       '-' + branchid + '-' + platformid +
+                       '_' + displayDays + '.png';
+            var html = '<a href="graph.html#' + $.param(params) + '">' +
+                       '<img src="' + img + '">';
+            td.html(html);
         });
         updateLocation();
     }
