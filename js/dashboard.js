@@ -110,7 +110,6 @@
                 rowhead += '.rowhead.' + test[j] + ',';
             }
         }
-        debug(selector);
         $(selector).show();
         $(colhead).show();
         $(rowhead).show();
