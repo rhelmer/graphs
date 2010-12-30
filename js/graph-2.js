@@ -19,7 +19,7 @@
         if (tests) {
             try {
                 tests = JSON.parse(decodeURIComponent(tests));
-            } catch(e) {
+            } catch (e) {
                 error('Could not understand URL', e);
                 return false;
             }
@@ -126,7 +126,7 @@
         updateLocation();
     }
 
-    $('#datatype').click(function (e) {
+    $('#datatype').click(function(e) {
         e.preventDefault();
         datatype = e.target.value;
         updatePlot();
@@ -392,7 +392,7 @@
 
     $('#showchangesets').click(function(e) {
         e.preventDefault();
-      
+
         // find changes which match this range
         var csets = [];
         var range = getZoomRange();
@@ -420,7 +420,7 @@
         $.each(branches, function() {
             var branch = this;
             var url = repoMap(branch);
-            window.open(url + '/pushloghtml?changeset=' + 
+            window.open(url + '/pushloghtml?changeset=' +
                         csets.join('&changeset='));
         });
     });
@@ -543,7 +543,7 @@
                              ' href="#" title="Implode this series"></a>');
               updateLocation();
             }
-    
+
             $('#displayrange').toggleClass('disabled', false);
             $('#datatype').toggleClass('disabled', false);
             $('#zoomin').toggleClass('disabled', false);
@@ -552,7 +552,7 @@
             //$('#exportcsv').toggleClass('disabled', false);
             $('#chart-link').toggleClass('disabled', false);
             $('#chart-embed').toggleClass('disabled', false);
-        } catch(e) {
+        } catch (e) {
             error('Could not add node ', e);
             throw e;
         }

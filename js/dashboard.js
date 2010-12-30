@@ -103,9 +103,9 @@
         var selector = '';
         var colhead = '';
         var rowhead = '';
-        for (var i=0; i < platform.length; i++) {
+        for (var i = 0; i < platform.length; i++) {
             colhead += 'thead td.' + platform[i] + ',';
-            for (var j=0; j < test.length; j++) {
+            for (var j = 0; j < test.length; j++) {
                 selector += '.' + platform[i] + '.' + test[j] + ',';
                 rowhead += '.rowhead.' + test[j] + ',';
             }

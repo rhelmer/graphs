@@ -19,7 +19,7 @@
         if (tests) {
             try {
                 tests = JSON.parse(decodeURIComponent(tests));
-            } catch(e) {
+            } catch (e) {
                 error('Could not understand URL', e);
                 return false;
             }
