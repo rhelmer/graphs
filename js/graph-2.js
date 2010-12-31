@@ -73,9 +73,6 @@
         $('#add-data-form select').unbind();
         $('#add-data-form select').change(onSelectData);
 
-        $('#displayrange').unbind();
-        $('#displayrange').change(onDisplayRange);
-
         $('#zoomin').unbind();
         $('#zoomin').click(onZoomInClick);
 
@@ -102,24 +99,26 @@
         }
     }
 
-    function onDisplayRange(e)
-    {
+    $('#displayrange').change(function(e) {
         e.preventDefault();
         displayDays = e.target.value;
         minT = new Date().getTime() - (DAY * displayDays);
         maxT = new Date().getTime();
         ajaxSeries.minT = minT;
         ajaxSeries.maxT = maxT;
-        _zoomFrom = null;
-        _zoomTo = null;
         updatePlot();
         zoomOut();
+        _zoomFrom = null;
+        _zoomTo = null;
+        overview.clearSelection();
         updateLocation();
-    }
+    });
 
-    $('#datatype').click(function(e) {
+    $('#datatype').change(function(e) {
         e.preventDefault();
         datatype = e.target.value;
+        _zoomFrom = null;
+        _zoomTo = null;
         updatePlot();
         updateLocation();
     });

@@ -359,6 +359,7 @@ function zoomIn()
 {
     var range = getPlotRange();
     zoomTo(range);
+    updateLocation();
 }
 
 function zoomOut()
@@ -381,6 +382,7 @@ function zoomOut()
     range.to = Math.min(range.to + dt, ajaxSeries.maxT);
 
     zoomTo(range);
+    updateLocation();
 }
 
 function zoomTo(range)
@@ -658,10 +660,6 @@ function updateLocation() {
     });
 
     var newLocation = url + '=' + JSON.stringify(args);
-    var selectionrange = {
-        from: _zoomFrom || ajaxSeries.minT,
-        to: _zoomTo || ajaxSeries.maxT
-    };
 
     if (_zoomFrom && _zoomTo) {
         newLocation += '&sel=' + _zoomFrom +
