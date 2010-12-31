@@ -458,6 +458,9 @@ function onOverviewSelect(e, ranges)
 function onOverviewUnselect(e)
 {
     zoomTo(null);
+    _zoomFrom = null;
+    _zoomTo = null;
+    updateLocation();
 }
 
 var resizeTimer = null;
@@ -655,12 +658,18 @@ function updateLocation() {
     });
 
     var newLocation = url + '=' + JSON.stringify(args);
-    var selectionrange = getZoomRange();
+    var selectionrange = {
+        from: _zoomFrom || ajaxSeries.minT,
+        to: _zoomTo || ajaxSeries.maxT
+    };
 
-    if (selectionrange) {
-        newLocation += '&sel=' + selectionrange['from'] +
-                       ',' + selectionrange['to'];
+    if (_zoomFrom && _zoomTo) {
+        newLocation += '&sel=' + _zoomFrom +
+                       ',' + _zoomTo; 
+    } else {
+        newLocation += '&sel=none';
     }
+
     newLocation += '&displayrange=' + $('#displayrange select').val();
     newLocation += '&datatype=' + $('#datatype select').val();
     window.location = newLocation;
