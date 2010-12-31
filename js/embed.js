@@ -46,7 +46,7 @@
         plot = $.plot($('#plot'), [], PLOT_OPTIONS);
     }
 
-    function initData(testid, branchid, platformid, data, sel)
+    function initData(testid, branchid, platformid, data)
     {
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
@@ -54,16 +54,6 @@
         ajaxSeries.exploded = false;
         ajaxSeries.visible = true;
         allSeries[uniqueSeries] = ajaxSeries;
-        //TODO use selection provided by URL
-/*
-        if (sel) {
-            var range = {
-                from: sel.split(',')[0],
-                to: sel.split(',')[1]
-            }
-            zoomTo(range);
-        }
-*/
     }
 
     function updateBindings()
@@ -116,7 +106,7 @@
                     error('Could not import test run data', false, data);
                     return false;
                 }
-                initData(testid, branchid, platformid, data, sel);
+                initData(testid, branchid, platformid, data);
                 updatePlot();
                 addSeries(testid, branchid, platformid, addSeriesNode);
 
