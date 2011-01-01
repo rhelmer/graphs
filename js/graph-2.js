@@ -464,7 +464,7 @@
                 count += 1;
             }
         });
-        if (!confirmTooMuchData(count, MAX_CSETS, 'data series')) {
+        if (!confirmTooMuchData(count, MAX_GRAPHS, 'data series')) {
             addMoreTestData();
             return false;
         }
