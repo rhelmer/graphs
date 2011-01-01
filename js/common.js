@@ -231,7 +231,7 @@ function convertData(testName, branchName, platformName, data)
         }
     }
 
-    // FIXME machineMap removed
+    // machineMap removed, use machine ID
 
     for (var machineid in machine_runs)
     {
