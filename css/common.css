@@ -27,6 +27,7 @@ a:hover {
 #header, #toolbar, #options, #charts {
 	position: absolute;
 	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
 	border: 0 solid #000;
 }
 
@@ -118,6 +119,7 @@ a:hover {
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee));
 	padding: 4px 8px;
 	-moz-box-shadow: 0 1px 0 rgba(255,255,255,.5);
+	-webkit-box-shadow: 0 1px 0 rgba(255,255,255,.5);
 	text-shadow: 0 1px 0 rgba(255,255,255,.5);
 	text-decoration: none;
 }
@@ -129,10 +131,14 @@ a:hover {
 	border-left-width: 1px;
 	-moz-border-radius-topleft: 4px;
 	-moz-border-radius-bottomleft: 4px;
+	-webkit-border-radius-topleft: 4px;
+	-webkit-border-radius-bottomleft: 4px;
 }
 #toolbar .button:last-child, .button:last-child {
 	-moz-border-radius-topright: 4px;
 	-moz-border-radius-bottomright: 4px;
+	-webkit-border-radius-topright: 4px;
+	-webkit-border-radius-bottomright: 4px;
 }
 .button:hover,
 .button.sbFocus {
@@ -152,6 +158,7 @@ a:hover {
 	background: rgba(0,0,0,.125);
 	font-size: 9px;
 	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
 }
 
 #errors {
