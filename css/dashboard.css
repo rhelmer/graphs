@@ -46,6 +46,7 @@ thead, table .rowhead {
 
 .rowhead p {
 	-moz-transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
 	width: 10px;
 	white-space:normal;
 }
