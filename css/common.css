@@ -32,6 +32,7 @@ a:hover {
 
 #header {
 	background: -moz-linear-gradient(-90deg, #306298, #234375);
+	background: -webkit-gradient(linear, left top, left bottom, from(#306298), to(#234375));
 }
 
 #header h1 a {
@@ -92,6 +93,7 @@ a:hover {
 
 #toolbar {
 	background: -moz-linear-gradient(-90deg, #f8f8f8, #e7e7e7);
+	background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#e7e7e7));
 	border-bottom-color: #d0d0d0;
 	padding: 0 10px;
 	line-height: 36px;
@@ -113,6 +115,7 @@ a:hover {
 	border: 1px solid #ccc;
 	border-left-width: 0;
 	background: -moz-linear-gradient(-90deg, #fff, #eee);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee));
 	padding: 4px 8px;
 	-moz-box-shadow: 0 1px 0 rgba(255,255,255,.5);
 	text-shadow: 0 1px 0 rgba(255,255,255,.5);
@@ -134,9 +137,11 @@ a:hover {
 .button:hover,
 .button.sbFocus {
 	background: -moz-linear-gradient(-90deg, #fff, #d1dff0);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#d1dff0));
 }
 .button:active {
 	background: -moz-linear-gradient(-90deg, #c4d0e0, #d1dff0);
+	background: -webkit-gradient(linear, left top, left bottom, from(#c4d0e0), to(#d1dff0));
 }
 
 #toolbar .button .key {

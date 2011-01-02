@@ -40,6 +40,7 @@ table, th, td {
 
 thead, table .rowhead {
 	background: -moz-linear-gradient(-90deg, #f8f8f8, #e7e7e7);
+	background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#e7e7e7));
 	font-size: 14px;
 	text-align: center;
 }
