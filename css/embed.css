@@ -26,6 +26,7 @@
 		background: rgba(0,0,0,.75);
 		color: #fff;
 		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
 		padding: 10px 15px;
 	}
 	#tooltip.locked .body {
@@ -84,6 +85,7 @@
 	background: #000 url(loading.gif) no-repeat center 20px;
 	opacity: .75;
 	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
 #loading-overlay span {
 	position: absolute;

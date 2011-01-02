@@ -11,6 +11,7 @@ html {
 	background: #fff;
 	border: 1px solid #cdd6df;
 	-moz-box-shadow: 0 1px 0 #fff;
+	-webkit-box-shadow: 0 1px 0 #fff;
 }
 #legend li {
 	position: relative;
@@ -183,6 +184,7 @@ html {
 		background: rgba(0,0,0,.75);
 		color: #fff;
 		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
 		padding: 10px 15px;
 	}
 	#tooltip.locked .body {
@@ -241,6 +243,7 @@ html {
 	background: #000 url(loading.gif) no-repeat center 20px;
 	opacity: .75;
 	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
 #loading-overlay span {
 	position: absolute;
@@ -261,6 +264,7 @@ html {
 	padding: 12px;
 	font-size: 13px;
 	-moz-border-radius: 15px;
+	-webkit-border-radius: 15px;
 }
 
 #add-overlay {
@@ -289,6 +293,8 @@ html {
 	color: #333;
 	text-align: left;
 	-moz-box-shadow: 0 2px 0 #0a2040,
+	                 0 2px 4px rgba();
+	-webkit-box-shadow: 0 2px 0 #0a2040,
 	                 0 2px 4px rgba();
 }
 #add-overlay h2 {
@@ -357,8 +363,10 @@ html {
 	font-size: 14px;
 	color: #333;
 	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
 	border-radius: 3px;
 	background: -moz-linear-gradient(#ffffff, #ededed);
+	background: -webkit-linear-gradient(gradient, left top, left bottom, from(#ffffff), to(#ededed));
 	cursor: pointer;
 }
 #add-overlay button:hover,
@@ -368,6 +376,7 @@ html {
 }
 #add-overlay button:active {
 	-moz-box-shadow: inset 0 1px 1px rgba(0,0,0,.2);
+	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.2);
 }
 #add-overlay button:active span {
 	position: relative;
@@ -375,6 +384,7 @@ html {
 }
 #add-overlay button[type="submit"] {
 	background: -moz-linear-gradient(#4b83c1, #426ca6);
+	background: -webkit-linear-gradient(gradient, left top, left bottom, from(#4b83c1), to(#426ca6));
 	border-color: #273f6c;
 	color: #fff;
 }
@@ -389,6 +399,7 @@ html {
 #add-overlay button[type="submit"]:disabled {
 	border-color: #d0d0d0;
 	background: -moz-linear-gradient(#ffffff, #ededed);
+	background: -webkit-linear-gradient(gradient, left top, left bottom, from(#ffffff), to(#ededed));
 	color: #ccc;
 }
 
