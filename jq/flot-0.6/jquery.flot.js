@@ -1281,7 +1281,6 @@
                     ps = datapoints.pointsize,
                     prevx = null, prevy = null;
                 
-                ctx.beginPath();
                 for (var i = ps; i < points.length; i += ps) {
                     var x1 = points[i - ps], y1 = points[i - ps + 1],
                         x2 = points[i], y2 = points[i + 1];
@@ -1346,14 +1345,26 @@
                         x2 = axisx.max;
                     }
 
+                    //
+
+                     // We call beginPath() and stroke() inside the for loop because there are currently performance
+
+                     // problems with HTML canvas polylines when used with a line width greater than 1. Stroking each
+
+                     // line avoids using polyline functionality and speed performance significantly.
+
+                     //
+
+                     ctx.beginPath();
+                     ctx.moveTo(axisx.p2c(prevx) + xoffset, axisy.p2c(prevy) + yoffset);
                     if (x1 != prevx || y1 != prevy)
                         ctx.moveTo(axisx.p2c(x1) + xoffset, axisy.p2c(y1) + yoffset);
-                    
+                    ctx.lineTo(axisx.p2c(x2) + xoffset, axisy.p2c(y2) + yoffset);
+                    ctx.stroke();                    
+
                     prevx = x2;
                     prevy = y2;
-                    ctx.lineTo(axisx.p2c(x2) + xoffset, axisy.p2c(y2) + yoffset);
                 }
-                ctx.stroke();
             }
 
             function plotLineArea(datapoints, axisx, axisy) {
