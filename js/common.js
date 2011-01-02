@@ -635,7 +635,6 @@ function updatePlot()
     });
     unlockTooltip();
     hideTooltip(true);
-    debug(plotOptions);
     plot = $.plot($('#plot'), plotData, plotOptions);
     if ($('#overview').length > 0) {
         overview = $.plot($('#overview'), overviewData, overviewOptions);
