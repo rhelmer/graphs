@@ -1348,12 +1348,8 @@
                     //
 
                      // We call beginPath() and stroke() inside the for loop because there are currently performance
-
                      // problems with HTML canvas polylines when used with a line width greater than 1. Stroking each
-
                      // line avoids using polyline functionality and speed performance significantly.
-
-                     //
 
                      ctx.beginPath();
                      ctx.moveTo(axisx.p2c(prevx) + xoffset, axisy.p2c(prevy) + yoffset);
