@@ -12,6 +12,16 @@
 <tr><td rowspan="1" colspan="3">graphs-stage2</td></tr>
 </thead><tbody>
 <tr>
+	<td>storeEval</td>
+	<td>{lastTime = new Date().getTime(); 'x'}</td>
+	<td>x</td>
+</tr>
+<tr>
+	<td>storeEval</td>
+	<td>{LOG.info = function(message) { var now = new Date().getTime(); var duration = now - lastTime; this.warn(message + duration); lastTime = now}; 'x';}</td>
+	<td>x</td>
+</tr>
+<tr>
 	<td>open</td>
 	<td>/#displayrange=30&amp;branch=firefox&amp;platform=%5B%22windows7%22%2C%22windowsxp%22%2C%22macosx%22%2C%22linux%22%5D&amp;test=%5B%22ts%22%2C%22tp%22%2C%22ss%22%5D</td>
 	<td></td>
@@ -327,11 +337,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForPopUp</td>
-	<td></td>
-	<td>30000</td>
-</tr>
-<tr>
 	<td>click</td>
 	<td>chart-link</td>
 	<td></td>
@@ -389,11 +394,6 @@
 <tr>
 	<td>addSelection</td>
 	<td>add-platforms</td>
-	<td>label=MacOSX Darwin 8.8.1</td>
-</tr>
-<tr>
-	<td>addSelection</td>
-	<td>add-platforms</td>
 	<td>label=WINNT 6.1</td>
 </tr>
 <tr>
@@ -431,17 +431,6 @@
 	<td>add-series-done</td>
 	<td></td>
 </tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Dashboard</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Perf-O-Matic</td>
-	<td></td>
-</tr>
-
 </tbody></table>
 </body>
 </html>
