@@ -16,7 +16,7 @@ def main():
     optionflags = doctest.ELLIPSIS
     if '-u' in sys.argv:
         optionflags |= doctest.REPORT_UDIFF
-    doctest.testfile('test_collect_amo.txt', optionflags=optionflags)
+    return doctest.testfile('test_collect_amo.txt', optionflags=optionflags)
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
