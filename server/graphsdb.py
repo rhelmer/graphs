@@ -13,7 +13,6 @@ for environ_name, kw_name in [('CONFIG_MYSQL_HOST', 'host'),
     if os.environ.get(environ_name):
         kw[kw_name] = os.environ[environ_name]
 
-
 ## This gets around problems with MySQL dropping a connection -- we
 ## catch the error and try to reopen the connection:
 

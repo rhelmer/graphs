@@ -31,8 +31,11 @@ def bz_request(api, path, data=None, method=None, username=None, password=None):
     return json.loads(data)
 
 def bz_check_request(*args, **kw):
-    result = bz_request(*args, **kw)
-    assert not result.get('error'), result
+    try:
+        result = bz_request(*args, **kw)
+        assert not result.get('error'), result
+    except urllib2.HTTPError, e:
+        assert 200 <= e.code < 300, e
 
 def bz_get_bug(api, bug_num):
     try:
@@ -42,6 +45,16 @@ def bz_get_bug(api, bug_num):
         raise
     except:
         log.exception("Error fetching bug %s" % bug_num)
+        return None
+
+def bz_get_bug_comments(api, bug_num):
+    try:
+        comments = bz_request(api, "/bug/%s/comment" % bug_num)
+        return comments
+    except KeyboardInterrupt:
+        raise
+    except:
+        log.exception("Error fetching comments for bug %s" % bug_num)
         return None
 
 def bz_notify_bug(api, bug_num, message, whiteboard, username, password, retries=5):
@@ -121,7 +134,7 @@ def bugs_from_comments(comments):
         bXXXXX
     """
     retval = []
-    m = re.search("b(?:ug(?:s)?)?\s*((?:\d+[, ]*)*)", comments, re.I)
+    m = re.search(r"\bb(?:ug(?:s)?)?\s*((?:\d+[, ]*)+)", comments, re.I)
     if m:
         for m in re.findall("\d+", m.group(1)):
             retval.append(int(m))
@@ -424,10 +437,17 @@ class AnalysisRunner:
         new_stddev = bad.forward_stats['variance'] ** 0.5
         forward_n = bad.forward_stats['n']
 
-        change = 100.0 * abs(new_value - initial_value) / float(initial_value)
+        if initial_value != 0:
+            change = 100.0 * abs(new_value - initial_value) / float(initial_value)
+        else:
+            change = 0.0
+
         delta = (new_value - initial_value)
 
-        z_score = abs(delta / initial_stddev)
+        if initial_stddev != 0:
+            z_score = abs(delta / initial_stddev)
+        else:
+            z_score = 0.0
 
         if self.isImprovement(test_name, good, bad):
             reason = "Improvement!"
@@ -547,7 +567,10 @@ class AnalysisRunner:
         initial_value = bad.historical_stats['avg']
         new_value = bad.forward_stats['avg']
 
-        change = 100.0 * abs(new_value - initial_value) / float(initial_value)
+        if initial_value != 0:
+            change = 100.0 * abs(new_value - initial_value) / float(initial_value)
+        else:
+            change = 0.0
 
         if self.isImprovement(test_name, good, bad):
             reason = "Improvement!"
@@ -585,6 +608,7 @@ class AnalysisRunner:
         branch = series.branch_name
         test_name = series.test_name
         short_name = series.test_shortname
+        os_name = series.os_name
 
         # Don't comment for good things
         if self.isImprovement(test_name, good, bad):
@@ -599,9 +623,16 @@ class AnalysisRunner:
         new_stddev = bad.forward_stats['variance'] ** 0.5
         forward_n = bad.forward_stats['n']
 
-        change = 100.0 * (new_value - initial_value) / float(initial_value)
+        if initial_value != 0:
+            change = 100.0 * (new_value - initial_value) / float(initial_value)
+        else:
+            change = 0.0
+
         delta = (new_value - initial_value)
-        z_score = abs(delta / initial_stddev)
+        if initial_stddev:
+            z_score = abs(delta / initial_stddev)
+        else:
+            z_score = 0.0
 
         good_rev = good.revision
         bad_rev = bad.revision
@@ -633,7 +664,7 @@ class AnalysisRunner:
         for bug in bugs:
             log.debug("Bug %s is implicated", bug)
             message = """\
-A changeset from this bug was associated with a %(test_name)s regression. boo-urns :(
+A changeset from this bug was associated with a %(os_name)s %(test_name)s regression on %(branch)s. boo-urns :(
 
   Previous: avg %(initial_value).3f stddev %(initial_stddev).3f of %(history_n)i runs up to %(good_rev)s
   New     : avg %(new_value).3f stddev %(new_stddev).3f of %(forward_n)i runs since %(bad_rev)s
@@ -648,9 +679,18 @@ please remove it only once you have confirmed this bug is not the cause
 of the regression.""" % locals()
 
             notify_bug = bug_override or bug
-            log.info("Notifying bug %s" , notify_bug)
 
-            bz_notify_bug(api, notify_bug, message, whiteboard, username, password)
+            # Look to see if this bug was previously implicated for this
+            # regression
+            comments = bz_get_bug_comments(api, notify_bug)
+            for c in comments['comments']:
+                msg = c['text']
+                if whiteboard in msg and os_name in msg and branch in msg and hg_url in msg:
+                    log.info("Not notifying %s, it was implicated before", notify_bug)
+                    break
+            else:
+                log.info("Notifying bug %s", notify_bug)
+                bz_notify_bug(api, notify_bug, message, whiteboard, username, password)
 
     def emailWarning(self, series, d, state, last_good):
         addresses = []
@@ -829,7 +869,8 @@ of the regression.""" % locals()
             self.printWarning(series, d, state, last_good)
             self.emailWarning(series, d, state, last_good)
             if self.config.has_option('main', 'bz_username') and self.config.has_option('main', 'bz_api'):
-                self.bugComment(series, d, state, last_good)
+                if self.config.has_option(series.branch_name, 'enable_bug_comments') and self.config.getboolean(series.branch_name, 'enable_bug_comments'):
+                    self.bugComment(series, d, state, last_good)
 
     def handleSeries(self, s):
         if self.config.has_option('os', s.os_name):
