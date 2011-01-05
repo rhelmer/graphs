@@ -1,0 +1,54 @@
+html {
+	background: #eff6fd url(bg.png);
+}
+
+#toolbar, #charts { left: 0; right: 0; }
+
+.loader {
+	position: relative;
+	left: 40%;
+	top: 30%;
+	width: 64px;
+	height: 64px;
+	background: url(dashboard-loading.gif) no-repeat left top;
+}
+
+.placeholder {
+	width:360px;
+	height:240px;
+	top: 30%;
+}
+
+
+.failed {
+	position: relative;
+	left: 45%;
+	top: 50%;
+	width: 16px;
+	height: 16px;
+}
+
+table {
+	border-collapse: collapse;
+	overflow: auto;
+}
+
+table, th, td {
+	border: 1px solid lightgrey;
+	padding: 5px;
+}
+
+thead, table .rowhead {
+	background: -moz-linear-gradient(-90deg, #f8f8f8, #e7e7e7);
+	background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#e7e7e7));
+	font-size: 14px;
+	text-align: center;
+}
+
+.rowhead p {
+	-moz-transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+	width: 10px;
+	white-space:normal;
+}
+

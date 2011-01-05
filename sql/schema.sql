@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS machines;
-CREATE TABLE machines (
+CREATE TABLE IF NOT EXISTS machines (
    id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
    os_id INT UNSIGNED NOT NULL,
    is_throttling TINYINT UNSIGNED NOT NULL DEFAULT '0',
@@ -12,8 +11,7 @@ CREATE TABLE machines (
    UNIQUE KEY (name)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS os_list;
-CREATE TABLE os_list (
+CREATE TABLE IF NOT EXISTS os_list (
    id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
    name VARCHAR(255) NOT NULL,
 
@@ -21,8 +19,7 @@ CREATE TABLE os_list (
    UNIQUE KEY (name)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS tests;
-CREATE TABLE tests (
+CREATE TABLE IF NOT EXISTS tests (
    id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
    name VARCHAR(255) NOT NULL,
    pretty_name VARCHAR(255),
@@ -35,8 +32,7 @@ CREATE TABLE tests (
    KEY (pageset_id)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS branches;
-CREATE TABLE branches (
+CREATE TABLE IF NOT EXISTS branches (
    id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
    name VARCHAR(255) NOT NULL,
 
@@ -44,8 +40,7 @@ CREATE TABLE branches (
    UNIQUE KEY (name)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS builds;
-CREATE TABLE builds (
+CREATE TABLE IF NOT EXISTS builds (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
    ref_build_id BIGINT UNSIGNED,
    ref_changeset VARCHAR(255),
@@ -58,8 +53,7 @@ CREATE TABLE builds (
    KEY (branch_id, date_added)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS pagesets;
-CREATE TABLE pagesets (
+CREATE TABLE IF NOT EXISTS pagesets (
    id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
    name VARCHAR(255) NOT NULL,
 
@@ -67,8 +61,7 @@ CREATE TABLE pagesets (
    UNIQUE KEY (name)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS pages;
-CREATE TABLE pages (
+CREATE TABLE IF NOT EXISTS pages (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
    pageset_id SMALLINT UNSIGNED NOT NULL,
    name VARCHAR(255) NOT NULL,
@@ -77,8 +70,7 @@ CREATE TABLE pages (
    UNIQUE KEY (pageset_id, name)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS test_runs;
-CREATE TABLE test_runs (
+CREATE TABLE IF NOT EXISTS test_runs (
    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
    machine_id SMALLINT UNSIGNED NOT NULL,
    test_id MEDIUMINT UNSIGNED NOT NULL,
@@ -92,8 +84,7 @@ CREATE TABLE test_runs (
    KEY (test_id, build_id, date_run)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS test_run_values;
-CREATE TABLE test_run_values (
+CREATE TABLE IF NOT EXISTS test_run_values (
    test_run_id INT UNSIGNED NOT NULL,
    interval_id SMALLINT UNSIGNED NOT NULL,
    value FLOAT NOT NULL,
@@ -102,12 +93,22 @@ CREATE TABLE test_run_values (
    PRIMARY KEY (test_run_id, interval_id)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS annotations;
-CREATE TABLE annotations (
+CREATE TABLE IF NOT EXISTS annotations (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   test_run_id int UNSIGNED NOT NULL,
   note text NOT NULL,
   bug_id INT UNSIGNED NOT NULL,
-  
+
   PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS valid_test_combinations_updated (
+  -- This matches test_runs.date_run:
+  last_updated INT NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS valid_test_combinations (
+  test_id INT NOT NULL,
+  branch_id INT NOT NULL,
+  os_id INT NOT NULL
 ) ENGINE=InnoDB;

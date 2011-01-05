@@ -1,0 +1,26 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteRule ^api/test/?$ server/api?item=tests [QSA]
+    RewriteRule ^api/test/runs/info/?$ server/api?item=testrun [QSA]
+    RewriteRule ^api/test/runs/values/?$ server/api?item=testrun&attribute=values [QSA]
+    RewriteRule ^api/test/runs/revisions/?$ server/api?item=testrun&attribute=revisions [QSA]
+    RewriteRule ^api/test/runs/latest/?$ server/api?item=testrun&id=$1&attribute=latest [QSA]
+    RewriteRule ^api/test/runs/? server/api?item=testruns [QSA]
+    RewriteRule ^api/test/([0-9]+)/?$ server/api?item=test&id=$1
+</IfModule>
+
+AddOutputFilterByType DEFLATE text/plain
+AddOutputFilterByType DEFLATE text/html
+AddOutputFilterByType DEFLATE text/xml
+AddOutputFilterByType DEFLATE text/css
+AddOutputFilterByType DEFLATE application/xml
+AddOutputFilterByType DEFLATE application/xhtml+xml
+AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/javascript
+AddOutputFilterByType DEFLATE application/x-javascript
+
+
+ExpiresActive On
+ExpiresDefault "access plus 15 minutes"
+FileETag None
+

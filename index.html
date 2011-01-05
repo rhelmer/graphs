@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard - Perf-o-Matic</title>
+    <link rel="stylesheet" href="css/reset.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/common.css" type="text/css" />
+    <link rel="stylesheet" href="css/dashboard.css" type="text/css" />
+</head>
+
+<body>
+
+<header id="header">
+    <h1>
+        <a href="index.html"><span id="logo">Perf-O-Matic</span></a>
+    </h1>
+    <nav>
+        <a class="selected" href="index.html">Dashboard</a>
+        <a href="graph.html">Custom Chart</a>
+    </nav>
+</header>
+
+<div id="toolbar">
+    <div class="group">
+        <span id="displayrange" class="button selectBox disabled" title="Time range to display">
+            <select>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 90 days</option>
+                <option value="365">Last 365 days</option>
+            </select>
+        </span>
+    </div>
+
+    <div class="group">
+        <span id="branch" class="button selectBox disabled" title="Branches">
+            <select>
+                <option value="firefox">Firefox</option>
+                <option value="tracemonkey">TraceMonkey</option>
+                <option value="places">Places</option>
+            </select>
+        </span>
+        <span id="platform" class="button selectBox disabled" title="Top Platforms">
+            <select>
+                <option value="0">Top Platforms</option>
+                <option value="windows7">Windows 7</option>
+                <option value="windowsxp">Windows XP</option>
+                <option value="macosx">Mac OSX</option>
+                <option value="linux">Linux</option>
+            </select>
+        </span>
+        <span id="test" class="button selectBox disabled" title="Top Tests">
+            <select>
+                <option value="0">Top Tests</option>
+                <option value="ts">Ts</option>
+                <option value="tp">Tp</option>
+                <option value="ss">SunSpider</option>
+            </select>
+        </span>
+    </div>
+</div>
+
+<div id="charts">
+  <table>
+    <thead>
+      <tr>
+        <td class="spacer"></td>
+        <td class="windows7">
+          Windows 7
+        </td>
+        <td class="windowsxp">
+          Windows XP
+        </td>
+        <td class="macosx">
+          Mac OS X
+        </td>
+        <td class="linux">
+          Linux
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="rowhead ts"><p>Ts</p></td>
+        <td class="windows7 ts">
+          <a class="windows7 ts" href="graph.html#tests=[[16,1,12]]"><img src="images/dashboard/flot-16-1-12_7.png"></a>
+        </td>
+        <td class="windowsxp ts">
+          <a class="windowsxp ts" href="graph.html#tests=[[16,1,1]]"><img src="images/dashboard/flot-16-1-1_7.png"></a>
+        </td>
+        <td class="macosx ts">
+          <a class="macosx ts" href="graph.html#tests=[[16,1,13]]"><img src="images/dashboard/flot-16-1-13_7.png"></a>
+        </td>
+        <td class="linux ts">
+          <a class="linux ts" href="graph.html#tests=[[16,1,14]]"><img src="images/dashboard/flot-16-1-14_7.png"></a>
+        </td>
+      </tr>
+      <tr>
+        <td class="rowhead tp"><p>Tp</p></td>
+        <td class="windows7 tp">
+          <a class="windows7 tp" href="graph.html#tests=[[38,1,12]]"><img src="images/dashboard/flot-38-1-12_7.png"></a>
+        </td>
+        <td class="windowsxp tp">
+          <a class="windowsxp tp" href="graph.html#tests=[[38,1,1]]"><img src="images/dashboard/flot-38-1-1_7.png"></a>
+        </td>
+        <td class="macosx tp">
+          <a class="macosx tp" href="graph.html#tests=[[38,1,13]]"><img src="images/dashboard/flot-38-1-13_7.png"></a>
+        </td>
+        <td class="linux tp">
+          <a class="linux tp" href="graph.html#tests=[[38,1,14]]"><img src="images/dashboard/flot-38-1-14_7.png"></a>
+        </td>
+      </tr>
+      <tr>
+        <td class="rowhead ss"><p>SunSpider</p></td>
+        <td class="windows7 ss">
+          <a class="windows7 ss" href="graph.html#tests=[[25,1,12]]"><img src="images/dashboard/flot-25-1-12_7.png"></a>
+        </td>
+        <td class="windowsxp ss">
+          <a class="windowsxp ss" href="graph.html#tests=[[25,1,1]]"><img src="images/dashboard/flot-25-1-1_7.png"></a>
+        </td>
+        <td class="macosx ss">
+          <a class="macosx ss" href="graph.html#tests=[[25,1,13]]"><img src="images/dashboard/flot-25-1-13_7.png"></a>
+        </td>
+        <td class="linux ss">
+          <a class="linux ss" href="graph.html#tests=[[25,1,14]]"><img src="images/dashboard/flot-25-1-14_7.png"></a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div id="errors">
+  </div>
+</div>
+
+<script type="text/javascript" src="jq/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="jq/flot-0.6/jquery.flot.js"></script>
+<script type="text/javascript" src="jq/flot-0.6/jquery.flot.selection.min.js"></script>
+<script type="text/javascript" src="jq/flot-0.6/jquery.flot.crosshair.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/dashboard.js"></script>
+
+</body>
+
+</html>
