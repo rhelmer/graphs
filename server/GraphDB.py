@@ -1,9 +1,10 @@
-
 from pysqlite2 import dbapi2 as sqlite
 #from databases import mysql as MySQLdb
 
+
 class GraphDB:
-    def __init__(self, dbname = None):
+
+    def __init__(self, dbname=None):
         if dbname == None:
             dbname = "graphs.db"
         self.db = sqlite.connect(dbname)
@@ -15,7 +16,7 @@ class GraphDB:
     def close(self):
         self.db.close()
 
-    def dbGetOneValue(self, statement, args = None):
+    def dbGetOneValue(self, statement, args=None):
         """DB Helper: execute a statement, and return the first value of the first row, or None."""
         cur = self.db.cursor()
         if args is None:
@@ -63,7 +64,7 @@ class GraphDB:
             builder_id = self.dbLastInsertId()
         return builder_id
 
-    def findOrAddTestId(self, name, testtype = 'value'):
+    def findOrAddTestId(self, name, testtype='value'):
         """
         name -- name of the test
         testtype -- type of the test, typically 'value' (default) or 'series'.
@@ -78,7 +79,7 @@ class GraphDB:
             test_id = self.dbLastInsertId()
         return test_id
 
-    def addRunValue(self, builder_id, test_id, tstamp, value, buildid = None, rawdata = None):
+    def addRunValue(self, builder_id, test_id, tstamp, value, buildid=None, rawdata=None):
         """
         builder_id -- id of the builder
         test_id -- id of the test
@@ -99,7 +100,7 @@ class GraphDB:
             self._addRunAnnotation(run_id, 'rawdata', rawdata)
         self.db.commit()
 
-    def addRunSeries(self, builder_id, test_id, tstamp, values, value = None, buildid = None, rawdata = None):
+    def addRunSeries(self, builder_id, test_id, tstamp, values, value=None, buildid=None, rawdata=None):
         """
         builder_id -- id of the builder
         test_id -- id of the test
@@ -188,7 +189,7 @@ class GraphDB:
         cur.close()
         return result
 
-    def getTestValues(self, builder_id, test_id, start_ts = None, end_ts = None):
+    def getTestValues(self, builder_id, test_id, start_ts=None, end_ts=None):
         """
         Get a list of test value results along with the run ids that
         the values came from.  The run ids can be used to get detailed
@@ -260,7 +261,7 @@ class GraphDB:
         cur.close()
         return result
 
-    def getBuilderTestPairs(self, test_type = None):
+    def getBuilderTestPairs(self, test_type=None):
         """
         Return the set of distinct (builder_id, test_id) pairs for
         which there is data; additionally, the timestamp of the newest
@@ -295,7 +296,7 @@ class GraphDB:
         cur.close()
         return result
 
-    def getSeriesNameValues(self, builder_id, test_id, name, start_ts = None, end_ts = None):
+    def getSeriesNameValues(self, builder_id, test_id, name, start_ts=None, end_ts=None):
         """
         Return the set of values returned for a given name in the given
         time range (or all time ranges) for the given test on the
@@ -344,7 +345,6 @@ class GraphDB:
     def makeGraphLink(self):
         pass
 
-
     # initSchema
     def initSchema(self):
         self.db.execute("""
@@ -391,4 +391,3 @@ class GraphDB:
           value TEXT
         )
         """)
-

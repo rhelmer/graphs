@@ -1,0 +1,96 @@
+#plot-box {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
+#plot-box { top: 5%; bottom: 0; }
+#plot {
+	position: absolute;
+	left: 30px;
+	right: 30px;
+	top: 30px;
+	bottom: 30px;
+}
+#plot { top: 5px; }
+
+#tooltip {
+	position: absolute;
+	visibility: hidden;
+	pointer-events: none;
+}	
+#tooltip.locked {
+	pointer-events: auto;
+}
+	#tooltip .body {
+		display: block;
+		background: rgba(0,0,0,.75);
+		color: #fff;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		padding: 10px 15px;
+	}
+	#tooltip.locked .body {
+		background: rgba(0,0,0,.9);
+	}
+		#tooltip .body div {
+			margin-top: .5em;
+		}
+		#tooltip .body div:first-child {
+			margin-top: .5em;
+		}
+		#tooltip .body p.small {
+			font-size: 10px;
+			color: #c0c0c0;
+		}
+		#tooltip .body a {
+			color: #c9e2f2;
+		}
+	#tooltip .tip {
+		display: block;
+		height: 10px;
+		background: url(tip.png) no-repeat center top;
+	}
+	#tooltip.locked .tip {
+		background-image: url(tip-locked.png);
+	}
+	
+#loading-overlay {
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0,0,0,.25);
+	z-index: 1001;
+}
+#loading-overlay div {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 146px;
+	height: 126px;
+	margin: auto;
+	color: #fff;
+	font-size: 12px;
+}
+#loading-overlay b {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: #000 url(loading.gif) no-repeat center 20px;
+	opacity: .75;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+#loading-overlay span {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 20px;
+	text-align: center;
+}
