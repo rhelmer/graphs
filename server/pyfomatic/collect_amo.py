@@ -1,6 +1,8 @@
-from graphsdb import db, amo_db
+from graphsdb import amo_db_auth
+from databases import mysql as MySQLdb
 import csv
 
+amo_db = MySQLdb.connect(*amo_db_auth)
 
 class ParseError(Exception):
     pass
