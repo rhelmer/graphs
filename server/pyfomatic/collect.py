@@ -255,15 +255,15 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
       if dataSetType not in ('VALUES', 'AVERAGE'):
         raise ImproperFormatException("data set type was not 'VALUES' or 'AVERAGE'")
 
-    databaseCursor = databaseConnection.cursor()
-
-    metadata = MetaDataFromTalos(databaseCursor, databaseModule, inputStream)
-    if dataSetType == 'VALUES':
-      average = valuesReader(databaseCursor, databaseModule, inputStream, metadata)
-      responseList.append("""RETURN\t%s\tgraph.html#type=series&tests=[{"test":%d,"branch":%d,"machine":%d,"testrun":%d}]""" % (metadata.test_name, metadata.test_id, metadata.branch_id, metadata.machine_id, metadata.test_run_id))
-    else:
-      average = averageReader(databaseCursor, databaseModule, inputStream, metadata)
-    responseList.append("""RETURN\t%s\t%.2f\tgraph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
+      databaseCursor = databaseConnection.cursor()
+  
+      metadata = MetaDataFromTalos(databaseCursor, databaseModule, inputStream)
+      if dataSetType == 'VALUES':
+        average = valuesReader(databaseCursor, databaseModule, inputStream, metadata)
+        responseList.append("""RETURN\t%s\tgraph.html#type=series&tests=[{"test":%d,"branch":%d,"machine":%d,"testrun":%d}]""" % (metadata.test_name, metadata.test_id, metadata.branch_id, metadata.machine_id, metadata.test_run_id))
+      else:
+        average = averageReader(databaseCursor, databaseModule, inputStream, metadata)
+      responseList.append("""RETURN\t%s\t%.2f\tgraph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
 
   except Exception, x:
     responseList.append(x)
