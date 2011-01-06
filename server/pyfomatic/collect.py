@@ -248,9 +248,13 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
     dataSetType = inputStream.readline().strip().upper()
     #responseList.append('line 2: "%s"' % dataSetType)
     if dataSetType == 'AMO':
-      from pyfomatic.collect_amo import parse_amo_collection
-      parse_amo_collection(inputStream)
-      responseList.append('RETURN\tsuccess')
+      try:
+          from pyfomatic.collect_amo import parse_amo_collection
+          parse_amo_collection(inputStream)
+          responseList.append('RETURN\tsuccess')
+      except Exception, e:
+          responseList.append('RETURN\tfail %s' % str(e))
+
     else:
       if dataSetType not in ('VALUES', 'AVERAGE'):
         raise ImproperFormatException("data set type was not 'VALUES' or 'AVERAGE'")
