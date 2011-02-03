@@ -208,7 +208,8 @@
 
             $.each($('#add-branches option:selected'), function(i, branch) {
                 $.each($('#add-tests option'), function(j, test) {
-                    if (branch.value in manifest.testMap[test.value].branchIds) {
+                    if (branch.value in
+                        manifest.testMap[test.value].branchIds) {
                         $(this).attr('disabled', '');
                     } else {
                         $(this).attr('disabled', 'disabled');
@@ -219,9 +220,14 @@
             $.each($('#add-branches option:selected'), function(i, branch) {
                 $.each($('#add-tests option:selected'), function(j, test) {
                     $.each($('#add-platforms option'), function(k, platform) {
-                        if (($.inArray(parseInt(test.value), manifest.branchMap[branch.value].testIds) != -1) &&
-                            ($.inArray(parseInt(platform.value), manifest.branchMap[branch.value].platformIds) != -1) &&
-                            ($.inArray(parseInt(platform.value), manifest.testMap[test.value].platformIds) != -1)) {
+                        if (($.inArray(parseInt(test.value),
+                              manifest.branchMap[branch.value]
+                                      .testIds) != -1) &&
+                              ($.inArray(parseInt(platform.value),
+                               manifest.branchMap[branch.value]
+                                       .platformIds) != -1) &&
+                            ($.inArray(parseInt(platform.value),
+                             manifest.testMap[test.value].platformIds) != -1)) {
                             $(this).attr('disabled', '');
                         } else {
                             $(this).attr('disabled', 'disabled');
@@ -351,7 +357,7 @@
                     var range = {
                         from: parseInt(sel.split(',')[0]),
                         to: parseInt(sel.split(',')[1])
-                    }
+                    };
                     zoomTo(range);
                 }
                 addSeries(testid, branchid, platformid, addSeriesNode);
@@ -515,7 +521,7 @@
               $(node).append('<strong>' + testName + '</strong>');
               $(node).append('<span>' + branchName + '</span>');
               $(node).append('<span>' + platformName + '</span>');
-              $(node).append('<small class="loader"' + 
+              $(node).append('<small class="loader"' +
                              'title="Series is loading"></small>');
               $(node).append('<a id="' + uniqueSeries + '" class="remove"' +
                              ' href="#" title="Remove this series"></a>');
