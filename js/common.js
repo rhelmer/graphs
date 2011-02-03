@@ -109,6 +109,9 @@ $('#errors .error').each(function() {
     delay += 500;
 });
 
+/**
+  * @constructor
+  */
 $.fn.selectBox = function() {
     var onchange = function(e) {
         var option = $('option:selected', this).html();
@@ -140,39 +143,48 @@ $.fn.selectBox = function() {
 
     return this;
 };
-    $.fn.showBubble = function(anchor) {
-        anchor = $(anchor);
-        var offset = anchor.offset(),
-            w = anchor.outerWidth(),
-            h = anchor.outerHeight(),
-            bubbleWrap = this.find('.bubble-wrap');
 
-        bubbleWrap.css({ left: offset.left + w / 2, top: offset.top + h });
+/**
+* @constructor
+* @param {jQuery} anchor anchor for bubble.
+*/
+$.fn.showBubble = function(anchor) {
+    anchor = $(anchor);
+    var offset = anchor.offset(),
+        w = anchor.outerWidth(),
+        h = anchor.outerHeight(),
+        bubbleWrap = this.find('.bubble-wrap');
 
-        return this.bind('click.bubble', onClickBubble)
-                   .bind('copy.bubble', onCopyBubble)
-                   .show();
+    bubbleWrap.css({ left: offset.left + w / 2, top: offset.top + h });
 
-        function onClickBubble(e) {
-            if (bubbleWrap.has(e.target).length == 0) {
-                $(this).hideBubble();
-                return false;
-            }
+    return this.bind('click.bubble', onClickBubble)
+               .bind('copy.bubble', onCopyBubble)
+               .show();
+
+    function onClickBubble(e) {
+        if (bubbleWrap.has(e.target).length == 0) {
+            $(this).hideBubble();
+            return false;
         }
+    }
 
-        function onCopyBubble(e) {
-            if ($(e.target).closest('input,textarea').length) {
-                var self = $(this);
-                setTimeout(function() { self.hideBubble(); }, 100);
-            }
+    function onCopyBubble(e) {
+        if ($(e.target).closest('input,textarea').length) {
+            var self = $(this);
+            setTimeout(function() { self.hideBubble(); }, 100);
         }
-    };
+    }
+};
 
-    $.fn.hideBubble = function(anchor) {
-        return this.unbind('click.bubble')
-                   .unbind('copy.bubble')
-                   .hide();
-    };
+/**
+* @constructor
+* @param {jQuery} anchor anchor for bubble.
+*/
+$.fn.hideBubble = function(anchor) {
+    return this.unbind('click.bubble')
+               .unbind('copy.bubble')
+               .hide();
+};
 
 // FIXME perhaps graphserver should send us data in this format instead
 function convertData(testName, branchName, platformName, data)
@@ -663,7 +675,7 @@ function updateLocation() {
 
     if (_zoomFrom && _zoomTo) {
         newLocation += '&sel=' + _zoomFrom +
-                       ',' + _zoomTo; 
+                       ',' + _zoomTo;
     } else {
         newLocation += '&sel=none';
     }
