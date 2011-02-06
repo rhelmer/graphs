@@ -1,0 +1,69 @@
+# NOTE - tested in RHEL5 only.
+# Currently testing RHEL6 and Fedora 14
+# Also see https://wiki.mozilla.org/Perfomatic/Installation for 1.0 version
+
+# graph server dependencies
+sudo yum install httpd mod_wsgi git MySQL-python26 python26-setuptools varnish mysql-server cairo
+
+# for building node.js and deps:
+sudo yum install gcc-c++ cairo-devel
+
+# add graphs user and vhost
+sudo /usr/sbin/useradd graphs
+sudo mkdir /var/www/html/graphs
+sudo chown graphs:graphs /var/www/html/graphs
+sudo su - graphs
+cd /var/www/html
+git clone https://github.com/rhelmer/graphs.git graphs/
+sudo mkdir /var/log/httpd/graphs.example.com
+
+# excerpt from /etc/httpd/conf.d/graphs.example.com.conf
+
+ <VirtualHost *:8080>
+     ServerName graphs.example.com
+     ServerAdmin me@example.com
+     DocumentRoot /var/www/html/graphs
+     <Directory "/var/www/html/graphs">
+         AllowOverride All
+         Options ExecCGI FollowSymLinks
+         AddHandler cgi-script .cgi
+     </Directory>
+     # Only allow certain hosts to send test data
+     <FilesMatch ^(collect|bulk).cgi$>
+         deny from all
+         allow from x.y.z.a
+     </FilesMatch>
+     WSGIScriptAlias /server/api /var/www/html/graphs/server/api.wsgi
+     WSGIScriptAlias /server/dumpdata /var/www/html/graphs/server/dumpdata.wsgi
+
+# configure server/api.wsgi, add db username/password/hostname
+
+# system-wide easy install webob
+# FIXME this has been packaged as RPM in RHEL6/F14
+sudo easy_install webob
+
+# edit httpd.conf and varnish configs, put apache on port 8080 and varnish on 80
+# TODO expand on this
+
+$ sudo cat /etc/cron.d/graphs# generate server-side graphs
+*/5 * * * * graphs /var/www/html/graphs/scripts/static_graphs.sh
+# keep cache warm
+# FIXME  server-side graphs should replace this soon
+*/1 * * * * graphs /var/www/html/graphs/scripts/cache.sh
+
+# manual install of node.js (as graphs user)
+# FIXME get this packaged up as RPM
+wget 'http://nodejs.org/dist/node-v0.2.6.tar.gz'
+tar zxf node-v0.2.6.tar.gz
+cd node-v0.2.6
+./configure --prefix=$HOME/node
+make install
+export PATH=$PATH:$HOME/node/bin
+
+# install node package manager npm http://npmjs.org/
+curl http://npmjs.org/install.sh | sh
+npm install canvas htmlparser jquery jsdom
+
+# MySQL DB setup
+echo "create database o_graphs; grant all privileges on o_graphs.* to o@'localhost' identified by 'o';" | mysql5 -uroot
+mysql -uroot o_graphs < sql/schema.sql

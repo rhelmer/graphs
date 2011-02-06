@@ -1,0 +1,7 @@
+Perf-O-Matic 2.0
+Mozilla Graph Server
+https://wiki.mozilla.org/Perfomatic:UI
+
+The Mozilla graph server is used to understand how multiple performance metrics change over time. It is a web application for creating graphs of performance test results for a user-configurable combination of branch, operating system and machine. 
+
+See INSTALL for installation instructions.
