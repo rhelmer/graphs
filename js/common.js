@@ -222,7 +222,8 @@ function convertData(testName, branchName, platformName, data)
         var run = test_runs[i];
         var machineid = run[6];
         var changeset = run[1][2];
-         // graphserver gives us seconds, flot wants ms
+        // graphserver gives us seconds, flot wants ms
+        // FIXME should support other unit names
         var t = run[2] * 1000;
         var v = run[3];
 
@@ -515,11 +516,12 @@ function updateTooltip(item)
     $('#tt-series').html(test + ' (' + branch + ')');
     $('#tt-series2').html(platform + ' (' + machine + ')');
     if (datatype == 'running') {
-        $('#tt-v').html(parseInt(v) + ' ms');
+        // FIXME should support unit names
+        $('#tt-v').html(parseInt(v));
         $('#tt-dv').html('&Delta; ' + dv.toFixed(0) +
-                         ' ms (' + (100 * dvp).toFixed(1) + '%)');
+                         ' (' + (100 * dvp).toFixed(1) + '%)');
     } else if (datatype == 'delta') {
-        $('#tt-v').html('&Delta; ' + v.toFixed(3) + ' ms');
+        $('#tt-v').html('&Delta; ' + v.toFixed(3));
         $('#tt-dv').html('');
     } else if (datatype == 'deltapercent') {
         $('#tt-v').html('&Delta; ' + v.toFixed(3) + '%');
