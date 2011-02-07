@@ -13,6 +13,7 @@ sudo chown graphs:graphs /var/www/html/graphs
 sudo su - graphs
 cd /var/www/html
 git clone https://github.com/rhelmer/graphs.git graphs/
+cp dist.htaccess .htaccess
 # configure server/api.wsgi, add db username/password/hostname
 # FIXME refactor below to all use one setting
 # change "graphs-stage2" to proper graphserver in:
