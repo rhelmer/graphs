@@ -89,7 +89,7 @@ cat /etc/cron.d/graphs
 
 # MySQL DB setup
 sudo /sbin/service mysqld restart
-echo "create database graphs_v2; grant all privileges on graphs_v2.* to graphs@'localhost' identified by 'secret_passsword';" | mysql -u root
+echo "create database graphs_v2; grant all privileges on graphs_v2.* to 'graphs'@'localhost' identified by 'secret_passsword';" | mysql -u root
 cd /var/www/html/graphs/
 mysql -u root graphs_v2 < sql/schema.sql
 
