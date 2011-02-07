@@ -93,3 +93,7 @@ echo "create database graphs_v2; grant all privileges on graphs_v2.* to 'graphs'
 cd /var/www/html/graphs/
 mysql -u root graphs_v2 < sql/schema.sql
 
+# insert test data
+mysql -u graphs -p graphs_v2 < sql/test_data.sql 
+# TODO show example POST using curl
+# based on https://wiki.mozilla.org/Buildbot/Talos/DataFormat
