@@ -56,6 +56,8 @@ cat /etc/httpd/conf.d/graphs.example.com.conf
 sudo /etc/init.d/httpd restart
 sudo /etc/init.d/varnish restart
 
+sudo /sbin/chkconfig httpd on
+
 # open firewall
 # add to /etc/sysconfig/iptables
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
@@ -89,6 +91,7 @@ cat /etc/cron.d/graphs
 
 # MySQL DB setup
 sudo /sbin/service mysqld restart
+sudo /sbin/chkconfig mysqld on
 echo "create database graphs_v2; grant all privileges on graphs_v2.* to 'graphs'@'localhost' identified by 'secret_passsword';" | mysql -u root
 cd /var/www/html/graphs/
 mysql -u root graphs_v2 < sql/schema.sql
