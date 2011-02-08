@@ -353,7 +353,7 @@
                 }
                 initData(testid, branchid, platformid, data);
                 updatePlot();
-                if (sel) {
+                if (sel && sel != 'none') {
                     var range = {
                         from: parseInt(sel.split(',')[0]),
                         to: parseInt(sel.split(',')[1])
