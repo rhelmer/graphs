@@ -208,8 +208,8 @@
 
             $.each($('#add-branches option:selected'), function(i, branch) {
                 $.each($('#add-tests option'), function(j, test) {
-                    if (branch.value in
-                        manifest.testMap[test.value].branchIds) {
+                    if ($.inArray(parseInt(branch.value),
+                        manifest.testMap[test.value].branchIds) != -1) {
                         $(this).attr('disabled', '');
                     } else {
                         $(this).attr('disabled', 'disabled');
