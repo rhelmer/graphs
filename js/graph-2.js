@@ -206,35 +206,41 @@
                 $(this).attr('disabled', 'disabled');
             });
 
-            $.each($('#add-branches option:selected'), function(i, branch) {
-                $.each($('#add-tests option'), function(j, test) {
-                    if ($.inArray(parseInt(branch.value),
-                        manifest.testMap[test.value].branchIds) != -1) {
-                        $(this).attr('disabled', '');
-                    } else {
-                        $(this).attr('disabled', 'disabled');
-                    }
+            var branchIds = [];
+            $.each($('#add-branches option:selected'), function() {
+                branchIds.push(parseInt($(this).val()));
+            });
+            
+            var $tests = $('#add-tests option').filter(function() {
+                var testId = parseInt($(this).val());
+                return branchIds.every(function(branchId) {
+                    return ($.inArray(testId, manifest.branchMap[branchId].testIds) != -1);
                 });
             });
 
-            $.each($('#add-branches option:selected'), function(i, branch) {
-                $.each($('#add-tests option:selected'), function(j, test) {
-                    $.each($('#add-platforms option'), function(k, platform) {
-                        if (($.inArray(parseInt(test.value),
-                              manifest.branchMap[branch.value]
-                                      .testIds) != -1) &&
-                              ($.inArray(parseInt(platform.value),
-                               manifest.branchMap[branch.value]
-                                       .platformIds) != -1) &&
-                            ($.inArray(parseInt(platform.value),
-                             manifest.testMap[test.value].platformIds) != -1)) {
-                            $(this).attr('disabled', '');
-                        } else {
-                            $(this).attr('disabled', 'disabled');
-                        }
-                    });
-                });
+            $tests.attr('disabled', '');
+
+            var testIds = [];
+            $('#add-tests option:selected').each(function() {
+                testIds.push(parseInt($(this).val()));
             });
+
+            if (testIds.length == 0) {
+                return false;
+            }
+
+            var $platforms = $('#add-platforms option').filter(function() {
+                var platformId = parseInt($(this).val());
+                var testResult = testIds.every(function(testId) {
+                    return ($.inArray(platformId, manifest.testMap[testId].platformIds) != -1);
+                });
+                var branchResult = branchIds.every(function(branchId) {
+                    return ($.inArray(platformId, manifest.branchMap[branchId].platformIds) != -1);
+                });
+                return testResult;
+            });
+
+            $platforms.attr('disabled', '');
 
             $.each($('#add-data-form option:selected'), function() {
                 // FIXME could probably do this in selector
