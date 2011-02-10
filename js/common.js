@@ -30,7 +30,9 @@ function repoMap(branch)
 
     var map = {
         'firefox': 'mozilla-central',
-        'tracemonkey': 'tracemonkey'
+        'tracemonkey': 'tracemonkey',
+        'seamonkey': 'comm-central',
+        'thunderbird': 'comm-central'
     };
 
     if (branch in map) {
