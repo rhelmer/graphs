@@ -290,10 +290,13 @@ def getTestRuns(id, attribute, req):
         ave_totals = {}
         testRuns = []
         for row in rows:
-            averages[row['ref_changeset']] = averages.get(row['ref_changeset'], 0) + row['average']
+            row_avg = 0
+            if row['average'] != None:
+                row_avg = row['average']
+            averages[row['ref_changeset']] = averages.get(row['ref_changeset'], 0) + row_avg
             ave_totals[row['ref_changeset']] = ave_totals.get(row['ref_changeset'], 0) + 1
             annotations = getAnnotations(row['id'], 'array')
-            testRuns.append([row['id'], [row['build_id'], row['ref_build_id'], row['ref_changeset']], row['date_run'], row['average'], row['run_number'], annotations, row['machine_id']])
+            testRuns.append([row['id'], [row['build_id'], row['ref_build_id'], row['ref_changeset']], row['date_run'], row_avg, row['run_number'], annotations, row['machine_id']])
 
         averages = dict(
             (changeset, total / ave_totals[changeset])
