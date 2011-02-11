@@ -243,17 +243,10 @@
                                                   .branchMap[branchId]
                                                   .platformIds) != -1);
                 });
-                return testResult;
+                return testResult && branchResult;
             });
 
             $platforms.attr('disabled', '');
-
-            $.each($('#add-data-form option:selected'), function() {
-                // FIXME could probably do this in selector
-                if ($(this).attr('disabled')) {
-                    $(this).removeAttr('selected');
-                }
-            });
 
         } catch (e) {
             error('Could not build menu', e);
