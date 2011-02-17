@@ -19,7 +19,7 @@ flot_text.onload = function() {
     var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
                   '#bf5c41'];
     
-    var SERVER = 'http://graphs-stage2.mozilla.org';
+    var SERVER = 'http://graphs.allizom.org';
     
     var LIGHT_COLORS = jQuery.map(COLORS, function(color) {
         //return jQuery.color.parse(color).add('a', -.5).toString();
@@ -130,10 +130,10 @@ flot_text.onload = function() {
             var platformName = id[1][2];
 
             var http = require('http');
-            var graphs = http.createClient(80, 'graphs-stage2.mozilla.org');
+            var graphs = http.createClient(80, SERVER);
             var request = graphs.request('GET', 
                 '/api/test/runs?id='+testid+'&branchid='+branchid+'&platformid='+platformid, 
-                {'host': 'graphs-stage2.mozilla.org'});
+                {'host': SERVER});
             request.end();
             request.on('response', function (response) {
                 var responseBody = '';
