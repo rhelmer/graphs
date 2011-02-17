@@ -8,18 +8,19 @@ var document = require("jsdom").jsdom(),
     flot = document.createElement("script"),
     flot_text = document.createElement("script");
 
+var SERVER = 'localhost',
+    VHOST = 'graphs.allizom.org';
+
 window.Canvas = require('canvas');
-flot.src = 'http://localhost/jq/jquery.flot.node-canvas.js';
+flot.src = 'http://' + VHOST + '/jq/jquery.flot.node-canvas.js';
 flot.onload = function() {
-    flot_text.src = 'http://localhost/jq/jquery.flot.text.js';
+    flot_text.src = 'http://' + VHOST + '/jq/jquery.flot.text.js';
 };
 flot_text.onload = function() {
     var DAY = 86400000;
     
     var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
                   '#bf5c41'];
-    
-    var SERVER = 'http://graphs.allizom.org';
     
     var LIGHT_COLORS = jQuery.map(COLORS, function(color) {
         //return jQuery.color.parse(color).add('a', -.5).toString();
@@ -133,7 +134,7 @@ flot_text.onload = function() {
             var graphs = http.createClient(80, SERVER);
             var request = graphs.request('GET', 
                 '/api/test/runs?id='+testid+'&branchid='+branchid+'&platformid='+platformid, 
-                {'host': SERVER});
+                {'Host': VHOST});
             request.end();
             request.on('response', function (response) {
                 var responseBody = '';
