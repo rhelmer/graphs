@@ -57,6 +57,7 @@ insert into branches values (NULL,"mobile-lorentz-qt");
 insert into branches values (NULL,"mobile-electrolysis-qt");
 insert into branches values (NULL,"mobile-places-qt");
 insert into branches values (NULL,"mobile-try");
+insert into branches values (NULL,"AddonTester");
 
 -- osid,isthrottling,cpuspeed,name,isactive,dateadded
 -- stage talos
