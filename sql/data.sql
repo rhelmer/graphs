@@ -46,6 +46,7 @@ insert into branches values (NULL,"Jaegermonkey");
 insert into branches values (NULL,"SeaMonkey");
 insert into branches values (NULL,"Addonsmgr");
 insert into branches values (NULL,"SeaMonkey2.0");
+insert into branches values (NULL,"SeaMonkey2.1");
 insert into branches values (NULL,"Shadow-Central");
 insert into branches values (NULL,"mobile");
 insert into branches values (NULL,"mobile-tracemonkey");
@@ -963,19 +964,29 @@ insert into machines values (NULL,18,0,NULL,"Linux_x86-64_services-central_leak_
 --SeaMonkey
 insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.1",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-2.0",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_comm-central-trunk",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_comm-central-trunk_leak_test_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-1.9.1",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-2.0",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-central-trunk",1,unix_timestamp());
 insert into machines values (NULL,7,0,NULL,"OS_X_10.5_comm-central-trunk_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-1.9.1",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-1.9.1_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-2.0",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-central",1,unix_timestamp());
 insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-central-trunk_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6_comm-2.0",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6_comm-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6_comm-central-trunk",1,unix_timestamp());
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6_comm-central-trunk_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-1.9.1",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-2.0",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-2.0_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-central-trunk",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-central-trunk_leak_test",1,unix_timestamp());
 
