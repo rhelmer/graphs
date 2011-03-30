@@ -1350,3 +1350,5 @@ insert into tests values (NULL,"dromaeo_v8","Dromaeo (V8)",1,1,12);
 insert into tests values (NULL,"dromaeo_basics","Dromaeo (String/Array/Eval/Regex)",1,1,12);
 insert into tests values (NULL,"a11y","a11y",1,1,13);
 insert into tests values (NULL,"num_ctors","Number of Constructors",0,1,NULL);
+insert into tests values (NULL,"tpaint","Paint",1,1,NULL);
+insert into tests values (NULL,"ts_paint","Ts, Paint",1,1,NULL);
