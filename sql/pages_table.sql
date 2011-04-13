@@ -1027,3 +1027,27 @@ insert into pages values (NULL, 12, "richards.html");
 -- "a11y"
 insert into pages values (NULL, 13, "dhtml.html");
 insert into pages values (NULL, 13, "tablemutation.html");
+
+-- "tp4m" 21 mobile pages, April 2011
+insert into pages values (NULL, 14, "news.google.com");
+insert into pages values (NULL, 14, "m.news.google.com");
+insert into pages values (NULL, 14, "amazon.com");
+insert into pages values (NULL, 14, "m.amazon.com");
+insert into pages values (NULL, 14, "yahoo.co.jp");
+insert into pages values (NULL, 14, "m.yahoo.co.jp");
+insert into pages values (NULL, 14, "m.google.com");
+insert into pages values (NULL, 14, "m.accuweather.com");
+insert into pages values (NULL, 14, "m.mail.ru");
+insert into pages values (NULL, 14, "m.baidu.com");
+insert into pages values (NULL, 14, "m.news.baidu.com");
+insert into pages values (NULL, 14, "m.yandex.ru");
+insert into pages values (NULL, 14, "m.news.yandex.ru");
+insert into pages values (NULL, 14, "m.bbc.co.uk");
+insert into pages values (NULL, 14, "m.nytimes.com");
+insert into pages values (NULL, 14, "m.cnn.com");
+insert into pages values (NULL, 14, "m.twitter.com");
+insert into pages values (NULL, 14, "m.wikipedia.com");
+insert into pages values (NULL, 14, "m.espn.com");
+insert into pages values (NULL, 14, "news.google.co.il");
+insert into pages values (NULL, 14, "news.google.ae");
+

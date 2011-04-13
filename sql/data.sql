@@ -1440,3 +1440,5 @@ insert into tests values (NULL,"a11y","a11y",1,1,13);
 insert into tests values (NULL,"num_ctors","Number of Constructors",0,1,NULL);
 insert into tests values (NULL,"tpaint","Paint",1,1,NULL);
 insert into tests values (NULL,"ts_paint","Ts, Paint",1,1,NULL);
+insert into tests values (NULL,"tp4m_nochrome", "Tp4 Mobile NoChrome",0,1,14);
+insert into tests values (NULL,"tp4m", "Tp4 Mobile",1,1,14);
