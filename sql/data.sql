@@ -1442,3 +1442,5 @@ insert into tests values (NULL,"tpaint","Paint",1,1,NULL);
 insert into tests values (NULL,"ts_paint","Ts, Paint",1,1,NULL);
 insert into tests values (NULL,"tp4m_nochrome", "Tp4 Mobile NoChrome",0,1,14);
 insert into tests values (NULL,"tp4m", "Tp4 Mobile",1,1,14);
+insert into tests values (NULL,"tp4m_shutdown_nochrome", "Tp4 Shutdown Mobile NoChrome",0,1,14);
+insert into tests values (NULL,"tp4m_shutdown", "Tp4 Shutdown Mobile",1,1,14);
