@@ -51,6 +51,7 @@ insert into branches values (NULL,"Shadow-Central");
 insert into branches values (NULL,"Devtools");
 insert into branches values (NULL,"Mozilla-Aurora");
 insert into branches values (NULL,"Mozilla-Beta");
+insert into branches values (NULL,"Mozilla-Beta-Release");
 insert into branches values (NULL,"Alder");
 insert into branches values (NULL,"Holly");
 insert into branches values (NULL,"Larch");
