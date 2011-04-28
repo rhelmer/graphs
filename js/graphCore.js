@@ -122,7 +122,8 @@ function initGraphCore(useDiscrete)
         var ylabelsize = 55;
         leftw += 15 + ylabelsize;
 
-        var nw = Math.max(100, document.width - leftw);
+        var width = parseInt(getComputedStyle(document.body,null).width);
+        var nw = Math.max(100, width - leftw);
         var nh = 400;
 
         $("#graph")[0].width = nw;
