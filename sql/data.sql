@@ -55,6 +55,7 @@ insert into branches values (NULL,"Mozilla-Beta-Release");
 insert into branches values (NULL,"Alder");
 insert into branches values (NULL,"Holly");
 insert into branches values (NULL,"Larch");
+insert into branches values (NULL,"UX");
 insert into branches values (NULL,"mobile");
 insert into branches values (NULL,"mobile-tracemonkey");
 insert into branches values (NULL,"mobile-1.9.2");
@@ -1049,6 +1050,20 @@ insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_larch",1,unix_timestamp
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_larch_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_larch",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_larch_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_ux",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_ux_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_QT_ux",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_QT_ux_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_ux",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_ux_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_ux",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_ux_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_ux",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_ux_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_ux",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_ux_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_ux",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_ux_leak_test",1,unix_timestamp());
 
 --SeaMonkey
 insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.1",1,unix_timestamp());
