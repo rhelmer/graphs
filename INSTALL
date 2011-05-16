@@ -35,6 +35,7 @@ cat /etc/httpd/conf.d/graphs.example.com.conf
         AllowOverride All
         Options ExecCGI FollowSymLinks
         AddHandler cgi-script .cgi
+        AddHandler wsgi-script .wsgi
     </Directory>
     # Only allow certain hosts to send test data
     <FilesMatch ^(collect|bulk).cgi$>
