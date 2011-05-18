@@ -1,10 +1,14 @@
-# Currently testing on RHEL6 and Fedora 14
+# Tested on RHEL 6
 # Also see https://wiki.mozilla.org/Perfomatic/Installation for 1.0 version
 
-sudo yum install httpd mod_wsgi git MySQL-python varnish mysql-server cairo python-webob wget
+sudo yum install httpd mod_wsgi git MySQL-python varnish mysql-server cairo python-setuptools wget 
+
+# install python dependencies (packaged RPM is too old)
+sudo easy_install webob
 
 # for building node.js and deps:
 sudo yum install gcc-c++ cairo-devel openssl-devel make
+
 
 # add graphs user
 sudo /usr/sbin/useradd graphs
@@ -13,6 +17,7 @@ sudo chown graphs:graphs /var/www/html/graphs
 sudo su - graphs
 cd /var/www/html
 git clone https://github.com/rhelmer/graphs.git graphs/
+cd graphs
 cp dist.htaccess .htaccess
 # configure server/api.wsgi, add db username/password/hostname
 # FIXME refactor below to all use one setting
@@ -68,9 +73,10 @@ sudo /sbin/service iptables restart
 
 # manual install of node.js (as graphs user)
 # FIXME get this packaged up as RPM
-wget 'http://nodejs.org/dist/node-v0.2.6.tar.gz'
-tar zxf node-v0.2.6.tar.gz
-cd node-v0.2.6
+cd ~/
+wget 'http://nodejs.org/dist/node-v0.4.7.tar.gz'
+tar zxf node-v0.4.7.tar.gz 
+cd node-v0.4.7
 ./configure --prefix=$HOME/node
 make install
 
