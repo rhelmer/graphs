@@ -93,7 +93,7 @@ cat /etc/cron.d/graphs
 */5 * * * * graphs /var/www/html/graphs/scripts/static_graphs.sh
 # keep cache warm
 # FIXME  server-side graphs should replace this soon
-*/1 * * * * graphs /var/www/html/graphs/scripts/cache.sh
+*/1 * * * * graphs /var/www/html/graphs/scripts/cache.sh graphs.allizom.org
 """
 
 # MySQL DB setup
