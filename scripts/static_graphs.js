@@ -12,11 +12,12 @@ var SERVER = 'localhost',
     VHOST = 'graphs.allizom.org';
 
 window.Canvas = require('canvas');
-flot.src = 'http://' + VHOST + '/jq/jquery.flot.node-canvas.js';
-flot.onload = function() {
-    flot_text.src = 'http://' + VHOST + '/jq/jquery.flot.text.js';
-};
-flot_text.onload = function() {
+jQuery.getScript('http://' + VHOST + '/jq/jquery.flot.node-canvas.js', function() {
+    console.log('loaded1');
+    jQuery.getScript('http://' + VHOST + '/jq/jquery.flot.text.js', run);
+});
+function run() {
+    console.log('loaded2');
     var DAY = 86400000;
     
     var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
