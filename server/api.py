@@ -1,6 +1,8 @@
 from graphsdb import db
 import MySQLdb.cursors
 from webob import exc
+from datetime import datetime, timedelta
+from time import mktime
 
 
 #Get an array of all tests by build and os
@@ -251,6 +253,9 @@ def getTestRuns(id, attribute, req):
     branchid = int(req.params['branchid'])
     platformid = int(req.params.get('platformid', -1))
 
+    days = int(req.params.get('days', 365))
+    age = datetime.utcnow() - timedelta(days=days)
+
     if platformid == -1 and machineid != -1:
         sql = """
     SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset
@@ -261,11 +266,12 @@ def getTestRuns(id, attribute, req):
           AND machines.id = %s
           AND branches.id = %s
           AND machines.is_active <> 0
+          AND date_run >= %s
     ORDER BY date_run ASC
 """
 
         cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-        cursor.execute(sql, (id, machineid, branchid))
+        cursor.execute(sql, (id, machineid, branchid, mktime(age.timetuple())))
     elif machineid == -1 and platformid != -1:
         sql = """
     SELECT test_runs.*, builds.id as build_id, builds.ref_build_id, builds.ref_changeset
@@ -277,10 +283,11 @@ def getTestRuns(id, attribute, req):
           AND os_list.id = %s
           AND branches.id = %s
           AND machines.is_active <> 0
+          AND date_run >= %s
     ORDER BY date_run ASC
 """
         cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-        cursor.execute(sql, (id, platformid, branchid))
+        cursor.execute(sql, (id, platformid, branchid, mktime(age.timetuple())))
     else:
         raise exc.HTTPBadRequest("You must provide one machineid *or* platformid")
 
@@ -301,7 +308,7 @@ def getTestRuns(id, attribute, req):
         averages = dict(
             (changeset, total / ave_totals[changeset])
             for changeset, total in averages.iteritems())
-        result = {'stat': 'ok', 'test_runs': testRuns,
+        result = {'age': mktime(age.timetuple()), 'stat': 'ok', 'test_runs': testRuns,
                   'averages': averages,
                   'min': min(row['average'] for row in rows),
                   'max': max(row['average'] for row in rows),
