@@ -9,7 +9,7 @@ var document = require("jsdom").jsdom(),
     flot_text = document.createElement("script");
 
 var SERVER = 'localhost',
-    VHOST = 'graphs.allizom.org';
+    VHOST = 'graphs-new.mozilla.org';
 
 window.Canvas = require('canvas');
 jQuery.getScript('http://' + VHOST + '/jq/jquery.flot.node-canvas.js', function() {
