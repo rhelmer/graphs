@@ -15,7 +15,7 @@ var DAY = 86400000;
 var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
               '#bf5c41'];
 
-var SERVER = 'http://graphs.allizom.org';
+var SERVER = 'http://graphs-new.mozilla.org';
 //var SERVER = 'http://localhost';
 
 var LIGHT_COLORS = $.map(COLORS, function(color) {
