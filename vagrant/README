@@ -1,0 +1,36 @@
+This project will use vagrant and puppet to 
+install a complete Mozilla Graph Server (https://wiki.mozilla.org/Perfomatic)
+environment in a local VM.
+
+---
+INSTALL
+---
+
+1) Install http://www.virtualbox.org/ (4.0.x)
+
+2) Run vagrant (http://vagrantup.com/) :
+
+$ gem install vagrant
+$ vagrant box add lucid64 http://files.vagrantup.com/lucid64.box
+$ vagrant up
+
+3) Add 33.33.33.10 to /etc/hosts:
+33.33.33.10	graphs
+
+4) Enjoy your Mozilla Graphs environment!
+
+dashboard:      http://graphs
+custom chart:   http://graphs/graph.html
+embedded:       http://graphs-new.mozilla.org/embed.html#tests=[[16,1,1]]&sel=none&displayrange=7&datatype=running
+
+SSH into your VM:
+$ vagrant ssh
+
+---
+KNOWN ISSUES
+---
+
+* pulls data from http://graphs-new.mozilla.org not local graphserver
+* dashboard will not be populated until cronjob has finished executing
+** DOCROOT in static_graphs.sh, is wrong, need to make it configurable
+** SERVER needs to be changed from localhost to graphs-new.m.o in static_graphs.js

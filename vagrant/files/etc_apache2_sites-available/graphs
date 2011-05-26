@@ -1,0 +1,22 @@
+<VirtualHost *:80>
+    # FIXME customize this
+    ServerName graphs
+    # FIXME customize this
+    ServerAdmin me@example.com
+    DocumentRoot /var/www/graphs
+    <Directory "/var/www/graphs">
+        AllowOverride All
+        Options ExecCGI FollowSymLinks
+        AddHandler cgi-script .cgi
+        AddHandler wsgi-script .wsgi
+    </Directory>
+    # Only allow certain hosts to send test data
+    <FilesMatch ^(collect|bulk).cgi$>
+        deny from all
+        # FIXME customize this
+        allow from x.y.z.a
+    </FilesMatch>
+    WSGIScriptAlias /server/api /var/www/graphs/server/api.wsgi
+    WSGIScriptAlias /server/dumpdata /var/www/graphs/server/dumpdata.wsgi
+</VirtualHost>
+
