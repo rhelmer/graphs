@@ -648,11 +648,6 @@ function updatePlot()
         plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
         overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS,
                                    overview_xaxis, yaxis);
-
-        if (!series.visible) {
-            plotOptions.grid.hoverable = false;
-            plotOptions.grid.clickable = false;
-        }
     });
     unlockTooltip();
     hideTooltip(true);
