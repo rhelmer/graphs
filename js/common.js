@@ -614,6 +614,9 @@ function updatePlot()
         var allPlots = parseSeries(series, count, 3, 1);
         for (var i = 0; i < allPlots.length; i++) {
             var plot = allPlots[i];
+            if (!series.visible) {
+                delete(plot.data);
+            }
             if (datatype != 'running') {
                 plot = deltaPlot(plot);
                 maxV = plot.maxV > maxV ? plot.maxV : maxV;
