@@ -118,7 +118,7 @@ class graphs-base {
         '/usr/bin/rsync -av --exclude=".git" /home/graphs/dev/graphs/ /var/www/graphs/':
             alias => 'graphs-install',
             timeout => '3600',
-            require => [User[graphs], Exec[git-pull], Package[rsync]],
+            require => [User[graphs], Exec[git-pull], Package[rsync], File['/var/www/graphs']],
             user => 'graphs';
 
         '/usr/bin/wget -N "http://nodejs.org/dist/node-v0.4.8.tar.gz"':
@@ -140,19 +140,19 @@ class graphs-base {
             user => 'graphs',
             cwd => '/home/graphs/dev/node-v0.4.8',
             creates => '/home/graphs/node',
-            require => Exec['unpack-node'];
+            require => [Exec['unpack-node'], Package['build-essential']];
 
-        '/usr/bin/wget -N "http://registry.npmjs.org/npm/-/npm-1.0.6.tgz"':
+        '/usr/bin/wget -N "http://registry.npmjs.org/npm/-/npm-1.0.13.tgz"':
             alias => 'download-npm',
             user => 'graphs',
             cwd => '/home/graphs/dev/',
             require => Exec['install-node'];
 
-        '/bin/mkdir npm-1.0.6 && /bin/tar -C npm-1.0.6 -xf npm-1.0.6.tgz':
+        '/bin/mkdir npm-1.0.13 && /bin/tar -C npm-1.0.13 -xf npm-1.0.13.tgz':
             alias => 'unpack-npm',
             user => 'graphs',
             cwd => '/home/graphs/dev/',
-            creates => '/home/graphs/dev/npm-1.0.6',
+            creates => '/home/graphs/dev/npm-1.0.13',
             require => Exec['download-npm'];
 
         '/usr/bin/make install':
@@ -160,7 +160,7 @@ class graphs-base {
             path => '/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/opt/ruby/bin/:/home/graphs/node/bin',
             environment => ['HOME=/home/graphs', 'UID=10000'],
             user => 'graphs',
-            cwd => '/home/graphs/dev/npm-1.0.6/package',
+            cwd => '/home/graphs/dev/npm-1.0.13/package',
             require => Exec['unpack-npm'];
 
         '/home/graphs/node/bin/npm install canvas htmlparser jquery jsdom':
