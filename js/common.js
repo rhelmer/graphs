@@ -49,7 +49,8 @@ var PLOT_OPTIONS = {
     selection: { mode: 'x', color: '#97c6e5' },
     /* crosshair: { mode: 'xy', color: '#cdd6df', lineWidth: 1 }, */
     series: { shadowSize: 0 },
-    lines: { show: true },
+    lines: { show: false },
+    points: { show: true },
     grid: {
         color: '#cdd6df',
         borderWidth: 2,
