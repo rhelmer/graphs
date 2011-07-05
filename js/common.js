@@ -34,7 +34,7 @@ function repoMap(branch)
         'seamonkey': 'comm-central',
         'thunderbird': 'comm-central',
         'mozilla-inbound': 'integration/mozilla-inbound',
-        'try', 'try'
+        'try': 'try'
     };
 
     if (branch in map) {
