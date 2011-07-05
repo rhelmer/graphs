@@ -33,7 +33,8 @@ function repoMap(branch)
         'tracemonkey': 'tracemonkey',
         'seamonkey': 'comm-central',
         'thunderbird': 'comm-central',
-        'mozilla-inbound': 'integration/mozilla-inbound'
+        'mozilla-inbound': 'integration/mozilla-inbound',
+        'try': 'try'
     };
 
     if (branch in map) {
