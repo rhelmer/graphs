@@ -58,6 +58,7 @@ insert into branches values (NULL,"Mozilla-Release");
 insert into branches values (NULL,"Mozilla-Release-Release");
 insert into branches values (NULL,"Mozilla-Inbound");
 insert into branches values (NULL,"Fx-Team");
+insert into branches values (NULL,"Ionmonkey");
 insert into branches values (NULL,"Alder");
 insert into branches values (NULL,"Holly");
 insert into branches values (NULL,"Larch");
@@ -1156,6 +1157,20 @@ insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_ux",1,unix_timestamp())
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_ux_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_ux",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_ux_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_ionmonkey",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_ionmonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_QT_ionmonkey",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_QT_ionmonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_ionmonkey",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_ionmonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_ionmonkey",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_ionmonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_ionmonkey",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_ionmonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_ionmonkey",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_ionmonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_ionmonkey",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_ionmonkey_leak_test",1,unix_timestamp());
 
 --SeaMonkey
 insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.1",1,unix_timestamp());
