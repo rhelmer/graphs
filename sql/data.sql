@@ -821,6 +821,14 @@ insert into machines values (NULL,17,0,"2.26","tools-r3-snow-001",1,unix_timesta
 insert into machines values (NULL,17,0,"2.26","tools-r3-snow-002",1,unix_timestamp());
 insert into machines values (NULL,19,0,"2.26","tools-r3-w764-001",1,unix_timestamp());
 insert into machines values (NULL,19,0,"2.26","tools-r3-w764-002",1,unix_timestamp());
+-- addon on-demand perf testing pool
+insert into machines values (NULL,12,0,"2.26","addon-r3-w7-001",1,unix_timestamp());
+insert into machines values (NULL,12,0,"2.26","addon-r3-w7-002",1,unix_timestamp());
+insert into machines values (NULL,12,0,"2.26","addon-r3-w7-003",1,unix_timestamp());
+insert into machines values (NULL,14,0,"2.26","addon-r3-fed-001",1,unix_timestamp());
+insert into machines values (NULL,14,0,"2.26","addon-r3-fed-002",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","addon-r3-snow-001",1,unix_timestamp());
+insert into machines values (NULL,17,0,"2.26","addon-r3-snow-002",1,unix_timestamp());
 
 
 -- builders
