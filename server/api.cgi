@@ -84,7 +84,7 @@ def sendJsonResponse(status, data, lastmod):
     if lastmod and status != 304:
         sys.stdout.write("Last-Modified: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", lastmod) + "\r\n")
     if data:
-        sys.stdout.write("Content-Type: text/html\r\n")
+        sys.stdout.write("Content-Type: application/json\r\n")
         data = json.write(data)
         sys.stdout.write("Content-Length: %i\r\n" % len(data))
         sys.stdout.write("\r\n")
@@ -106,7 +106,7 @@ def sendRawResponse(status, filename, lastmod):
     size = fp.tell()
     fp.seek(0)
 
-    sys.stdout.write("Content-Type: text/html\r\n")
+    sys.stdout.write("Content-Type: application/json\r\n")
     sys.stdout.write("Content-Length: %i\r\n" % size)
     sys.stdout.write("\r\n")
     while True:
