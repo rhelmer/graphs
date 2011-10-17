@@ -35,7 +35,8 @@ function repoMap(branch)
         'thunderbird': 'comm-central',
         'mozilla-inbound': 'integration/mozilla-inbound',
         'try': 'try',
-        'mobile': 'mozilla-central'
+        'mobile': 'mozilla-central',
+        'firefox-non-pgo': 'mozilla-central'
     };
 
     if (branch in map) {
