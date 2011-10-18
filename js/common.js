@@ -39,6 +39,10 @@ function repoMap(branch)
         'firefox-non-pgo': 'mozilla-central'
     };
 
+    if (branch.indexOf('-non-pgo') != -1) {
+        branch = branch.split('-non-pgo')[0]
+    }
+
     if (branch in map) {
         return HGWEB + '/' + map[branch];
     } else {
