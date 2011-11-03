@@ -39,7 +39,7 @@ function repoMap(branch)
     };
 
     if (branch.indexOf('-non-pgo') != -1) {
-        branch = branch.split('-non-pgo')[0]
+        branch = branch.split('-non-pgo')[0];
     }
 
     if (branch in map) {
