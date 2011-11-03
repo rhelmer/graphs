@@ -25,10 +25,10 @@
             [[115, 1, 1], ['tp', 'firefox', 'windowsxp']],
             [[115, 1, 13], ['tp', 'firefox', 'macosx']],
             [[115, 1, 14], ['tp', 'firefox', 'linux']],
-            [[25, 1, 12], ['ss', 'firefox', 'windows7']],
-            [[25, 1, 1], ['ss', 'firefox', 'windowsxp']],
-            [[25, 1, 13], ['ss', 'firefox', 'macosx']],
-            [[25, 1, 14], ['ss', 'firefox', 'linux']]
+            [[104, 1, 12], ['ss', 'firefox', 'windows7']],
+            [[104, 1, 1], ['ss', 'firefox', 'windowsxp']],
+            [[104, 1, 13], ['ss', 'firefox', 'macosx']],
+            [[104, 1, 14], ['ss', 'firefox', 'linux']]
         ], 'tracemonkey': [
             [[16, 4, 12], ['ts', 'tracemonkey', 'windows7']],
             [[16, 4, 1], ['ts', 'tracemonkey', 'windowsxp']],
@@ -38,10 +38,10 @@
             [[115, 4, 1], ['tp', 'tracemonkey', 'windowsxp']],
             [[115, 4, 13], ['tp', 'tracemonkey', 'macosx']],
             [[115, 4, 14], ['tp', 'tracemonkey', 'linux']],
-            [[25, 4, 12], ['ss', 'tracemonkey', 'windows7']],
-            [[25, 4, 1], ['ss', 'tracemonkey', 'windowsxp']],
-            [[25, 4, 13], ['ss', 'tracemonkey', 'macosx']],
-            [[25, 4, 14], ['ss', 'tracemonkey', 'linux']]
+            [[104, 4, 12], ['ss', 'tracemonkey', 'windows7']],
+            [[104, 4, 1], ['ss', 'tracemonkey', 'windowsxp']],
+            [[104, 4, 13], ['ss', 'tracemonkey', 'macosx']],
+            [[104, 4, 14], ['ss', 'tracemonkey', 'linux']]
         ], 'places': [
             [[16, 8, 12], ['ts', 'places', 'windows7']],
             [[16, 8, 1], ['ts', 'places', 'windowsxp']],
@@ -51,10 +51,10 @@
             [[115, 8, 1], ['tp', 'places', 'windowsxp']],
             [[115, 8, 13], ['tp', 'places', 'macosx']],
             [[115, 8, 14], ['tp', 'places', 'linux']],
-            [[25, 8, 12], ['ss', 'places', 'windows7']],
-            [[25, 8, 1], ['ss', 'places', 'windowsxp']],
-            [[25, 8, 13], ['ss', 'places', 'macosx']],
-            [[25, 8, 14], ['ss', 'places', 'linux']]
+            [[104, 8, 12], ['ss', 'places', 'windows7']],
+            [[104, 8, 1], ['ss', 'places', 'windowsxp']],
+            [[104, 8, 13], ['ss', 'places', 'macosx']],
+            [[104, 8, 14], ['ss', 'places', 'linux']]
         ]};
         return ids[branch];
     }
