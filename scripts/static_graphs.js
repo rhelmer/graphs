@@ -143,6 +143,12 @@ function run() {
                 });
                 response.on('end', function() {
                     var data = JSON.parse(responseBody);
+                    if (!data || data['stat'] != 'ok') { 
+                        console.log('WARN: failed to fetch '
+                                    + [testid, branchid, platformid, data,
+                                       displayDays]);
+                        console.log('WARN: status was ' + data['stat']);
+                    }
                     data = convertData(testid, branchid, platformid, data,
                                        displayDays);
                     updatePlot(data, displayDays);
@@ -165,9 +171,6 @@ function run() {
             'test': testName,
             'mean': []
         };
-
-        if (!data) return false;
-        if (data['stat'] != 'ok') return false;
 
         var test_runs = data['test_runs'];
         var averages = data['averages'];
