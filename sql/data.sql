@@ -2157,3 +2157,7 @@ insert into tests values (NULL,"tp5_modlistbytes_paint","Tp5 MozAfterPaint (Modi
 insert into tests values (NULL,"tp5_modlistbytes_nochrome_paint","Tp5 NoChrome MozAfterPaint (Modified Page List Bytes)",0,1,NULL);
 insert into tests values (NULL,"tp5_shutdown_paint","Tp5 Shutdown MozAfterPaint",1,1,15);
 insert into tests values (NULL,"tp5_shutdown_nochrome_paint","Tp5 NoChrome Shutdown MozAfterPaint",0,1,15);
+insert into tests values (NULL,"tp5_responsiveness_paint","Tp5 Responsiveness MozAfterPaint",1,1,15);
+insert into tests values (NULL,"tp5_responsiveness_nochrome_paint","Tp5 NoChrome Responsiveness MozAfterPaint",0,1,15);
+insert into tests values (NULL,"tp5_responsiveness_nochrome","Tp5 NoChrome Responsiveness",0,1,15);
+insert into tests values (NULL,"tp5_responsiveness","Tp5 Responsiveness",1,1,15);
