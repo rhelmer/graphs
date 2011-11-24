@@ -17,10 +17,10 @@
     function getIds(branch)
     {
         var ids = {'firefox': [
-            [[16, 1, 12], ['ts', 'firefox', 'windows7']],
-            [[16, 1, 1], ['ts', 'firefox', 'windowsxp']],
-            [[16, 1, 13], ['ts', 'firefox', 'macosx']],
-            [[16, 1, 14], ['ts', 'firefox', 'linux']],
+            [[83, 1, 12], ['ts', 'firefox', 'windows7']],
+            [[83, 1, 1], ['ts', 'firefox', 'windowsxp']],
+            [[83, 1, 13], ['ts', 'firefox', 'macosx']],
+            [[83, 1, 14], ['ts', 'firefox', 'linux']],
             [[115, 1, 12], ['tp', 'firefox', 'windows7']],
             [[115, 1, 1], ['tp', 'firefox', 'windowsxp']],
             [[115, 1, 13], ['tp', 'firefox', 'macosx']],
@@ -29,32 +29,6 @@
             [[104, 1, 1], ['ss', 'firefox', 'windowsxp']],
             [[104, 1, 13], ['ss', 'firefox', 'macosx']],
             [[104, 1, 14], ['ss', 'firefox', 'linux']]
-        ], 'tracemonkey': [
-            [[16, 4, 12], ['ts', 'tracemonkey', 'windows7']],
-            [[16, 4, 1], ['ts', 'tracemonkey', 'windowsxp']],
-            [[16, 4, 13], ['ts', 'tracemonkey', 'macosx']],
-            [[16, 4, 14], ['ts', 'tracemonkey', 'linux']],
-            [[115, 4, 12], ['tp', 'tracemonkey', 'windows7']],
-            [[115, 4, 1], ['tp', 'tracemonkey', 'windowsxp']],
-            [[115, 4, 13], ['tp', 'tracemonkey', 'macosx']],
-            [[115, 4, 14], ['tp', 'tracemonkey', 'linux']],
-            [[104, 4, 12], ['ss', 'tracemonkey', 'windows7']],
-            [[104, 4, 1], ['ss', 'tracemonkey', 'windowsxp']],
-            [[104, 4, 13], ['ss', 'tracemonkey', 'macosx']],
-            [[104, 4, 14], ['ss', 'tracemonkey', 'linux']]
-        ], 'places': [
-            [[16, 8, 12], ['ts', 'places', 'windows7']],
-            [[16, 8, 1], ['ts', 'places', 'windowsxp']],
-            [[16, 8, 13], ['ts', 'places', 'macosx']],
-            [[16, 8, 14], ['ts', 'places', 'linux']],
-            [[115, 8, 12], ['tp', 'places', 'windows7']],
-            [[115, 8, 1], ['tp', 'places', 'windowsxp']],
-            [[115, 8, 13], ['tp', 'places', 'macosx']],
-            [[115, 8, 14], ['tp', 'places', 'linux']],
-            [[104, 8, 12], ['ss', 'places', 'windows7']],
-            [[104, 8, 1], ['ss', 'places', 'windowsxp']],
-            [[104, 8, 13], ['ss', 'places', 'macosx']],
-            [[104, 8, 14], ['ss', 'places', 'linux']]
         ]};
         return ids[branch];
     }
