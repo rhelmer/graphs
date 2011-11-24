@@ -58,31 +58,7 @@ function run() {
         [[104, 1, 12], ['ss', 'firefox', 'windows7']],
         [[104, 1, 1], ['ss', 'firefox', 'windowsxp']],
         [[104, 1, 13], ['ss', 'firefox', 'macosx']],
-        [[104, 1, 14], ['ss', 'firefox', 'linux']],
-        [[83, 4, 12], ['ts', 'tracemonkey', 'windows7']],
-        [[83, 4, 1], ['ts', 'tracemonkey', 'windowsxp']],
-        [[83, 4, 13], ['ts', 'tracemonkey', 'macosx']],
-        [[83, 4, 14], ['ts', 'tracemonkey', 'linux']],
-        [[115, 4, 12], ['tp', 'tracemonkey', 'windows7']],
-        [[115, 4, 1], ['tp', 'tracemonkey', 'windowsxp']],
-        [[115, 4, 13], ['tp', 'tracemonkey', 'macosx']],
-        [[115, 4, 14], ['tp', 'tracemonkey', 'linux']],
-        [[104, 4, 12], ['ss', 'tracemonkey', 'windows7']],
-        [[104, 4, 1], ['ss', 'tracemonkey', 'windowsxp']],
-        [[104, 4, 13], ['ss', 'tracemonkey', 'macosx']],
-        [[104, 4, 14], ['ss', 'tracemonkey', 'linux']],
-        [[83, 8, 12], ['ts', 'places', 'windows7']],
-        [[83, 8, 1], ['ts', 'places', 'windowsxp']],
-        [[83, 8, 13], ['ts', 'places', 'macosx']],
-        [[83, 8, 14], ['ts', 'places', 'linux']],
-        [[115, 8, 12], ['tp', 'places', 'windows7']],
-        [[115, 8, 1], ['tp', 'places', 'windowsxp']],
-        [[115, 8, 13], ['tp', 'places', 'macosx']],
-        [[115, 8, 14], ['tp', 'places', 'linux']],
-        [[104, 8, 12], ['ss', 'places', 'windows7']],
-        [[104, 8, 1], ['ss', 'places', 'windowsxp']],
-        [[104, 8, 13], ['ss', 'places', 'macosx']],
-        [[104, 8, 14], ['ss', 'places', 'linux']]
+        [[104, 1, 14], ['ss', 'firefox', 'linux']]
     ];
 
     function updatePlot(series, displayDays)
