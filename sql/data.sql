@@ -85,6 +85,7 @@ insert into branches values (NULL,"mobile-try");
 insert into branches values (NULL,"AddonTester");
 insert into branches values (NULL,"mobile-2.0");
 insert into branches values (NULL,"mobile-2.0-qt");
+insert into branches values (NULL,"ThunderbirdTest");
 
 insert into branches values (NULL,"Firefox-Non-PGO");
 insert into branches values (NULL,"Firefox-Release-Non-PGO");
@@ -136,6 +137,7 @@ insert into branches values (NULL,"Oak-Non-PGO");
 insert into branches values (NULL,"Pine-Non-PGO");
 insert into branches values (NULL,"mobile-try-Non-PGO");
 insert into branches values (NULL,"AddonTester-Non-PGO");
+insert into branches values (NULL,"ThunderbirdTest-Non-PGO");
 
 -- osid,isthrottling,cpuspeed,name,isactive,dateadded
 -- stage talos
@@ -1554,6 +1556,52 @@ insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-beta",1,unix_time
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-beta_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-central-trunk",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-central-trunk_leak_test",1,unix_timestamp());
+
+-- Thunderbird
+insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.2",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.2_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-aurora",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-aurora_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-beta",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-beta_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-central",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-release",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_comm-release_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-1.9.2",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-1.9.2_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-aurora",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-aurora_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-beta",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-beta_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-central",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-release",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_comm-release_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_comm-1.9.2",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_comm-1.9.2_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_comm-aurora_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_comm-beta_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_comm-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_comm-release_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_comm-aurora",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_comm-aurora_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_comm-beta",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_comm-beta_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_comm-central",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_comm-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_comm-release",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_comm-release_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-1.9.2",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-1.9.2_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-aurora",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-aurora_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-beta",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-beta_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-central",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-central_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-release",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_comm-release_leak_test",1,unix_timestamp());
 
 --mobile
 insert into machines values (NULL,9,0,NULL,"maemo-n810-01",1,unix_timestamp());
