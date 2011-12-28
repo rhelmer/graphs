@@ -87,6 +87,7 @@ insert into branches values (NULL,"AddonTester");
 insert into branches values (NULL,"mobile-2.0");
 insert into branches values (NULL,"mobile-2.0-qt");
 insert into branches values (NULL,"ThunderbirdTest");
+insert into branches values (NULL,"Profiling");
 
 insert into branches values (NULL,"Firefox-Non-PGO");
 insert into branches values (NULL,"Firefox-Release-Non-PGO");
@@ -139,6 +140,7 @@ insert into branches values (NULL,"Pine-Non-PGO");
 insert into branches values (NULL,"mobile-try-Non-PGO");
 insert into branches values (NULL,"AddonTester-Non-PGO");
 insert into branches values (NULL,"ThunderbirdTest-Non-PGO");
+insert into branches values (NULL,"Profiling-Non-PGO");
 
 -- osid,isthrottling,cpuspeed,name,isactive,dateadded
 -- stage talos
@@ -1508,6 +1510,20 @@ insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_ionmonkey",1,unix_times
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_ionmonkey_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_ionmonkey",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_ionmonkey_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_profiling",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_profiling_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_QT_profiling",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_QT_profiling_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_profiling",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_profiling_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_profiling",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_profiling_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_profiling",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_profiling_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_profiling",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_profiling_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_profiling",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_profiling_leak_test",1,unix_timestamp());
 
 --SeaMonkey
 insert into machines values (NULL,6,0,NULL,"Linux_comm-1.9.1",1,unix_timestamp());
