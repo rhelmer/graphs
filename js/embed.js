@@ -9,16 +9,31 @@
     var menu;
     var downloadingManifest = false;
     var loadSeries = [];
+    var onPlotHoverFunction = onPlotHover;
+    var onPlotClickFunction = onPlotClick;
+    var onPlotSelectFunction = onPlotSelect;
 
     function init()
     {
         initPlot();
-        updateBindings();
         var args = getUrlVars();
         var tests = args['tests'];
         sel = args['sel'] ? args['sel'] : 'none';
         displayDays = args['displayrange'] ? args['displayrange'] : displayDays;
         datatype = args['datatype'] ? args['datatype'] : 'running';
+        if (args['transparent']) {
+            $(document.body).css('background', 'transparent');
+        }
+        if (args['notooltips']) {
+            onPlotHoverFunction = false;
+            onPlotClickFunction = function() {
+                window.parent.location.href = 'graph.html?#tests=[[' +
+                                              tests + ']]';
+            };
+            onPlotSelectFunction = false;
+        }
+        updateBindings();
+
         if (tests) {
             try {
                 tests = JSON.parse(decodeURIComponent(tests));
@@ -61,9 +76,13 @@
 
     function updateBindings()
     {
-        $('#plot').bind('plothover', onPlotHover);
-        $('#plot').bind('plotclick', onPlotClick);
-        $('#plot').bind('plotselected', onPlotSelect);
+        $('#plot').unbind('plothover');
+        $('#plot').unbind('plotclick');
+        $('#plot').unbind('plotselected');
+
+        $('#plot').bind('plothover', onPlotHoverFunction);
+        $('#plot').bind('plotclick', onPlotClickFunction);
+        $('#plot').bind('plotselected', onPlotSelectFunction);
     }
 
     function fetchData(testid, branchid, platformid, sel) {

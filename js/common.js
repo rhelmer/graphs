@@ -11,6 +11,7 @@ var prevSeriesIndex = -1,
     prevDataIndex = -1;
 var allSeries = {};
 
+var USE_GENERATED_IMAGES_IN_DASHBOARD = true;
 var MAX_GRAPHS = 6;
 var MAX_CSETS = 100;
 var DAY = 86400000;
@@ -712,4 +713,16 @@ function updateLocation() {
     newLocation += '&displayrange=' + $('#displayrange select').val();
     newLocation += '&datatype=' + $('#datatype select').val();
     window.location = newLocation;
+}
+
+function iframeMarkupForEmbeddedChart(width, height, hash)
+{
+    var protocol = window.location.protocol;
+    var hostname = window.location.hostname;
+    var pathname = window.location.pathname;
+    pathname = pathname.replace(/\w+\.html/, 'embed.html');
+
+    return '<iframe type="text/html" width="' + width + '" height="' + height +
+           '" src="' + protocol + '//' + hostname + pathname + hash +
+           '&notooltips=true" frameborder="0"</iframe>';
 }

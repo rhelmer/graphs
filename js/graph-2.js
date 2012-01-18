@@ -583,15 +583,11 @@
 
     $('#chart-embed').click(function() {
         $('#embed-overlay').showBubble(this);
-        var hostname = window.location.hostname;
-        var pathname = window.location.pathname;
-        var hash = window.location.hash;
-        pathname = pathname.replace('graph.html', 'embed.html');
 
-        $('#embed-code').html('<iframe type="text/html"' +
-                        ' width="480" height="390"' +
-                        ' src="http://' + hostname + pathname + hash + '"' +
-                        ' frameborder="0"></iframe>');
+        var hash = window.location.hash;
+        var markup = iframeMarkupForEmbeddedChart(480, 390, hash);
+
+        $('#embed-code').html(markup);
         $('#embed-code').focus().select();
         return false;
     });

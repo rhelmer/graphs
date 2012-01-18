@@ -94,13 +94,17 @@
                            sel: 'none',
                            displayrange: displayDays,
                            datatype: datatype };
-            var img = 'http://graphs.mozilla.org/images/dashboard/flot-' +
-                      testid +
-                      '-' + branchid + '-' + platformid +
-                      '_' + displayDays + '.png';
-            var html = '<a href="graph.html#' + $.param(params) + '">' +
-                       '<img src="' + img + '">';
-            td.html(html);
+            var html = '<a href="graph.html#' + $.param(params) + '">';
+            if (USE_GENERATED_IMAGES_IN_DASHBOARD) {
+                html += '<img src="' + SERVER + '/images/dashboard/flot-' +
+                        testid + '-' + branchid + '-' + platformid + '_' +
+                        displayDays + '.png' + '">';
+            } else {
+                params['transparent'] = true;
+                var hash = '#' + $.param(params);
+                html += iframeMarkupForEmbeddedChart(360, 240, hash);
+            }
+            td.html(html + '</a>');
         });
         updateLocation();
     }
