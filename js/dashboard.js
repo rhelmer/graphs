@@ -3,36 +3,58 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 (function($) {
 
-    // FIXME server should store "popular" values
-    var DEFAULT_BRANCH = 'firefox',
-        DEFAULT_PLATFORM = ['windows7', 'windowsxp', 'macosx', 'linux'],
-        DEFAULT_TEST = ['ts', 'tp', 'ss'];
+    var branchToId;
+    var platformToId;
+    var testToId;
+
+    function fetchDashboardManifest()
+    {
+        defaultBranch = 'Firefox';
+        branchToId = {'Firefox': 1};
+        platformToId = {
+            'Windows 7': 12,
+            'Windows XP': 1,
+            'Mac OS X': 13,
+            'Linux': 14
+        };
+        testToId = {
+            'Ts': 83,
+            'Tp': 115,
+            'SunSpider': 104
+        };
+    }
+    fetchDashboardManifest();
+
+    var DEFAULT_DISPLAYDAYS = 7;
+    var DEFAULT_BRANCH = defaultBranch;
+    var DEFAULT_PLATFORM = [];
+    var DEFAULT_TEST = [];
+
+    $.each(platformToId, function (name, id) { DEFAULT_PLATFORM.push(name); });
+    $.each(testToId, function (name, id) { DEFAULT_TEST.push(name); });
 
     var args = getUrlVars();
-    displayDays = args['displayrange'] ? args['displayrange'] : displayDays;
-    branch = args['branch'] ? args['branch'] : DEFAULT_BRANCH;
-    platform = args['platform'] ?
-               JSON.parse(decodeURIComponent(args['platform'])) :
-               DEFAULT_PLATFORM;
-    test = args['test'] ? JSON.parse(decodeURIComponent(args['test'])) :
-                          DEFAULT_TEST;
+    var displayDays = args['displayrange'] ? args['displayrange'] : DEFAULT_DISPLAYDAYS;
+    var branch = args['branch'] ? args['branch'] : DEFAULT_BRANCH;
+    var platform = args['platform'] ?
+        JSON.parse(decodeURIComponent(args['platform']).replace(/\+/g, ' ')) :
+        DEFAULT_PLATFORM;
+    var test = args['test'] ?
+        JSON.parse(decodeURIComponent(args['test']).replace(/\+/g, ' ')) :
+        DEFAULT_TEST;
 
     function getIds(branch)
     {
-        var ids = {'firefox': [
-            [[83, 1, 12], ['ts', 'firefox', 'windows7']],
-            [[83, 1, 1], ['ts', 'firefox', 'windowsxp']],
-            [[83, 1, 13], ['ts', 'firefox', 'macosx']],
-            [[83, 1, 14], ['ts', 'firefox', 'linux']],
-            [[115, 1, 12], ['tp', 'firefox', 'windows7']],
-            [[115, 1, 1], ['tp', 'firefox', 'windowsxp']],
-            [[115, 1, 13], ['tp', 'firefox', 'macosx']],
-            [[115, 1, 14], ['tp', 'firefox', 'linux']],
-            [[104, 1, 12], ['ss', 'firefox', 'windows7']],
-            [[104, 1, 1], ['ss', 'firefox', 'windowsxp']],
-            [[104, 1, 13], ['ss', 'firefox', 'macosx']],
-            [[104, 1, 14], ['ss', 'firefox', 'linux']]
-        ]};
+        var ids = {};
+        $.each(branchToId, function (branchName) {
+            ids[branchName] = [];
+            $.each(testToId, function (testName) {
+                $.each(platformToId, function (platformName) {
+                    ids[branchName].push([[testToId[testName], branchToId[branchName], platformToId[platformName]],
+                        [testName, branchName, platformName]]);
+                });
+            });
+        });
         return ids[branch];
     }
 
@@ -58,18 +80,18 @@
             var testid = id[0][0];
             var branchid = id[0][1];
             var platformid = id[0][2];
-            var testName = id[1][0];
-            var branchName = id[1][1];
-            var platformName = id[1][2];
+            var testName = 'test' + id[1][0];
+            var branchName = 'branch' + id[1][1];
+            var platformName = 'platform' + id[1][2];
 
-            var td = $('td .' + platformName + '.' + testName);
+            var td = $('td.platform' + platformid + '.test' + testid);
             td.html('<div class="placeholder"><p class="loader">');
             var tests = [[testid, branchid, platformid]];
             var params = { tests: JSON.stringify(tests),
                            sel: 'none',
                            displayrange: displayDays,
                            datatype: datatype };
-            var img = 'images/dashboard/flot-' + testid +
+            var img = 'http://graphs.mozilla.org/images/dashboard/flot-' + testid +
                        '-' + branchid + '-' + platformid +
                        '_' + displayDays + '.png';
             var html = '<a href="graph.html#' + $.param(params) + '">' +
@@ -86,10 +108,10 @@
         var colhead = '';
         var rowhead = '';
         for (var i = 0; i < platform.length; i++) {
-            colhead += 'thead td.' + platform[i] + ',';
+            colhead += 'thead td.platform' + platformToId[platform[i]] + ',';
             for (var j = 0; j < test.length; j++) {
-                selector += '.' + platform[i] + '.' + test[j] + ',';
-                rowhead += '.rowhead.' + test[j] + ',';
+                selector += '.platform' + platformToId[platform[i]] + '.test' + testToId[test[j]] + ',';
+                rowhead += '.rowhead.test' + testToId[test[j]] + ',';
             }
         }
         $(selector).show();
@@ -133,6 +155,31 @@
         }
         restrictDisplay();
         updateLocation();
+    });
+
+
+    $('#charts').prepend($('<table><thead><tr><td class="spacer"></td></tr></thead><tbody></tbody></table>'))
+
+    $.each(branchToId, function (name, id) {
+        var selected = name == branch ? ' selected' : '';
+        $('#branch select').append($('<option value="' + name + '"' + selected + '>' + name + '</option>'));
+    })
+
+    $.each(platformToId, function (name, id) {
+        var cell = document.createElement('td');
+        cell.appendChild(document.createTextNode(name));
+        cell.className = 'platform' + id;
+        $('#charts thead tr').append(cell);
+        $('#platform select').append($('<option value="' + name + '">' + name + '</option>'));
+    });
+
+    $.each(testToId, function (name, id) {
+        var cells = '';
+        $.each(platformToId, function (platformName, platformId) {
+            cells += '<td class="platform' + platformId + ' test' + id + '">' + name + ':' + platformName + '</td>'
+        })
+        $('#charts tbody').append($('<tr><td class="rowhead test' + id + '"><p>' + name + '</p></td>' + cells + '</tr>'));
+        $('#test select').append($('<option value="' + name + '">' + name + '</option>'));
     });
 
     $('#displayrange').toggleClass('disabled', false);

@@ -52,6 +52,16 @@ function repoMap(branch)
     }
 }
 
+function urlForChangeset(branch, changeset)
+{
+    return repoMap(branch) + '/rev/' + changeset;
+}
+
+function urlForChangesetList(branch, changesetList)
+{
+    return repoMap(branch) + '/pushloghtml?changeset=' + csets.join('&changeset=');
+}
+
 var PLOT_OPTIONS = {
     xaxis: { mode: 'time' },
     yaxis: { min: 0 },
@@ -542,8 +552,7 @@ function updateTooltip(item)
     } else {
         error('Unknown datatype');
     }
-    var url = repoMap(branch);
-    $('#tt-cset').html(changeset).attr('href', url + '/rev/' + changeset);
+    $('#tt-cset').html(changeset).attr('href', urlForChangeset(branch, changeset));
     $('#tt-t').html($.plot.formatDate(new Date(t), '%b %d, %y %H:%M'));
 
     plot.unhighlight();

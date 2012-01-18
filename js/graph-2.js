@@ -429,9 +429,7 @@
         }
         $.each(branches, function() {
             var branch = this;
-            var url = repoMap(branch);
-            window.open(url + '/pushloghtml?changeset=' +
-                        csets.join('&changeset='));
+            window.open(urlForChangesetList(branch, csets));
         });
     });
 
