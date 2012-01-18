@@ -57,7 +57,7 @@ function urlForChangeset(branch, changeset)
     return repoMap(branch) + '/rev/' + changeset;
 }
 
-function urlForChangesetList(branch, changesetList)
+function urlForChangesetList(branch, csets)
 {
     return repoMap(branch) + '/pushloghtml?changeset=' +
                              csets.join('&changeset=');
