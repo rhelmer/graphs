@@ -30,11 +30,12 @@
     var DEFAULT_PLATFORM = [];
     var DEFAULT_TEST = [];
 
-    $.each(platformToId, function (name, id) { DEFAULT_PLATFORM.push(name); });
-    $.each(testToId, function (name, id) { DEFAULT_TEST.push(name); });
+    $.each(platformToId, function(name, id) { DEFAULT_PLATFORM.push(name); });
+    $.each(testToId, function(name, id) { DEFAULT_TEST.push(name); });
 
     var args = getUrlVars();
-    var displayDays = args['displayrange'] ? args['displayrange'] : DEFAULT_DISPLAYDAYS;
+    var displayDays = args['displayrange'] ?
+                      args['displayrange'] : DEFAULT_DISPLAYDAYS;
     var branch = args['branch'] ? args['branch'] : DEFAULT_BRANCH;
     var platform = args['platform'] ?
         JSON.parse(decodeURIComponent(args['platform']).replace(/\+/g, ' ')) :
@@ -46,11 +47,13 @@
     function getIds(branch)
     {
         var ids = {};
-        $.each(branchToId, function (branchName) {
+        $.each(branchToId, function(branchName) {
             ids[branchName] = [];
-            $.each(testToId, function (testName) {
-                $.each(platformToId, function (platformName) {
-                    ids[branchName].push([[testToId[testName], branchToId[branchName], platformToId[platformName]],
+            $.each(testToId, function(testName) {
+                $.each(platformToId, function(platformName) {
+                    ids[branchName].push([[testToId[testName],
+                                           branchToId[branchName],
+                                           platformToId[platformName]],
                         [testName, branchName, platformName]]);
                 });
             });
@@ -91,9 +94,10 @@
                            sel: 'none',
                            displayrange: displayDays,
                            datatype: datatype };
-            var img = 'http://graphs.mozilla.org/images/dashboard/flot-' + testid +
-                       '-' + branchid + '-' + platformid +
-                       '_' + displayDays + '.png';
+            var img = 'http://graphs.mozilla.org/images/dashboard/flot-' +
+                      testid +
+                      '-' + branchid + '-' + platformid +
+                      '_' + displayDays + '.png';
             var html = '<a href="graph.html#' + $.param(params) + '">' +
                        '<img src="' + img + '">';
             td.html(html);
@@ -110,7 +114,8 @@
         for (var i = 0; i < platform.length; i++) {
             colhead += 'thead td.platform' + platformToId[platform[i]] + ',';
             for (var j = 0; j < test.length; j++) {
-                selector += '.platform' + platformToId[platform[i]] + '.test' + testToId[test[j]] + ',';
+                selector += '.platform' + platformToId[platform[i]] + '.test' +
+                            testToId[test[j]] + ',';
                 rowhead += '.rowhead.test' + testToId[test[j]] + ',';
             }
         }
@@ -158,28 +163,35 @@
     });
 
 
-    $('#charts').prepend($('<table><thead><tr><td class="spacer"></td></tr></thead><tbody></tbody></table>'))
+    $('#charts').prepend($('<table><thead><tr><td class="spacer"></td>' +
+                           '</tr></thead><tbody></tbody></table>'));
 
-    $.each(branchToId, function (name, id) {
+    $.each(branchToId, function(name, id) {
         var selected = name == branch ? ' selected' : '';
-        $('#branch select').append($('<option value="' + name + '"' + selected + '>' + name + '</option>'));
-    })
+        $('#branch select').append($('<option value="' + name + '"' +
+                                      selected + '>' + name + '</option>'));
+    });
 
-    $.each(platformToId, function (name, id) {
+    $.each(platformToId, function(name, id) {
         var cell = document.createElement('td');
         cell.appendChild(document.createTextNode(name));
         cell.className = 'platform' + id;
         $('#charts thead tr').append(cell);
-        $('#platform select').append($('<option value="' + name + '">' + name + '</option>'));
+        $('#platform select').append($('<option value="' + name + '">' +
+                                       name + '</option>'));
     });
 
-    $.each(testToId, function (name, id) {
+    $.each(testToId, function(name, id) {
         var cells = '';
-        $.each(platformToId, function (platformName, platformId) {
-            cells += '<td class="platform' + platformId + ' test' + id + '">' + name + ':' + platformName + '</td>'
-        })
-        $('#charts tbody').append($('<tr><td class="rowhead test' + id + '"><p>' + name + '</p></td>' + cells + '</tr>'));
-        $('#test select').append($('<option value="' + name + '">' + name + '</option>'));
+        $.each(platformToId, function(platformName, platformId) {
+            cells += '<td class="platform' + platformId + ' test' + id + '">' +
+                      name + ':' + platformName + '</td>';
+        });
+        $('#charts tbody').append($('<tr><td class="rowhead test' + id +
+                                    '"><p>' + name + '</p></td>' + cells +
+                                    '</tr>'));
+        $('#test select').append($('<option value="' + name + '">' + name +
+                                   '</option>'));
     });
 
     $('#displayrange').toggleClass('disabled', false);

@@ -59,7 +59,8 @@ function urlForChangeset(branch, changeset)
 
 function urlForChangesetList(branch, changesetList)
 {
-    return repoMap(branch) + '/pushloghtml?changeset=' + csets.join('&changeset=');
+    return repoMap(branch) + '/pushloghtml?changeset=' +
+                             csets.join('&changeset=');
 }
 
 var PLOT_OPTIONS = {
@@ -552,7 +553,8 @@ function updateTooltip(item)
     } else {
         error('Unknown datatype');
     }
-    $('#tt-cset').html(changeset).attr('href', urlForChangeset(branch, changeset));
+    $('#tt-cset').html(changeset).attr('href',
+                                       urlForChangeset(branch, changeset));
     $('#tt-t').html($.plot.formatDate(new Date(t), '%b %d, %y %H:%M'));
 
     plot.unhighlight();
