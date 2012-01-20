@@ -2520,6 +2520,8 @@ insert into tests values (NULL,"tp5_responsiveness_nochrome_paint","Tp5 NoChrome
 insert into tests values (NULL,"tp5_responsiveness_nochrome","Tp5 NoChrome Responsiveness",0,1,15);
 insert into tests values (NULL,"tp5_responsiveness","Tp5 Responsiveness",1,1,15);
 insert into tests values (NULL,"tp5r_nochrome_paint","Tp5r NoChrome MozAfterPaint",0,1,15);
+
+--second deployment for all pageloader test
 insert into tests values (NULL,"tp5r_paint","Tp5r MozAfterPaint",1,1,15);
 insert into tests values (NULL,"tp5r_pbytes_paint", "Tp5r MozAfterPaint (Private Bytes)",1,1,NULL);
 insert into tests values (NULL,"tp5r_pbytes_nochrome_paint","Tp5r NoChrome MozAfterPaint (Private Bytes)",0,1,NULL);
@@ -2543,3 +2545,16 @@ insert into tests values (NULL,"tp5r_responsiveness_paint","Tp5r Responsiveness 
 insert into tests values (NULL,"tp5r_responsiveness_nochrome_paint","Tp5r NoChrome Responsiveness MozAfterPaint",0,1,15);
 insert into tests values (NULL,"tp5r_responsiveness_nochrome","Tp5r NoChrome Responsiveness",0,1,15);
 insert into tests values (NULL,"tp5r_responsiveness","Tp5r Responsiveness",1,1,15);
+insert into tests values (NULL,"tsspider.2_paint","SunSpider 2 MozAfterPaint",1,1,7);
+insert into tests values (NULL,"tsspider.2_nochrome_paint","SunSpider 2 NoChrome MozAfterPaint",0,1,7);
+insert into tests values (NULL,"tdhtml.2_paint","DHTML 2 MozAfterPaint",1,1,3);
+insert into tests values (NULL,"tdhtml.2_nochrome_paint","DHTML 2 NoChrome MozAfterPaint",0,1,3);
+insert into tests values (NULL,"tscroll.2_paint","tscroll 2",1,1,11);
+insert into tests values (NULL,"a11y.2_paint","a11y 2 MozAfterPaint",1,1,13);
+insert into tests values (NULL,"tsvg.2","SVG 2",1,1,5);
+insert into tests values (NULL,"tsvg.2_nochrome","SVG 2 NoChrome",0,1,5);
+insert into tests values (NULL,"tsvg_opacity.2","SVG, Opacity 2",1,1,9);
+insert into tests values (NULL,"tsvg_opacity.2_nochrome","SVG, Opacity 2 NoChrome",1,1,9);
+insert into tests values (NULL,"v8.2_paint","V8 2 MozAfterPaint",1,1,10);
+insert into tests values (NULL,"v8.2_nochrome_paint","V8 2 NoChrome MozAfterPaint",1,1,10);
+-- note: no gfx or dromaeo in the .2 list, tp5 is mentioned as tp5r for rss and tp5.2 would look odd.
