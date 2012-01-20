@@ -62,23 +62,27 @@ class graphs-base {
     package {
         'apache2':
             ensure => latest,
-            require => [Exec['apt-get-update']];
+            require => Exec['apt-get-update'];
 
         'libapache2-mod-wsgi':
-            require => Package[apache2],
-            ensure => 'present';
+            ensure => latest,
+            require => [Exec['apt-get-update'], Package[apache2]];
 
         'git-core':
-            ensure => 'present';
+            ensure => latest,
+            require => Exec['apt-get-update'];
 
         'rsync':
-            ensure => 'present';
+            ensure => latest,
+            require => Exec['apt-get-update'];
 
         'build-essential':
-            ensure => 'present';
+            ensure => latest,
+            require => Exec['apt-get-update'];
 
         'libcairo-dev':
-            ensure => 'present';
+            ensure => latest,
+            require => Exec['apt-get-update'];
     }
 
     user { 'graphs':
@@ -121,38 +125,38 @@ class graphs-base {
             require => [User[graphs], Exec[git-pull], Package[rsync], File['/var/www/graphs']],
             user => 'graphs';
 
-        '/usr/bin/wget -N "http://nodejs.org/dist/node-v0.4.8.tar.gz"':
+        '/usr/bin/wget -N "http://nodejs.org/dist/node-v0.6.8.tar.gz"':
             alias => 'download-node',
             user => 'graphs',
             cwd => '/home/graphs/dev/',
             require => File['/home/graphs/dev'];
 
-        '/bin/tar zxf node-v0.4.8.tar.gz':
+        '/bin/tar zxf node-v0.6.8.tar.gz':
             alias => 'unpack-node',
             user => 'graphs',
             cwd => '/home/graphs/dev/',
-            creates => '/home/graphs/dev/graphs/node-v0.4.8',
+            creates => '/home/graphs/dev/graphs/node-v0.6.8',
             require => Exec['download-node'];
 
-        '/home/graphs/dev/node-v0.4.8/configure --prefix=/home/graphs/node && /usr/bin/make install':
+        '/home/graphs/dev/node-v0.6.8/configure --prefix=/home/graphs/node && /usr/bin/make install':
             alias => 'install-node',
             environment => 'HOME=/home/graphs',
             user => 'graphs',
-            cwd => '/home/graphs/dev/node-v0.4.8',
+            cwd => '/home/graphs/dev/node-v0.6.8',
             creates => '/home/graphs/node',
             require => [Exec['unpack-node'], Package['build-essential']];
 
-        '/usr/bin/wget -N "http://registry.npmjs.org/npm/-/npm-1.0.13.tgz"':
+        '/usr/bin/wget -N "http://registry.npmjs.org/npm/-/npm-1.1.0-2.tgz"':
             alias => 'download-npm',
             user => 'graphs',
             cwd => '/home/graphs/dev/',
             require => Exec['install-node'];
 
-        '/bin/mkdir npm-1.0.13 && /bin/tar -C npm-1.0.13 -xf npm-1.0.13.tgz':
+        '/bin/mkdir npm-1.1.0-2 && /bin/tar -C npm-1.1.0-2 -xf npm-1.1.0-2.tgz':
             alias => 'unpack-npm',
             user => 'graphs',
             cwd => '/home/graphs/dev/',
-            creates => '/home/graphs/dev/npm-1.0.13',
+            creates => '/home/graphs/dev/npm-1.1.0-2',
             require => Exec['download-npm'];
 
         '/usr/bin/make install':
@@ -160,7 +164,7 @@ class graphs-base {
             path => '/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/opt/ruby/bin/:/home/graphs/node/bin',
             environment => ['HOME=/home/graphs', 'UID=10000'],
             user => 'graphs',
-            cwd => '/home/graphs/dev/npm-1.0.13/package',
+            cwd => '/home/graphs/dev/npm-1.1.0-2/package',
             require => Exec['unpack-npm'];
 
         '/home/graphs/node/bin/npm install canvas htmlparser jquery jsdom':
