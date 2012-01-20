@@ -1,4 +1,5 @@
-export PYTHONPATH='/var/www/graphs/server'
+export DOCROOT='/var/www/graphs'
+export PYTHONPATH="${DOCROOT}/var/www/graphs/server"
 export CONFIG_MYSQL_HOST=''
 export CONFIG_MYSQL_USER=''
 export CONFIG_MYSQL_PASSWORD=''
