@@ -11,7 +11,6 @@ from time import mktime
 #Get an array of all tests by build and os
 def getTests(id, attribute, req):
     if attribute == 'short':
-        update_valid_test_combinations()
         result = getTestOptions()
         result['stat'] = 'ok'
         result['from'] = 'db'

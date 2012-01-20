@@ -1,4 +1,10 @@
+export PYTHONPATH='/var/www/graphs/server'
+export CONFIG_MYSQL_HOST=''
+export CONFIG_MYSQL_USER=''
+export CONFIG_MYSQL_PASSWORD=''
+export CONFIG_MYSQL_DBNAME=''
+
+# generate server-side static images, for dashboard
 */5 * * * * graphs /var/www/graphs/scripts/static_graphs.sh
-# keep cache warm
-# FIXME  server-side graphs should replace this soon
-*/1 * * * * graphs /var/www/graphs/scripts/cache.sh graphs
+# find and record recent valid test combos for manifest
+0 * * * * graphs /usr/bin/python /var/www/graphs/scripts/refresh_test_combos.py
