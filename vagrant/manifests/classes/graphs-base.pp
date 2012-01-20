@@ -83,6 +83,18 @@ class graphs-base {
         'libcairo-dev':
             ensure => latest,
             require => Exec['apt-get-update'];
+
+        'python-webob':
+            ensure => latest,
+            require => Exec['apt-get-update'];
+
+        'python-mysqldb':
+            ensure => latest,
+            require => Exec['apt-get-update'];
+
+        'mysql-server':
+            ensure => latest,
+            require => Exec['apt-get-update'];
     }
 
     user { 'graphs':
