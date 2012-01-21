@@ -717,12 +717,8 @@ function updateLocation() {
 
 function iframeMarkupForEmbeddedChart(width, height, hash)
 {
-    var protocol = window.location.protocol;
-    var hostname = window.location.hostname;
-    var pathname = window.location.pathname;
-    pathname = pathname.replace(/\w+\.html/, 'embed.html');
-
+    var href = window.location.href;
+    var url = href.substring(0, href.lastIndexOf('/')) + '/embed.html' + hash;
     return '<iframe type="text/html" width="' + width + '" height="' + height +
-           '" src="' + protocol + '//' + hostname + pathname + hash +
-           '&notooltips=true" frameborder="0"</iframe>';
+           '" src="' + url + '&notooltips=true" frameborder="0"</iframe>';
 }
