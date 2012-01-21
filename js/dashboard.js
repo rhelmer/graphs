@@ -3,30 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 (function($) {
 
-    var branchToId;
-    var platformToId;
-    var testToId;
+    var dashboardManifest = fetchDashboardManifest();
+    var branchToId = dashboardManifest['branchToId'];
+    var platformToId = dashboardManifest['platformToId'];
+    var testToId = dashboardManifest['testToId'];
 
-    function fetchDashboardManifest()
-    {
-        defaultBranch = 'Firefox';
-        branchToId = {'Firefox': 1};
-        platformToId = {
-            'Windows 7': 12,
-            'Windows XP': 1,
-            'Mac OS X': 13,
-            'Linux': 14
-        };
-        testToId = {
-            'Ts': 83,
-            'Tp': 115,
-            'SunSpider': 104
-        };
-    }
-    fetchDashboardManifest();
 
     var DEFAULT_DISPLAYDAYS = 7;
-    var DEFAULT_BRANCH = defaultBranch;
+    var DEFAULT_BRANCH = dashboardManifest['defaultBranch'];
     var DEFAULT_PLATFORM = [];
     var DEFAULT_TEST = [];
 
