@@ -80,7 +80,8 @@
                            datatype: datatype };
             var html = '<a href="graph.html#' + $.param(params) + '">';
             if (USE_GENERATED_IMAGES_IN_DASHBOARD) {
-                html += '<img src="' + IMAGE_SERVER + '/images/dashboard/flot-' +
+                html += '<img src="' + IMAGE_SERVER +
+                        '/images/dashboard/flot-' +
                         testid + '-' + branchid + '-' + platformid + '_' +
                         displayDays + '.png' + '">';
             } else {

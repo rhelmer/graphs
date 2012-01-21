@@ -13,7 +13,7 @@ var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
 // server for JSON performance data
 var SERVER = 'http://graphs-new.mozilla.org';
 // server for static dashboard images
-var IMAGE_SERVER = SERVER
+var IMAGE_SERVER = SERVER;
 
 var LIGHT_COLORS = $.map(COLORS, function(color) {
     return $.color.parse(color).add('a', -.5).toString();
