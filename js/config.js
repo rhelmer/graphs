@@ -10,8 +10,10 @@ var DAY = 86400000;
 var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
               '#bf5c41'];
 
+// server for JSON performance data
 var SERVER = 'http://graphs-new.mozilla.org';
-//var SERVER = 'http://localhost';
+// server for static dashboard images
+var IMAGE_SERVER = SERVER
 
 var LIGHT_COLORS = $.map(COLORS, function(color) {
     return $.color.parse(color).add('a', -.5).toString();
