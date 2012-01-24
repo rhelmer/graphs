@@ -92,9 +92,9 @@ function urlForChangesetList(branch, csets)
 }
 
 // FIXME move this back to dashboard.js once the bug 718925 is fixed
-function fetchDashboardManifest()
+function fetchDashboardManifest(callback)
 {
-    return {
+    callback({
         'defaultBranch': 'Firefox',
         'branchToId': {'Firefox': 1},
         'platformToId': {
@@ -108,5 +108,5 @@ function fetchDashboardManifest()
         'Tp': 115,
         'SunSpider': 104
         }
-    };
+    });
 }

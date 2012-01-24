@@ -3,30 +3,19 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 (function($) {
 
-    var dashboardManifest = fetchDashboardManifest();
-    var branchToId = dashboardManifest['branchToId'];
-    var platformToId = dashboardManifest['platformToId'];
-    var testToId = dashboardManifest['testToId'];
-
+    var branchToId;
+    var platformToId;
+    var testToId;
 
     var DEFAULT_DISPLAYDAYS = 7;
-    var DEFAULT_BRANCH = dashboardManifest['defaultBranch'];
+    var DEFAULT_BRANCH;
     var DEFAULT_PLATFORM = [];
     var DEFAULT_TEST = [];
 
-    $.each(platformToId, function(name, id) { DEFAULT_PLATFORM.push(name); });
-    $.each(testToId, function(name, id) { DEFAULT_TEST.push(name); });
-
-    var args = getUrlVars();
-    var displayDays = args['displayrange'] ?
-                      args['displayrange'] : DEFAULT_DISPLAYDAYS;
-    var branch = args['branch'] ? args['branch'] : DEFAULT_BRANCH;
-    var platform = args['platform'] ?
-        JSON.parse(decodeURIComponent(args['platform']).replace(/\+/g, ' ')) :
-        DEFAULT_PLATFORM;
-    var test = args['test'] ?
-        JSON.parse(decodeURIComponent(args['test']).replace(/\+/g, ' ')) :
-        DEFAULT_TEST;
+    var displayDays;
+    var branch;
+    var platform;
+    var test;
 
     function getIds(branch)
     {
@@ -116,80 +105,109 @@
         $('.spacer').show();
     }
 
-
-    $('#displayrange').change(function(e) {
-        e.preventDefault();
-        displayDays = e.target.value;
-        refreshGraphs(getIds(branch));
-    });
-
-    $('#branch').change(function(e) {
-        e.preventDefault();
-        branch = e.target.value;
-        refreshGraphs(getIds(branch));
-    });
-
-    $('#platform').change(function(e) {
-        e.preventDefault();
-        if (e.target.value == 0) {
-            platform = DEFAULT_PLATFORM;
-        } else {
-            platform = [e.target.value];
-        }
-        restrictDisplay();
-        updateLocation();
-    });
-
-    $('#test').change(function(e) {
-        e.preventDefault();
-        if (e.target.value == 0) {
-            test = DEFAULT_TEST;
-        } else {
-            test = [e.target.value];
-        }
-        restrictDisplay();
-        updateLocation();
-    });
-
-
-    $('#charts').prepend($('<table><thead><tr><td class="spacer"></td>' +
-                           '</tr></thead><tbody></tbody></table>'));
-
-    $.each(branchToId, function(name, id) {
-        var selected = name == branch ? ' selected' : '';
-        $('#branch select').append($('<option value="' + name + '"' +
-                                      selected + '>' + name + '</option>'));
-    });
-
-    $.each(platformToId, function(name, id) {
-        var cell = document.createElement('td');
-        cell.appendChild(document.createTextNode(name));
-        cell.className = 'platform' + id;
-        $('#charts thead tr').append(cell);
-        $('#platform select').append($('<option value="' + name + '">' +
-                                       name + '</option>'));
-    });
-
-    $.each(testToId, function(name, id) {
-        var cells = '';
-        $.each(platformToId, function(platformName, platformId) {
-            cells += '<td class="platform' + platformId + ' test' + id + '">' +
-                      name + ':' + platformName + '</td>';
+    function setup() {
+        $('#displayrange').change(function(e) {
+            e.preventDefault();
+            displayDays = e.target.value;
+            refreshGraphs(getIds(branch));
         });
-        $('#charts tbody').append($('<tr><td class="rowhead test' + id +
-                                    '"><p>' + name + '</p></td>' + cells +
-                                    '</tr>'));
-        $('#test select').append($('<option value="' + name + '">' + name +
-                                   '</option>'));
+
+        $('#branch').change(function(e) {
+            e.preventDefault();
+            branch = e.target.value;
+            refreshGraphs(getIds(branch));
+        });
+
+        $('#platform').change(function(e) {
+            e.preventDefault();
+            if (e.target.value == 0) {
+                platform = DEFAULT_PLATFORM;
+            } else {
+                platform = [e.target.value];
+            }
+            restrictDisplay();
+            updateLocation();
+        });
+
+        $('#test').change(function(e) {
+            e.preventDefault();
+            if (e.target.value == 0) {
+                test = DEFAULT_TEST;
+            } else {
+                test = [e.target.value];
+            }
+            restrictDisplay();
+            updateLocation();
+        });
+
+
+        $('#charts').prepend($('<table><thead><tr><td class="spacer"></td>' +
+                               '</tr></thead><tbody></tbody></table>'));
+
+        $.each(branchToId, function(name, id) {
+            var selected = name == branch ? ' selected' : '';
+            $('#branch select').append($('<option value="' + name + '"' +
+                                          selected + '>' + name +
+                                          '</option>'));
+        });
+
+        $.each(platformToId, function(name, id) {
+            var cell = document.createElement('td');
+            cell.appendChild(document.createTextNode(name));
+            cell.className = 'platform' + id;
+            $('#charts thead tr').append(cell);
+            $('#platform select').append($('<option value="' + name + '">' +
+                                           name + '</option>'));
+        });
+
+        $.each(testToId, function(name, id) {
+            var cells = '';
+            $.each(platformToId, function(platformName, platformId) {
+                cells += '<td class="platform' + platformId + ' test' + id +
+                         '">' + name + ':' + platformName + '</td>';
+            });
+            $('#charts tbody').append($('<tr><td class="rowhead test' + id +
+                                        '"><p>' + name + '</p></td>' + cells +
+                                        '</tr>'));
+            $('#test select').append($('<option value="' + name + '">' + name +
+                                       '</option>'));
+        });
+
+        $('#displayrange').toggleClass('disabled', false);
+        $('#branch').toggleClass('disabled', false);
+        $('#platform').toggleClass('disabled', false);
+        $('#test').toggleClass('disabled', false);
+
+        refreshGraphs(getIds(branch));
+        restrictDisplay();
+        $('.selectBox').selectBox();
+    }
+
+    fetchDashboardManifest(function(dashboardManifest) {
+        branchToId = dashboardManifest['branchToId'];
+        platformToId = dashboardManifest['platformToId'];
+        testToId = dashboardManifest['testToId'];
+
+        function decode(arg)
+        {
+            return decodeURIComponent(arg).replace(/\+/g, ' ');
+        }
+
+        DEFAULT_BRANCH = dashboardManifest['defaultBranch'];
+        $.each(platformToId, function(name, id) {
+            DEFAULT_PLATFORM.push(name); });
+        $.each(testToId, function(name, id) { DEFAULT_TEST.push(name); });
+
+        var args = getUrlVars();
+        displayDays = args['displayrange'] ?
+                      args['displayrange'] : DEFAULT_DISPLAYDAYS;
+
+        branch = args['branch'] ? decode(args['branch']) : DEFAULT_BRANCH;
+        platform = args['platform'] ? JSON.parse(decode(args['platform'])) :
+                                      DEFAULT_PLATFORM;
+        test = args['test'] ? JSON.parse(decode(args['test'])) : DEFAULT_TEST;
+
+        setup();
     });
-
-    $('#displayrange').toggleClass('disabled', false);
-    $('#branch').toggleClass('disabled', false);
-    $('#platform').toggleClass('disabled', false);
-    $('#test').toggleClass('disabled', false);
-
-    refreshGraphs(getIds(branch));
-    restrictDisplay();
-    $('.selectBox').selectBox();
 
 })(jQuery);
