@@ -88,6 +88,7 @@ insert into branches values (NULL,"mobile-2.0");
 insert into branches values (NULL,"mobile-2.0-qt");
 insert into branches values (NULL,"ThunderbirdTest");
 insert into branches values (NULL,"Profiling");
+insert into branches values (NULL,"Mozilla-Esr10");
 
 insert into branches values (NULL,"Firefox-Non-PGO");
 insert into branches values (NULL,"Firefox-Release-Non-PGO");
@@ -1135,6 +1136,11 @@ insert into machines values (NULL,22,0,"2.4","talos-r4-lion-077",1,unix_timestam
 insert into machines values (NULL,22,0,"2.4","talos-r4-lion-078",1,unix_timestamp());
 insert into machines values (NULL,22,0,"2.4","talos-r4-lion-079",1,unix_timestamp());
 insert into machines values (NULL,22,0,"2.4","talos-r4-lion-080",1,unix_timestamp());
+insert into machines values (NULL,22,0,"2.4","talos-r4-lion-081",1,unix_timestamp());
+insert into machines values (NULL,22,0,"2.4","talos-r4-lion-082",1,unix_timestamp());
+insert into machines values (NULL,22,0,"2.4","talos-r4-lion-083",1,unix_timestamp());
+insert into machines values (NULL,22,0,"2.4","talos-r4-lion-084",1,unix_timestamp());
+insert into machines values (NULL,22,0,"2.4","talos-r4-lion-085",1,unix_timestamp());
 
 
 -- auto-tools staging
@@ -1412,6 +1418,20 @@ insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-release",1,unix
 insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-release_leak_test",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-release",1,unix_timestamp());
 insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-release_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_mozilla-esr10",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_mozilla-esr10_leak_test",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_QT_mozilla-esr10",1,unix_timestamp());
+insert into machines values (NULL,6,0,NULL,"Linux_QT_mozilla-esr10_leak_test",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-esr10",1,unix_timestamp());
+insert into machines values (NULL,7,0,NULL,"OS_X_10.5.2_mozilla-esr10_leak_test",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-esr10",1,unix_timestamp());
+insert into machines values (NULL,8,0,NULL,"WINNT_5.2_mozilla-esr10_leak_test",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_mozilla-esr10",1,unix_timestamp());
+insert into machines values (NULL,19,0,NULL,"WINNT_6.1_mozilla-esr10_leak_test",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-esr10",1,unix_timestamp());
+insert into machines values (NULL,17,0,NULL,"OS_X_10.6.2_mozilla-esr10_leak_test",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-esr10",1,unix_timestamp());
+insert into machines values (NULL,18,0,NULL,"Linux_x86-64_mozilla-esr10_leak_test",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_mozilla-inbound",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_mozilla-inbound_leak_test",1,unix_timestamp());
 insert into machines values (NULL,6,0,NULL,"Linux_QT_mozilla-inbound",1,unix_timestamp());
