@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+<html>
+
+<head>
+    <title>Dashboard - Perf-o-Matic</title>
+    <link rel="stylesheet" href="css/reset.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/common.css" type="text/css" />
+    <link rel="stylesheet" href="css/dashboard.css" type="text/css" />
+</head>
+
+<body>
+
+<header id="header">
+    <h1>
+        <a href="index.html"><span id="logo">Perf-O-Matic</span></a>
+    </h1>
+    <nav>
+        <a class="selected" href="index.html">Dashboard</a>
+        <a href="graph.html">Custom Chart</a>
+    </nav>
+</header>
+
+<div id="toolbar">
+    <div class="group">
+        <span id="displayrange" class="button selectBox disabled" title="Time range to display">
+            <select>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 90 days</option>
+                <option value="365">Last 365 days</option>
+            </select>
+        </span>
+    </div>
+
+    <div class="group">
+        <span id="branch" class="button selectBox disabled" title="Branches">
+            <select>
+            </select>
+        </span>
+        <span id="platform" class="button selectBox disabled" title="Top Platforms">
+            <select>
+                <option value="0">Top Platforms</option>
+            </select>
+        </span>
+        <span id="test" class="button selectBox disabled" title="Top Tests">
+            <select>
+                <option value="0">Top Tests</option>
+            </select>
+        </span>
+    </div>
+</div>
+
+<div id="charts">
+  <div id="errors">
+  </div>
+</div>
+
+<script type="text/javascript" src="jq/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="jq/flot-0.7/jquery.flot.min.js"></script>
+<script type="text/javascript" src="jq/flot-0.7/jquery.flot.selection.min.js"></script>
+<script type="text/javascript" src="jq/flot-0.7/jquery.flot.crosshair.min.js"></script>
+<script type="text/javascript" src="js/config.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/dashboard.js"></script>
+
+</body>
+
+</html>

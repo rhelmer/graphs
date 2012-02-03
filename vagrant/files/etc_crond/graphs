@@ -1,0 +1,11 @@
+export DOCROOT='/var/www/graphs'
+export PYTHONPATH="${DOCROOT}/server"
+export CONFIG_MYSQL_HOST=''
+export CONFIG_MYSQL_USER=''
+export CONFIG_MYSQL_PASSWORD=''
+export CONFIG_MYSQL_DBNAME=''
+
+# generate server-side static images, for dashboard
+*/5 * * * * graphs /var/www/graphs/scripts/static_graphs.sh
+# find and record recent valid test combos for manifest
+0 * * * * graphs /usr/bin/python /var/www/graphs/scripts/refresh_test_combos.py
