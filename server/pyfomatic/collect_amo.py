@@ -1,9 +1,11 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
-from graphsdb import db, amo_db
+from graphsdb import amo_db_auth, db
+from databases import mysql as MySQLdb
 import csv
 
+amo_db = MySQLdb.connect(*amo_db_auth)
 
 class ParseError(Exception):
     pass

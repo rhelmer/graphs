@@ -97,8 +97,6 @@ def sendJsonResponse(status, data, lastmod):
         data = json.dumps(data, separators=(',', ':'),
                           default=convert_set)
         resp.body = data
-    return resp
-
 
 def sendRawResponse(status, filename, lastmod):
     """Send data.  Assume status is a number and filename is the name of a file
@@ -116,7 +114,6 @@ def sendRawResponse(status, filename, lastmod):
     resp.content_length = size
     resp.app_iter = Chunked(fp)
     return resp
-
 
 class Chunked(object):
     def __init__(self, fp, size=4096):
