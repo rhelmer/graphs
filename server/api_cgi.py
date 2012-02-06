@@ -97,6 +97,7 @@ def sendJsonResponse(status, data, lastmod):
         data = json.dumps(data, separators=(',', ':'),
                           default=convert_set)
         resp.body = data
+    return resp
 
 def sendRawResponse(status, filename, lastmod):
     """Send data.  Assume status is a number and filename is the name of a file
