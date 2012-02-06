@@ -157,6 +157,7 @@ function convertData(testName, branchName, platformName, data)
     for (var i in test_runs)
     {
         var run = test_runs[i];
+        var annotations = run[7];
         var machineid = run[6];
         var changeset = run[1][2];
         // graphserver gives us seconds, flot wants ms
@@ -167,8 +168,15 @@ function convertData(testName, branchName, platformName, data)
         var current_run = {
             'changeset': changeset,
             't': t,
-            'v': v
+            'v': v,
         };
+        if (annotations) {
+            current_run['d'] = annotations['stdev'];
+            current_run['l'] = annotations['min'];
+            current_run['h'] = annotations['max'];
+            gdata['hasStatistics'] = true;
+        }
+
 
         if (changeset in averages) {
             gdata.mean.push(current_run);
@@ -198,7 +206,7 @@ function convertData(testName, branchName, platformName, data)
 function parseSeries(seriesIn, i, weight, explodedWeight)
 {
     var color = COLORS[i % COLORS.length];
-    var datasets = [{ data: seriesIn.mean }];
+    var datasets = [{ id: 'graph' + i, data: seriesIn.mean }];
     var lineWidth = seriesIn.visible ? weight : 0;
 
     if (seriesIn.exploded) {
@@ -207,8 +215,11 @@ function parseSeries(seriesIn, i, weight, explodedWeight)
         lineWidth = seriesIn.visible ? explodedWeight : 0;
     }
 
-    return $.map(datasets, function(d) {
-        return {
+    var plots = [];
+    $.each(datasets, function(index) {
+        d = datasets[index];
+        var plot = {
+            id: d.id,
             lines: { lineWidth: lineWidth },
             color: color,
             data: $.map(d.data, function(p) { return [[p.t, p.v]]; }),
@@ -220,7 +231,27 @@ function parseSeries(seriesIn, i, weight, explodedWeight)
                 changesets: $.map(d.data, function(p) {return p.changeset;})
             }
         };
+        if (seriesIn.hasStatistics) {
+            // FIXME Add these plots first to avoid shadowing main plots.
+            function addPlot(dataMap, graphPostfix, weight) {
+                plots.push({
+                    color: 'green',
+                    data: $.map(d.data, dataMap),
+                    id: plot.id + graphPostfix,
+                    fillBetween: plot.id,
+                    points: {show: false},
+                    lines: {show: seriesIn.visible, fill: weight,
+                        lineWidth: 0}});
+            }
+
+            addPlot(function(p) { return [[p.t, p.l]]; }, '_min', 0.1);
+            addPlot(function(p) { return [[p.t, p.h]]; }, '_max', 0.1);
+            addPlot(function(p) { return [[p.t, p.v - p.d]]; }, '_dmin', 0.3);
+            addPlot(function(p) { return [[p.t, p.v + p.d]]; }, '_dmax', 0.3);
+        }
+        plots.push(plot);
     });
+    return plots;
 }
 
 //  http://jquery-howto.blogspot.com/2009/09/get-url-parameters-values-with-jquery.html
@@ -432,7 +463,7 @@ var ttHideTimer = null,
 
 function updateTooltip(item)
 {
-    if (ttLocked) return;
+    if (ttLocked || !item.series.etc) return;
 
     var i = item.dataIndex,
         s = item.series,
