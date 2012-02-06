@@ -168,7 +168,7 @@ function convertData(testName, branchName, platformName, data)
         var current_run = {
             'changeset': changeset,
             't': t,
-            'v': v,
+            'v': v
         };
         if (annotations) {
             current_run['d'] = annotations['stdev'];
