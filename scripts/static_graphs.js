@@ -5,12 +5,12 @@
 /**
  * Generate static dashboard images using node, flot, jsdom, and node-canvas
  */
-var document = require("jsdom").jsdom(),
+var document = require('jsdom').jsdom(),
     window = document.createWindow(),
     jQuery = require('jquery').create(window),
     fs = require('fs'),
-    flot = document.createElement("script"),
-    flot_text = document.createElement("script");
+    flot = document.createElement('script'),
+    flot_text = document.createElement('script');
 
 var Configuration = {};
 var Common = {};
@@ -19,22 +19,23 @@ var Common = {};
 (function() {
     var $ = jQuery;
 
-    configJs = fs.readFileSync(__dirname + '/../js/config.js','utf8');
+    configJs = fs.readFileSync(__dirname + '/../js/config.js', 'utf8');
     eval(configJs);
     Configuration.DAY = DAY;
     Configuration.VHOST = VHOST;
     Configuration.COLORS = COLORS;
-    Configuration.jQueryScriptUrl = function (filename) {
+    Configuration.jQueryScriptUrl = function(filename) {
         return 'http://' + VHOST + '/jq/' + filename;
     }
     Configuration.fetchDashboardManifest = fetchDashboardManifest;
 
-    commonJs = fs.readFileSync(__dirname + '/../js/common.js','utf8');
+    commonJs = fs.readFileSync(__dirname + '/../js/common.js', 'utf8');
     eval(commonJs);
     Common.convertData = convertData;
     Common.parseSeries = parseSeries;
 })();
 
+/** attach fake canvas to window */
 window.Canvas = require('canvas');
 jQuery.getScript(Configuration.jQueryScriptUrl('jquery.flot.node-canvas.js'),
     function() {
@@ -66,8 +67,8 @@ function run(dashboardManifest) {
             autoHighlight: false,
             canvasText: { show: true }
         },
-        width:360,
-        height:240
+        width: 360,
+        height: 240
     };
 
     function updatePlot(series, displayDays)
@@ -83,8 +84,10 @@ function run(dashboardManifest) {
         minT = series.minT;
         maxT = series.maxT;
 
-        var xaxis = { xaxis: { min: minT, max: maxT, labelWidth:50, labelHeight: 20 } },
-            yaxis = { yaxis: { min: 0, max: maxV + marginV, labelWidth: 50, labelHeight: 20 } };
+        var xaxis = { xaxis: { min: minT, max: maxT, labelWidth: 50,
+                               labelHeight: 20 } },
+            yaxis = { yaxis: { min: 0, max: maxV + marginV, labelWidth: 50,
+                               labelHeight: 20 } };
         var plotOptions = jQuery.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
 
         var testid = series['test'];
@@ -94,13 +97,13 @@ function run(dashboardManifest) {
             plot = jQuery.plot(placeholder, plotData, plotOptions),
             node_canvas = plot.getCanvas(),
             ctx = node_canvas.getContext('2d'),
-            out = fs.createWriteStream('./images/dashboard/flot-' + 
-                testid + '-' + branchid + '-' + platformid + 
+            out = fs.createWriteStream('./images/dashboard/flot-' +
+                testid + '-' + branchid + '-' + platformid +
                 '_' + displayDays + '.png');
             stream = node_canvas.createPNGStream();
-    
-        stream.on('data', function ( chunk ) {
-            out.write(chunk); 
+
+        stream.on('data', function(chunk) {
+            out.write(chunk);
         });
     }
 
@@ -113,17 +116,17 @@ function run(dashboardManifest) {
         var request = graphs.request('GET', url,
             {'Host': Configuration.VHOST});
         request.end();
-        request.on('response', function (response) {
+        request.on('response', function(response) {
             var responseBody = '';
             response.setEncoding('utf8');
             response.on('data', function(chunk) { responseBody += chunk; });
             response.on('end', function() {
                 console.log(url);
                 var data = JSON.parse(responseBody);
-                if (!data || data['stat'] != 'ok') { 
-                    console.log('WARN: failed to fetch '
-                                + [testId, branchId, platformId, data,
-                                   displayDays]);
+                if (!data || data['stat'] != 'ok') {
+                    console.log('WARN: failed to fetch ' +
+                                [testId, branchId, platformId, data,
+                                 displayDays]);
                     console.log('WARN: status was ' + data['stat']);
                 }
                 data = Common.convertData(testId, branchId, platformId, data,
@@ -134,12 +137,12 @@ function run(dashboardManifest) {
     }
 
     var defaultBranchId = branchToId[defaultBranch];
-    jQuery.each(platformToId, function (platformName, platformId) {
-        jQuery.each(testToId, function (testName, testId) {
+    jQuery.each(platformToId, function(platformName, platformId) {
+        jQuery.each(testToId, function(testName, testId) {
             refreshGraphs(7, defaultBranchId, platformId, testId);
             refreshGraphs(30, defaultBranchId, platformId, testId);
             refreshGraphs(90, defaultBranchId, platformId, testId);
             refreshGraphs(365, defaultBranchId, platformId, testId);
         });
     });
-};
+}
