@@ -12,23 +12,44 @@ var document = require("jsdom").jsdom(),
     flot = document.createElement("script"),
     flot_text = document.createElement("script");
 
-var SERVER = 'localhost',
-    VHOST = 'graphs-new.mozilla.org';
+var Configuration = {};
+var Common = {};
+
+// FIXME config.js and common.js should define classes themselves
+(function() {
+    var $ = jQuery;
+
+    configJs = fs.readFileSync(__dirname + '/../js/config.js','utf8');
+    eval(configJs);
+    Configuration.DAY = DAY;
+    Configuration.VHOST = VHOST;
+    Configuration.COLORS = COLORS;
+    Configuration.jQueryScriptUrl = function (filename) {
+        return 'http://' + VHOST + '/jq/' + filename;
+    }
+    Configuration.fetchDashboardManifest = fetchDashboardManifest;
+
+    commonJs = fs.readFileSync(__dirname + '/../js/common.js','utf8');
+    eval(commonJs);
+    Common.convertData = convertData;
+    Common.parseSeries = parseSeries;
+})();
 
 window.Canvas = require('canvas');
-jQuery.getScript('http://' + VHOST + '/jq/jquery.flot.node-canvas.js', function() {
-    jQuery.getScript('http://' + VHOST + '/jq/jquery.flot.text.js', run);
+jQuery.getScript(Configuration.jQueryScriptUrl('jquery.flot.node-canvas.js'),
+    function() {
+        var flotTextUrl = Configuration.jQueryScriptUrl('jquery.flot.text.js');
+        jQuery.getScript(flotTextUrl, function() {
+            Configuration.fetchDashboardManifest(run);
+        });
 });
-function run() {
-    var DAY = 86400000;
-    
-    var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
-                  '#bf5c41'];
-    
-    var LIGHT_COLORS = jQuery.map(COLORS, function(color) {
-        //return jQuery.color.parse(color).add('a', -.5).toString();
-    });
-    
+
+function run(dashboardManifest) {
+    var defaultBranch = dashboardManifest['defaultBranch'];
+    var branchToId = dashboardManifest['branchToId'];
+    var platformToId = dashboardManifest['platformToId'];
+    var testToId = dashboardManifest['testToId'];
+
     var PLOT_OPTIONS = {
         xaxis: { mode: 'time' },
         yaxis: { min: 0 },
@@ -49,28 +70,12 @@ function run() {
         height:240
     };
 
-    // FIXME server should store "popular" values
-    var ids = [
-        [[83, 1, 12], ['ts', 'firefox', 'windows7']],
-        [[83, 1, 1], ['ts', 'firefox', 'windowsxp']],
-        [[83, 1, 13], ['ts', 'firefox', 'macosx']],
-        [[83, 1, 14], ['ts', 'firefox', 'linux']],
-        [[115, 1, 12], ['tp', 'firefox', 'windows7']],
-        [[115, 1, 1], ['tp', 'firefox', 'windowsxp']],
-        [[115, 1, 13], ['tp', 'firefox', 'macosx']],
-        [[115, 1, 14], ['tp', 'firefox', 'linux']],
-        [[104, 1, 12], ['ss', 'firefox', 'windows7']],
-        [[104, 1, 1], ['ss', 'firefox', 'windowsxp']],
-        [[104, 1, 13], ['ss', 'firefox', 'macosx']],
-        [[104, 1, 14], ['ss', 'firefox', 'linux']]
-    ];
-
     function updatePlot(series, displayDays)
     {
         var minV, maxV, marginV, minT, maxT;
         series.exploded = false;
         series.visible = true;
-        var plotData = parseSeries(series, 0, 3, 1);
+        var plotData = Common.parseSeries(series, 0, 3, 1);
 
         minV = series.minV;
         maxV = series.maxV;
@@ -99,141 +104,42 @@ function run() {
         });
     }
 
-    function refreshGraphs(displayDays) 
+    function refreshGraphs(displayDays, branchId, platformId, testId)
     {
-        jQuery.each(ids, function(index, id) {
-            var testid = id[0][0];
-            var branchid = id[0][1];
-            var platformid = id[0][2];
-            var testName = id[1][0];
-            var branchName = id[1][1];
-            var platformName = id[1][2];
-
-            var http = require('http');
-            var graphs = http.createClient(80, SERVER);
-            var request = graphs.request('GET', 
-                '/api/test/runs?id='+testid+'&branchid='+branchid+'&platformid='+platformid, 
-                {'Host': VHOST});
-            request.end();
-            request.on('response', function (response) {
-                var responseBody = '';
-                response.setEncoding('utf8');
-                response.on('data', function(chunk) {
-                    responseBody += chunk;
-                });
-                response.on('end', function() {
-                    var data = JSON.parse(responseBody);
-                    if (!data || data['stat'] != 'ok') { 
-                        console.log('WARN: failed to fetch '
-                                    + [testid, branchid, platformid, data,
-                                       displayDays]);
-                        console.log('WARN: status was ' + data['stat']);
-                    }
-                    data = convertData(testid, branchid, platformid, data,
-                                       displayDays);
-                    updatePlot(data, displayDays);
-                });
-            });
-        });
-    }
-    // FIXME perhaps graphserver should send us data in this format instead
-    function convertData(testName, branchName, platformName, data, displayDays)
-    {
-        var gdata =
-        {
-            'branch': branchName,
-            'maxT': undefined,
-            'minT': undefined,
-            'maxV': undefined,
-            'minV': undefined,
-            'platform': platformName,
-            'runs': [],
-            'test': testName,
-            'mean': []
-        };
-
-        var test_runs = data['test_runs'];
-        var averages = data['averages'];
-    
-        gdata.minT = new Date().getTime() - (DAY * displayDays);
-        gdata.maxT = new Date().getTime();
-        gdata.minV = data['min'];
-        gdata.maxV = data['max'];
-    
-        minT = gdata.minT;
-        maxT = gdata.maxT;
-    
-        machine_runs = {};
-        for (var i in test_runs)
-        {
-            var run = test_runs[i];
-            var machineid = run[6];
-            var changeset = run[1][2];
-             // graphserver gives us seconds, flot wants ms
-            var t = run[2] * 1000;
-            var v = run[3];
-    
-            var current_run = {
-                'changeset': changeset,
-                't': t,
-                'v': v
-            };
-    
-            if (changeset in averages) {
-                gdata.mean.push(current_run);
-            }
-    
-            if (machine_runs[machineid]) {
-                machine_runs[machineid].push(current_run);
-            } else {
-                machine_runs[machineid] = [current_run];
-            }
-        }
-    
-        // FIXME machineMap removed
-    
-        for (var machineid in machine_runs)
-        {
-            var machineName = 'machine' + machineid;
-            gdata.runs.push({
-                'machine': machineName,
-                'data': machine_runs[machineid]
-            });
-        }
-    
-        return gdata;
-    }
-
-    function parseSeries(seriesIn, i, weight, explodedWeight)
-    {
-        var color = COLORS[i % COLORS.length];
-        var datasets = [{ data: seriesIn.mean }];
-        var lineWidth = seriesIn.visible ? weight : 0;
-    
-        if (seriesIn.exploded) {
-            color = LIGHT_COLORS[i % LIGHT_COLORS.length];
-            datasets = seriesIn.runs;
-            lineWidth = seriesIn.visible ? explodedWeight : 0;
-        }
-    
-        return jQuery.map(datasets, function(d) {
-            return {
-                lines: { lineWidth: lineWidth },
-                color: color,
-                data: jQuery.map(d.data, function(p) { return [[p.t, p.v]]; }),
-                etc: {
-                    branch: seriesIn.branch,
-                    test: seriesIn.test,
-                    platform: seriesIn.platform,
-                    machine: d.machine,
-                    changesets: jQuery.map(d.data, function(p) {return p.changeset;})
+        var http = require('http');
+        var graphs = http.createClient(80, Configuration.VHOST);
+        var url = '/api/test/runs?id=' + testId + '&branchid=' + branchId +
+            '&platformid=' + platformId;
+        var request = graphs.request('GET', url,
+            {'Host': Configuration.VHOST});
+        request.end();
+        request.on('response', function (response) {
+            var responseBody = '';
+            response.setEncoding('utf8');
+            response.on('data', function(chunk) { responseBody += chunk; });
+            response.on('end', function() {
+                console.log(url);
+                var data = JSON.parse(responseBody);
+                if (!data || data['stat'] != 'ok') { 
+                    console.log('WARN: failed to fetch '
+                                + [testId, branchId, platformId, data,
+                                   displayDays]);
+                    console.log('WARN: status was ' + data['stat']);
                 }
-            };
+                data = Common.convertData(testId, branchId, platformId, data,
+                                          displayDays);
+                updatePlot(data, displayDays);
+            });
         });
     }
 
-    refreshGraphs(7);
-    refreshGraphs(30);
-    refreshGraphs(90);
-    refreshGraphs(365);
+    var defaultBranchId = branchToId[defaultBranch];
+    jQuery.each(platformToId, function (platformName, platformId) {
+        jQuery.each(testToId, function (testName, testId) {
+            refreshGraphs(7, defaultBranchId, platformId, testId);
+            refreshGraphs(30, defaultBranchId, platformId, testId);
+            refreshGraphs(90, defaultBranchId, platformId, testId);
+            refreshGraphs(365, defaultBranchId, platformId, testId);
+        });
+    });
 };
