@@ -233,7 +233,7 @@ def averageReader(databaseCursor, databaseModule, inputStream, metadata):
   return average
 
 #-----------------------------------------------------------------------------------------------------------------
-def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream=sys.stdout):
+def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys.stdout):
   if not databaseModule:
     databaseModule = sys.modules[databaseConnection.__module__.split('.')[0]]
 
@@ -241,6 +241,7 @@ def handleRequest(theForm, databaseConnection, databaseModule=None, outputStream
   responseList = ["Content-type: text/plain\n"]
 
   try:
+    theForm = req.POST
     if "filename" not in theForm:
       raise ImproperFormatException("Cannot find input stream")
 
