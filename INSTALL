@@ -127,3 +127,27 @@ mysql -u root graphs_v2 < sql/schema.sql
 mysql -u graphs -p graphs_v2 < sql/test_data.sql 
 # TODO show example POST using curl
 # based on https://wiki.mozilla.org/Buildbot/Talos/DataFormat
+
+# WEB TESTING
+
+A basic Selenium test is available:
+  tests/selenium.html
+
+# COLLECTION TESTING
+
+The data format is described in detail at:
+https://wiki.mozilla.org/Buildbot/Talos/DataFormat
+
+Take a file like this (test.txt):
+"""
+START
+AVERAGE
+talos-rev2-xp25, tzoom, Mozilla-Beta-Release, changeset_1, 13, 1229477017
+2.0
+END
+"""
+
+HTTP POST it:
+
+curl -X POST -F 'filename=@test.txt' 'http://graphs.allizom.org/server/collect'
+
