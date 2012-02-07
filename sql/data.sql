@@ -17,10 +17,10 @@ insert into os_list values (NULL, "Nokia n900");
 insert into os_list values (NULL, "MacOSX 10.6.2 (rev3)");
 insert into os_list values (NULL, "CentOS (x86_64) release 5 (Final)");
 insert into os_list values (NULL, "WINNT 6.1 x64");
-insert into os_list values (NULL, "Android 2.2");
+insert into os_list values (NULL, "Android 2.2 (Native)");
 insert into os_list values (NULL, "MacOSX 10.6 (rev4)");
 insert into os_list values (NULL, "MacOSX 10.7");
-insert into os_list values (NULL, "Android 2.2 (Native)");
+insert into os_list values (NULL, "Android 2.2");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox-Release");
