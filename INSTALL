@@ -40,13 +40,11 @@ cd /var/www/html
 git clone https://github.com/rhelmer/graphs.git graphs/
 cd graphs
 cp dist.htaccess .htaccess
-# configure server/api.wsgi, add db username/password/hostname
-# FIXME refactor below to all use one setting
-# change "graphs-new.mozilla.org" to proper graphserver in:
-#  scripts/static_graphs.js
-#  js/common.js
-#  tests/selenium.html
-exit
+
+configure server/api.wsgi, add r/o db username/password/hostname
+configure server/collector.wsgi, add r/w db username/password/hostname
+configure js/config.js
+configure tests/selenium.html
 
 # set up Apache vhost
 sudo mkdir /var/log/httpd/graphs.example.com
@@ -64,12 +62,13 @@ cat /etc/httpd/conf.d/graphs.example.com.conf
         AddHandler wsgi-script .wsgi
     </Directory>
     # Only allow certain hosts to send test data
-    <FilesMatch ^(collect|bulk).cgi$>
+    <FilesMatch ^(collect|bulk)$>
         deny from all
         allow from x.y.z.a
     </FilesMatch>
     WSGIScriptAlias /server/api /var/www/html/graphs/server/api.wsgi
     WSGIScriptAlias /server/dumpdata /var/www/html/graphs/server/dumpdata.wsgi
+    WSGIScriptAlias /server/collector /var/www/html/graphs/server/collector.wsgi
 
     ErrorLog /var/log/httpd/graphs.example.com/error.log
     CustomLog /var/log/httpd/graphs.example.com/access.log common
