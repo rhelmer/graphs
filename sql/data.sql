@@ -2578,3 +2578,7 @@ insert into tests values (NULL,"tsvg_opacity.2_nochrome","SVG, Opacity 2 NoChrom
 insert into tests values (NULL,"v8.2_paint","V8 2 MozAfterPaint",1,1,10);
 insert into tests values (NULL,"v8.2_nochrome_paint","V8 2 NoChrome MozAfterPaint",1,1,10);
 -- note: no gfx or dromaeo in the .2 list, tp5 is mentioned as tp5r for rss and tp5.2 would look odd.
+
+insert into tests values (NULL,"trobopan","Robocop Pan Benchmark",1,1,NULL);
+insert into tests values (NULL,"tcheckerboard","Robocop Checkerboarding Benchmark",1,1,NULL);
+
