@@ -238,7 +238,7 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
     databaseModule = sys.modules[databaseConnection.__module__.split('.')[0]]
 
   exitCode = None
-  responseList = ["Content-type: text/plain\n"]
+  responseList = []
 
   try:
     theForm = req.POST
@@ -282,4 +282,5 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
   for aResponseLine in responseList:
     print >>outputStream, aResponseLine
 
-  return exitCode
+  responseText = '\n'.join(responseList)
+  return (responseText, exitCode)

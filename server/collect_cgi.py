@@ -5,6 +5,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from webob.dec import wsgify
+from webob import Response
 import MySQLdb
 from pyfomatic import collect
 from graphsdb import db
@@ -12,4 +13,10 @@ from graphsdb import db
 
 @wsgify
 def application(req):
-    collect.handleRequest(req, db, MySQLdb)
+    (responseText, errorCode) = collect.handleRequest(req, db, MySQLdb)
+    return Response(
+        responseText,
+        content_type='text/plain',
+        status=errorCode)
+
+
