@@ -121,7 +121,6 @@ function run(dashboardManifest) {
             response.setEncoding('utf8');
             response.on('data', function(chunk) { responseBody += chunk; });
             response.on('end', function() {
-                console.log(url);
                 var data = JSON.parse(responseBody);
                 if (!data || data['stat'] != 'ok') {
                     console.log('WARN: failed to fetch ' +
