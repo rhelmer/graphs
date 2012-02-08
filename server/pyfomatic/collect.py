@@ -275,7 +275,7 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
       responseList.append("""RETURN\t%s\t%.2f\tgraph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
 
   except Exception, x:
-    responseList.append(x)
+    responseList.append(str(x))
     responseList.append(getTraceback())
     exitCode = 500
 
