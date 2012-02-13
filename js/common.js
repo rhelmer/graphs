@@ -235,7 +235,7 @@ function parseSeries(seriesIn, i, weight, explodedWeight)
             // FIXME Add these plots first to avoid shadowing main plots.
             function addPlot(dataMap, graphPostfix, weight) {
                 plots.push({
-                    color: 'green',
+                    color: color,
                     data: $.map(d.data, dataMap),
                     id: plot.id + graphPostfix,
                     fillBetween: plot.id,
@@ -390,7 +390,7 @@ function onPlotHover(e, pos, item)
 {
     $('#plot').css({ cursor: item ? 'pointer' : 'crosshair' });
 
-    if (item) {
+    if (item && item.series.etc) {
         if (item.seriesIndex != prevSeriesIndex ||
             item.dataIndex != prevDataIndex) {
 
@@ -410,7 +410,7 @@ function onPlotClick(e, pos, item)
 {
     unlockTooltip();
 
-    if (item) {
+    if (item && item.series.etc) {
         updateTooltip(item);
         showTooltip(item.pageX, item.pageY);
         lockTooltip();
