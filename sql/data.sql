@@ -17,10 +17,10 @@ insert into os_list values (NULL, "Nokia n900");
 insert into os_list values (NULL, "MacOSX 10.6.2 (rev3)");
 insert into os_list values (NULL, "CentOS (x86_64) release 5 (Final)");
 insert into os_list values (NULL, "WINNT 6.1 x64");
-insert into os_list values (NULL, "Android 2.2");
+insert into os_list values (NULL, "Android 2.2 (Native)");
 insert into os_list values (NULL, "MacOSX 10.6 (rev4)");
 insert into os_list values (NULL, "MacOSX 10.7");
-insert into os_list values (NULL, "Android 2.2 (Native)");
+insert into os_list values (NULL, "Android 2.2");
 
 insert into branches values (NULL,"Firefox");
 insert into branches values (NULL,"Firefox-Release");
@@ -2578,3 +2578,7 @@ insert into tests values (NULL,"tsvg_opacity.2_nochrome","SVG, Opacity 2 NoChrom
 insert into tests values (NULL,"v8.2_paint","V8 2 MozAfterPaint",1,1,10);
 insert into tests values (NULL,"v8.2_nochrome_paint","V8 2 NoChrome MozAfterPaint",1,1,10);
 -- note: no gfx or dromaeo in the .2 list, tp5 is mentioned as tp5r for rss and tp5.2 would look odd.
+
+insert into tests values (NULL,"trobopan","Robocop Pan Benchmark",1,1,NULL);
+insert into tests values (NULL,"tcheckerboard","Robocop Checkerboarding Benchmark",1,1,NULL);
+
