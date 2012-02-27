@@ -402,10 +402,13 @@
 
     var buttonHtmlGenerator = function(repository) {
         var text = 'Changesets';
-        if (repository)
+        if (repository) {
             text += ' for ' + repository;
-        return '<a class="button disabled" -data-repository="' + repository +
-               '" href="#">' + text + '</a>';
+            return '<a class="button disabled" -data-repository="' +
+                   repository + '" href="#">' + text + '</a>';
+        } else {
+            return '<a class="button disabled" href="#">' + text + '</a>';
+        }
     }
     var buttons = '';
     if (window.REPOSITORIES && window.DEFAULT_REPOSITORY) {
