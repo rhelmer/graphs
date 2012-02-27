@@ -507,7 +507,7 @@ function updateTooltip(item)
     if (additionalChangesets) {
         changesetLink = window.DEFAULT_REPOSITORY + ': ' + changesetLink;
         var sets = '';
-        $.each(additionalChangesets, function (name, value) {
+        $.each(additionalChangesets, function(name, value) {
             sets += '<a href="' + urlForChangeset(branch, value, name) +
                     '">' + name + ': ' + value + '</a>';
         });

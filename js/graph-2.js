@@ -400,7 +400,7 @@
         });
     }
 
-    var buttonHtmlGenerator = function (repository) {
+    var buttonHtmlGenerator = function(repository) {
         var text = 'Changesets';
         if (repository)
             text += ' for ' + repository;
@@ -409,7 +409,7 @@
     }
     var buttons = '';
     if (window.REPOSITORIES && window.DEFAULT_REPOSITORY) {
-        $.map(REPOSITORIES, function (repository) {
+        $.map(REPOSITORIES, function(repository) {
             buttons += buttonHtmlGenerator(repository);
         });
     } else {
@@ -437,8 +437,8 @@
                     var from = parseInt(range.from);
                     var to = parseInt(range.to);
                     if (time >= from && time <= to) {
-                        if (repository
-                            && repository != window.DEFAULT_REPOSITORY) {
+                        if (repository &&
+                            repository != window.DEFAULT_REPOSITORY) {
                             var sets = data.additionalChangesets;
                             if (sets)
                                 csets.push(sets[repository]);
