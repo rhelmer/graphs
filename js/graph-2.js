@@ -182,7 +182,7 @@
             $('#displayrange').toggleClass('disabled', true);
             $('#datatype').toggleClass('disabled', true);
             $('#zoomin').toggleClass('disabled', true);
-            $('#showchangesets').toggleClass('disabled', true);
+            $('#changeset-buttons .button').toggleClass('disabled', true);
             $('#exportcsv').toggleClass('disabled', true);
             $('#chart-link').toggleClass('disabled', true);
             $('#chart-embed').toggleClass('disabled', true);
@@ -400,8 +400,27 @@
         });
     }
 
-    $('#showchangesets').click(function(e) {
+    var buttonHtmlGenerator = function (repository) {
+        var text = 'Changesets';
+        if (repository)
+            text += ' for ' + repository;
+        return '<a class="button disabled" -data-repository="' + repository +
+               '" href="#">' + text + '</a>';
+    }
+    var buttons = '';
+    if (window.REPOSITORIES && window.DEFAULT_REPOSITORY) {
+        $.map(REPOSITORIES, function (repository) {
+            buttons += buttonHtmlGenerator(repository);
+        });
+    } else {
+        buttons = buttonHtmlGenerator();
+    }
+    $('#changeset-buttons').html(buttons);
+
+    $('#changeset-buttons .button').click(function(e) {
         e.preventDefault();
+
+        var repository = $(this).attr('-data-repository');
 
         // find changes which match this range
         var csets = [];
@@ -418,7 +437,14 @@
                     var from = parseInt(range.from);
                     var to = parseInt(range.to);
                     if (time >= from && time <= to) {
-                        csets.push(data.changeset);
+                        if (repository
+                            && repository != window.DEFAULT_REPOSITORY) {
+                            var sets = data.additionalChangesets;
+                            if (sets)
+                                csets.push(sets[repository]);
+                        } else {
+                            csets.push(data.changeset);
+                        }
                     }
                 });
             });
@@ -429,7 +455,8 @@
         }
         $.each(branches, function() {
             var branch = this;
-            window.open(urlForChangesetList(branch, csets));
+            if (csets.length)
+                window.open(urlForChangesetList(branch, csets, repository));
         });
     });
 
@@ -558,7 +585,7 @@
             $('#displayrange').toggleClass('disabled', false);
             $('#datatype').toggleClass('disabled', false);
             $('#zoomin').toggleClass('disabled', false);
-            $('#showchangesets').toggleClass('disabled', false);
+            $('#changeset-buttons .button').toggleClass('disabled', false);
             // TODO fix server
             //$('#exportcsv').toggleClass('disabled', false);
             $('#chart-link').toggleClass('disabled', false);
@@ -569,8 +596,6 @@
         }
         return node;
     }
-
-
 
     $('#chart-link').click(function() {
         $('#link-overlay').showBubble(this);

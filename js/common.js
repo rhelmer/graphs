@@ -160,6 +160,7 @@ function convertData(testName, branchName, platformName, data)
         var annotations = run[7];
         var machineid = run[6];
         var changeset = run[1][2];
+        var additionalChangesets = run[1][3];
         // graphserver gives us seconds, flot wants ms
         // FIXME should support other unit names
         var t = run[2] * 1000;
@@ -176,7 +177,9 @@ function convertData(testName, branchName, platformName, data)
             current_run['h'] = annotations['max'];
             gdata['hasStatistics'] = true;
         }
-
+        if (additionalChangesets) {
+            current_run['additionalChangesets'] = additionalChangesets;
+        }
 
         if (changeset in averages) {
             gdata.mean.push(current_run);
@@ -228,7 +231,9 @@ function parseSeries(seriesIn, i, weight, explodedWeight)
                 test: seriesIn.test,
                 platform: seriesIn.platform,
                 machine: d.machine,
-                changesets: $.map(d.data, function(p) {return p.changeset;})
+                changesets: $.map(d.data, function(p) {return p.changeset;}),
+                additionalChangesets: $.map(d.data, function(p) {
+                    return p['additionalChangesets']; })
             }
         };
         if (seriesIn.hasStatistics) {
@@ -479,7 +484,8 @@ function updateTooltip(item)
         v0 = i ? s.data[i - 1][1] : v,
         dv = v - v0,
         dvp = v / v0 - 1,
-        changeset = etc.changesets[item.dataIndex];
+        changeset = etc.changesets[item.dataIndex],
+        additionalChangesets = etc.additionalChangesets[item.dataIndex];
 
     $('#tt-series').html(test + ' (' + branch + ')');
     $('#tt-series2').html(platform + ' (' + machine + ')');
@@ -497,8 +503,22 @@ function updateTooltip(item)
     } else {
         error('Unknown datatype');
     }
-    $('#tt-cset').html(changeset).attr('href',
-                                       urlForChangeset(branch, changeset));
+    var changesetLink = changeset;
+    if (additionalChangesets) {
+        changesetLink = window.DEFAULT_REPOSITORY + ': ' + changesetLink;
+        var sets = '';
+        $.each(additionalChangesets, function (name, value) {
+            sets += '<a href="' + urlForChangeset(branch, value, name) +
+                    '">' + name + ': ' + value + '</a>';
+        });
+        $('#tt-scsets').html(sets);
+        $('#tt-scsets').show();
+    } else
+        $('#tt-scsets').hide();
+
+    var changesetUrl = urlForChangeset(branch, changeset,
+                       window.DEFAULT_REPOSITORY);
+    $('#tt-cset').html(changesetLink).attr('href', changesetUrl);
     $('#tt-t').html($.plot.formatDate(new Date(t), '%b %d, %y %H:%M'));
 
     plot.unhighlight();
