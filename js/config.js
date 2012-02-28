@@ -94,6 +94,20 @@ function urlForChangesetList(branch, csets)
                              csets.join('&changeset=');
 }
 
+/* Graph sever supports the concept of supplementary/additional changesets.
+ * In WebKit, test runs on Chromium port need to port both WebKit and Chromium
+ * revisions, and Chromium revision is reported as a supplementary changeset.
+ *
+ * To use this feature, define REPOSITORIES and DEFAULT_REPOSITORY here.
+ * var REPOSITORIES = ['WebKit', 'Chromium'];
+ * var DEFAULT_REPOSITORY = 'WebKit';
+ *
+ * The backend then needs to include a dictionary of repository names and
+ * revisions for each run.
+ * e.g. [1,[2,20110414135927,"abcdef012345", {"Chromium": 123}],...]
+ * instead of [1,[2,20110414135927,"abcdef012345"],...].
+ */
+
 // FIXME move this back to dashboard.js once the bug 718925 is fixed
 function fetchDashboardManifest(callback)
 {
