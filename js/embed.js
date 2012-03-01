@@ -9,9 +9,9 @@
     var menu;
     var downloadingManifest = false;
     var loadSeries = [];
-    var onPlotHoverFunction = onPlotHover;
-    var onPlotClickFunction = onPlotClick;
-    var onPlotSelectFunction = onPlotSelect;
+    var onPlotHoverFunction = GraphCommon.onPlotHover;
+    var onPlotClickFunction = GraphCommon.onPlotClick;
+    var onPlotSelectFunction = GraphCommon.onPlotSelect;
 
     function init()
     {
@@ -19,8 +19,6 @@
         var args = getUrlVars();
         var tests = args['tests'];
         sel = args['sel'] ? args['sel'] : 'none';
-        displayDays = args['displayrange'] ? args['displayrange'] : displayDays;
-        datatype = args['datatype'] ? args['datatype'] : 'running';
         if (args['transparent']) {
             $(document.body).css('background', 'transparent');
         }
@@ -41,7 +39,8 @@
                 error('Could not understand URL', e);
                 return false;
             }
-            if (!confirmTooMuchData(tests.length, MAX_GRAPHS, 'data series')) {
+            if (!GraphCommon.confirmTooMuchData(tests.length, MAX_GRAPHS,
+                                                'data series')) {
                 return false;
             }
 
@@ -61,17 +60,7 @@
 
     function initPlot()
     {
-        plot = $.plot($('#plot'), [], PLOT_OPTIONS);
-    }
-
-    function initData(testid, branchid, platformid, data)
-    {
-        var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
-                           platformid;
-        ajaxSeries = data;
-        ajaxSeries.exploded = false;
-        ajaxSeries.visible = true;
-        allSeries[uniqueSeries] = ajaxSeries;
+        GraphCommon.plot = $.plot($('#plot'), [], PLOT_OPTIONS);
     }
 
     function updateBindings()
@@ -88,8 +77,8 @@
     function fetchData(testid, branchid, platformid, sel) {
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
-        if (allSeries.hasOwnProperty(uniqueSeries)) {
-            if (!$.isEmptyObject(allSeries[uniqueSeries])) {
+        if (GraphCommon.allSeries.hasOwnProperty(uniqueSeries)) {
+            if (!$.isEmptyObject(GraphCommon.allSeries[uniqueSeries])) {
                 // already have this loaded, don't bother
                 return false;
             }
@@ -123,13 +112,14 @@
                 var testName = manifest.testMap[testid].name;
                 var branchName = manifest.branchMap[branchid].name;
                 var platformName = manifest.platformMap[platformid].name;
-                data = convertData(testName, branchName, platformName, data);
+                data = GraphCommon.convertData(testName, branchName,
+                                               platformName, data);
                 if (!data) {
                     error('Could not import test run data', false, data);
                     return false;
                 }
-                initData(testid, branchid, platformid, data);
-                updatePlot();
+                GraphCommon.initData(testid, branchid, platformid, data);
+                GraphCommon.updatePlot();
                 addSeries(testid, branchid, platformid, addSeriesNode);
 
                 updateBindings();
