@@ -91,12 +91,12 @@ class MetaDataFromTalos(object):
       databaseCursor.connection.rollback()
       raise DatabaseException("No machine_name called '%s' can be found" % self.machine_name)
     # get os_id
-    #try:
-      #databaseCursor.execute("select os_id from machines where id = %s", (self.machine_id,))
-      #self.os_id = databaseCursor.fetchall()[0][0]
-    #except (self.databaseModule.Error, IndexError), x:
-      #databaseCursor.connection.rollback()
-      #raise DatabaseException("No os_id for a machine_id '%s' can be found" % self.machine_id)
+    try:
+      databaseCursor.execute("select os_id from machines where id = %s", (self.machine_id,))
+      self.os_id = databaseCursor.fetchall()[0][0]
+    except (self.databaseModule.Error, IndexError), x:
+      databaseCursor.connection.rollback()
+      raise DatabaseException("No os_id for a machine_id '%s' can be found" % self.machine_id)
     # get test_id
     try:
       databaseCursor.execute("select id from tests where name = %s", (self.test_name,))
@@ -238,7 +238,7 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
     databaseModule = sys.modules[databaseConnection.__module__.split('.')[0]]
 
   exitCode = None
-  responseList = ["Content-type: text/plain\n"]
+  responseList = []
 
   try:
     theForm = req.POST
@@ -272,7 +272,7 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
         responseList.append("""RETURN\t%s\tgraph.html#type=series&tests=[{"test":%d,"branch":%d,"machine":%d,"testrun":%d}]""" % (metadata.test_name, metadata.test_id, metadata.branch_id, metadata.machine_id, metadata.test_run_id))
       else:
         average = averageReader(databaseCursor, databaseModule, inputStream, metadata)
-      responseList.append("""RETURN\t%s\t%.2f\tgraph.html#tests=[{"test":%d,"branch":%d,"machine":%d}]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.machine_id))
+      responseList.append("""RETURN\t%s\t%.2f\tgraph.html#tests=[[%d,%d,%d]]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.os_id))
 
   except Exception, x:
     responseList.append(str(x))
@@ -282,5 +282,5 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
   for aResponseLine in responseList:
     print >>outputStream, aResponseLine
 
-  responseText = '\n'.join(responseList)
+  responseText = '\n'.join(responseList) + '\n'
   return (responseText, exitCode)
