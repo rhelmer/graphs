@@ -269,7 +269,7 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
       metadata = MetaDataFromTalos(databaseCursor, databaseModule, inputStream)
       if dataSetType == 'VALUES':
         average = valuesReader(databaseCursor, databaseModule, inputStream, metadata)
-        responseList.append("""RETURN\t%s\tgraph.html#type=series&tests=[{"test":%d,"branch":%d,"machine":%d,"testrun":%d}]""" % (metadata.test_name, metadata.test_id, metadata.branch_id, metadata.machine_id, metadata.test_run_id))
+        responseList.append("""RETURN\t%s\tgraph.html#tests=[[%d,%d,%d]]""" % (metadata.test_name, metadata.test_id, metadata.branch_id, metadata.os_id))
       else:
         average = averageReader(databaseCursor, databaseModule, inputStream, metadata)
       responseList.append("""RETURN\t%s\t%.2f\tgraph.html#tests=[[%d,%d,%d]]""" % (metadata.test_name, average, metadata.test_id, metadata.branch_id, metadata.os_id))
