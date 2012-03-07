@@ -124,7 +124,7 @@ $.fn.hideBubble = function(anchor) {
 };
 
 // FIXME perhaps graphserver should send us data in this format instead
-function convertData(testName, branchName, platformName, data)
+function convertData(testName, branchName, platformName, data, displayDays)
 {
     var gdata =
     {
