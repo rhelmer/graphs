@@ -241,7 +241,7 @@ def handleRequest(req, databaseConnection, databaseModule=None, outputStream=sys
   responseList = []
 
   try:
-    if not theForm:
+    if req.method != 'POST':
       return ('Nothing to see here, use POST to send data\n', exitCode)
     theForm = req.POST
     if "filename" not in theForm:
