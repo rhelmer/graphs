@@ -1,50 +1,15 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+var displayDays = 7;
+var datatype = 'running';
+var branch, platform, test;
 
-//  http://jquery-howto.blogspot.com/2009/09/get-url-parameters-values-with-jquery.html
-function getUrlVars()
-{
-    var vars = [], hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf('#') +
-                                            1).split('&');
-    for (var i = 0; i < hashes.length; i++)
-    {
-        hash = hashes[i].split('=');
-        vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
-    }
-    return vars;
-}
-
-var GraphCommon = (function() {
-    var args = getUrlVars();
-    return {
-        displayDays: args['displayrange'] ? args['displayrange'] : 7,
-        datatype: args['datatype'] ? args['datatype'] : 'running',
-        zoomFrom: null,
-        zoomTo: null,
-        plot: null,
-        overview: null,
-        ajaxSeries: null,
-        prevSeriesIndex: -1,
-        prevDataIndex: -1,
-        allSeries: {}
-    };
-})();
-
-GraphCommon.daysInMicroseconds = function(days) {
-    return 86400000 * days;
-};
-
-GraphCommon.displayDaysInMicroseconds = function() {
-    return this.daysInMicroseconds(GraphCommon.displayDays);
-};
-
-GraphCommon.clearZoom = function() {
-    this.zoomFrom = null;
-    this.zoomTo = null;
-};
+var _zoomFrom, _zoomTo;
+var plot, overview, ajaxSeries;
+var prevSeriesIndex = -1,
+    prevDataIndex = -1;
+var allSeries = {};
 
 function debug(message)
 {
@@ -93,8 +58,11 @@ $.fn.selectBox = function() {
         var select = $(this);
         // FIXME need to pay attention to name here
         $('option', this).each(function() {
-            if (GraphCommon.displayDays == $(this).val() ||
-                GraphCommon.datatype == $(this).val()) {
+            if ((displayDays == $(this).val()) ||
+                (datatype == $(this).val()) ||
+                (branch == $(this).val()) ||
+                (platform == $(this).val()) ||
+                (test == $(this).val())) {
                     select.val($(this).val());
             }
         });
@@ -156,8 +124,7 @@ $.fn.hideBubble = function(anchor) {
 };
 
 // FIXME perhaps graphserver should send us data in this format instead
-GraphCommon.convertData = function(testName, branchName, platformName, data,
-                                   displayDays)
+function convertData(testName, branchName, platformName, data)
 {
     var gdata =
     {
@@ -178,10 +145,7 @@ GraphCommon.convertData = function(testName, branchName, platformName, data,
     var test_runs = data['test_runs'];
     var averages = data['averages'];
 
-    var displayDaysInMicroseconds = displayDays ?
-                                    this.daysInMicroseconds(displayDays) :
-                                    this.displayDaysInMicroseconds();
-    gdata.minT = new Date().getTime() - displayDaysInMicroseconds;
+    gdata.minT = new Date().getTime() - (DAY * displayDays);
     gdata.maxT = new Date().getTime();
     gdata.minV = data['min'];
     gdata.maxV = data['max'];
@@ -240,9 +204,9 @@ GraphCommon.convertData = function(testName, branchName, platformName, data,
     }
 
     return gdata;
-};
+}
 
-GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
+function parseSeries(seriesIn, i, weight, explodedWeight)
 {
     var color = COLORS[i % COLORS.length];
     var datasets = [{ id: 'graph' + i, data: seriesIn.mean }];
@@ -293,9 +257,24 @@ GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
         plots.push(plot);
     });
     return plots;
-};
+}
 
-GraphCommon.confirmTooMuchData = function(count, suggested, name)
+//  http://jquery-howto.blogspot.com/2009/09/get-url-parameters-values-with-jquery.html
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('#') +
+                                            1).split('&');
+    for (var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
+
+function confirmTooMuchData(count, suggested, name)
 {
     if (count > suggested) {
         var msg = 'WARNING: You are about to load ' + count +
@@ -306,9 +285,8 @@ GraphCommon.confirmTooMuchData = function(count, suggested, name)
         return window.confirm(msg);
     }
     return true;
-};
-
-GraphCommon.deltaPlot = function(plot)
+}
+function deltaPlot(plot)
 {
     var newPlot = [];
     var previous;
@@ -319,9 +297,9 @@ GraphCommon.deltaPlot = function(plot)
        var elapsed = $(this)[1];
        var newV;
        if (previous) {
-           if (GraphCommon.datatype == 'delta') {
+           if (datatype == 'delta') {
                newV = (elapsed - previous);
-           } else if (GraphCommon.datatype == 'deltapercent') {
+           } else if (datatype == 'deltapercent') {
                newV = (((elapsed / previous) - 1) * 100);
            } else {
                error('Unknown datatype');
@@ -335,26 +313,25 @@ GraphCommon.deltaPlot = function(plot)
     });
     plot.data = newPlot;
     return plot;
-};
-
-GraphCommon.getZoomRange = function()
+}
+function getZoomRange()
 {
     return {
-        from: GraphCommon.zoomFrom || GraphCommon.ajaxSeries.minT,
-        to: GraphCommon.zoomTo || GraphCommon.ajaxSeries.maxT
+        from: _zoomFrom || ajaxSeries.minT,
+        to: _zoomTo || ajaxSeries.maxT
     };
-};
+}
 
-GraphCommon.getPlotRange = function()
+function getPlotRange()
 {
-    var sel = this.plot.getSelection();
+    var sel = plot.getSelection();
     var range;
 
     if (sel && sel.xaxis) {
         range = sel.xaxis;
-        this.plot.clearSelection(true);
+        plot.clearSelection(true);
     } else {
-        var oldRange = this.getZoomRange();
+        var oldRange = getZoomRange();
         range = {
             from: oldRange.from + (oldRange.to - oldRange.from) / 4,
             to: oldRange.from + 3 * (oldRange.to - oldRange.from) / 4
@@ -362,18 +339,18 @@ GraphCommon.getPlotRange = function()
     }
 
     return range;
-};
+}
 
-GraphCommon.zoomIn = function()
+function zoomIn()
 {
-    var range = this.getPlotRange();
-    this.zoomToRange(range);
+    var range = getPlotRange();
+    zoomTo(range);
     updateLocation();
-};
+}
 
-GraphCommon.zoomOut = function()
+function zoomOut()
 {
-    var oldRange = this.getZoomRange();
+    var oldRange = getZoomRange();
 
     var range = {
         from: oldRange.from - (oldRange.to - oldRange.from) / 2,
@@ -381,116 +358,115 @@ GraphCommon.zoomOut = function()
     };
 
     var dt = 0;
-    if (range.from < this.ajaxSeries.minT) {
+    if (range.from < ajaxSeries.minT) {
         dt = ajaxSeries.minT - range.from;
-    } else if (range.to > this.ajaxSeries.maxT) {
-        dt = this.ajaxSeries.maxT - range.to;
+    } else if (range.to > ajaxSeries.maxT) {
+        dt = ajaxSeries.maxT - range.to;
     }
 
-    range.from = Math.max(range.from + dt, this.ajaxSeries.minT);
-    range.to = Math.min(range.to + dt, this.ajaxSeries.maxT);
+    range.from = Math.max(range.from + dt, ajaxSeries.minT);
+    range.to = Math.min(range.to + dt, ajaxSeries.maxT);
 
-    this.zoomToRange(range);
+    zoomTo(range);
     updateLocation();
-};
+}
 
-GraphCommon.zoomToRange = function(range)
+function zoomTo(range)
 {
-    this.zoomFrom = (range && range.from) || this.ajaxSeries.minT;
-    this.zoomTo = (range && range.to) || this.ajaxSeries.maxT;
+    _zoomFrom = (range && range.from) || ajaxSeries.minT;
+    _zoomTo = (range && range.to) || ajaxSeries.maxT;
 
-    this.unlockTooltip();
-    this.hideTooltip(true);
-    this.updatePlot();
+    unlockTooltip();
+    hideTooltip(true);
+    updatePlot();
 
-    if (this.ajaxSeries.minT < this.zoomFrom ||
-        this.zoomTo < this.ajaxSeries.maxT) {
-        this.overview.setSelection({xaxis: { from: this.zoomFrom,
-                                             to: this.zoomTo }}, true);
+    if (ajaxSeries.minT < _zoomFrom || _zoomTo < ajaxSeries.maxT) {
+        overview.setSelection({ xaxis: { from: _zoomFrom,
+                                         to: _zoomTo } }, true);
         var canZoomOut = true;
     } else {
-        this.overview.clearSelection(true);
+        overview.clearSelection(true);
         var canZoomOut = false;
     }
 
     $('#zoomout').toggleClass('disabled', !canZoomOut);
-};
-
-GraphCommon.onPlotHover = function(e, pos, item)
+}
+function onPlotHover(e, pos, item)
 {
     $('#plot').css({ cursor: item ? 'pointer' : 'crosshair' });
 
     if (item && item.series.etc) {
-        if (item.seriesIndex != GraphCommon.prevSeriesIndex ||
-            item.dataIndex != GraphCommon.prevDataIndex) {
+        if (item.seriesIndex != prevSeriesIndex ||
+            item.dataIndex != prevDataIndex) {
 
-            GraphCommon.updateTooltip(item);
-            GraphCommon.showTooltip(item.pageX, item.pageY);
-            GraphCommon.prevSeriesIndex = item.seriesIndex;
-            GraphCommon.prevDataIndex = item.dataIndex;
+            updateTooltip(item);
+            showTooltip(item.pageX, item.pageY);
+            prevSeriesIndex = item.seriesIndex;
+            prevDataIndex = item.dataIndex;
         }
     } else {
-        GraphCommon.hideTooltip();
-        GraphCommon.prevSeriesIndex = -1;
-        GraphCommon.prevDataIndex = -1;
+        hideTooltip();
+        prevSeriesIndex = -1;
+        prevDataIndex = -1;
     }
-};
+}
 
-GraphCommon.onPlotClick = function(e, pos, item)
+function onPlotClick(e, pos, item)
 {
-    GraphCommon.unlockTooltip();
+    unlockTooltip();
 
     if (item && item.series.etc) {
-        GraphCommon.updateTooltip(item);
-        GraphCommon.showTooltip(item.pageX, item.pageY);
-        GraphCommon.lockTooltip();
+        updateTooltip(item);
+        showTooltip(item.pageX, item.pageY);
+        lockTooltip();
     } else {
-        GraphCommon.hideTooltip(true);
+        hideTooltip(true);
     }
-};
+}
 
-GraphCommon.onPlotSelect = function(e, ranges)
+function onPlotSelect(e, ranges)
 {
-    GraphCommon.zoomFrom = ranges.xaxis.from;
-    GraphCommon.zoomTo = ranges.xaxis.to;
-};
+    _zoomFrom = ranges.xaxis.from;
+    _zoomTo = ranges.xaxis.to;
+}
 
-GraphCommon.onPlotUnSelect = function(e, ranges)
+function onPlotUnSelect(e, ranges)
 {
-    GraphCommon.clearZoom();
-};
+    _zoomFrom = null;
+    _zoomTo = null;
+}
 
-GraphCommon.onOverviewSelect = function(e, ranges)
+function onOverviewSelect(e, ranges)
 {
-    GraphCommon.plot.clearSelection(true);
-    GraphCommon.zoomToRange(ranges.xaxis);
+    plot.clearSelection(true);
+    zoomTo(ranges.xaxis);
     updateLocation();
-};
+}
 
-GraphCommon.onOverviewUnselect = function(e)
+function onOverviewUnselect(e)
 {
-    GraphCommon.zoomToRange(null);
-    GraphCommon.clearZoom();
+    zoomTo(null);
+    _zoomFrom = null;
+    _zoomTo = null;
     updateLocation();
-};
+}
 
-// FIXME: This variable should be defined in a closure.
 var resizeTimer = null;
 
-GraphCommon.onResize = function() {
+function onResize()
+{
     if (!resizeTimer) {
         resizeTimer = setTimeout(function() {
-            GraphCommon.updatePlot();
+            updatePlot();
             resizeTimer = null;
         }, 50);
     }
-};
+}
 
-// FIXME: These variables should be defined in a closure.
 var ttHideTimer = null,
     ttLocked = false;
 
-GraphCommon.updateTooltip = function(item)
+function updateTooltip(item)
 {
     if (ttLocked || !item.series.etc) return;
 
@@ -513,15 +489,15 @@ GraphCommon.updateTooltip = function(item)
 
     $('#tt-series').html(test + ' (' + branch + ')');
     $('#tt-series2').html(platform + ' (' + machine + ')');
-    if (this.datatype == 'running') {
+    if (datatype == 'running') {
         // FIXME should support unit names
         $('#tt-v').html(parseInt(v));
         $('#tt-dv').html('&Delta; ' + dv.toFixed(0) +
                          ' (' + (100 * dvp).toFixed(1) + '%)');
-    } else if (this.datatype == 'delta') {
+    } else if (datatype == 'delta') {
         $('#tt-v').html('&Delta; ' + v.toFixed(3));
         $('#tt-dv').html('');
-    } else if (this.datatype == 'deltapercent') {
+    } else if (datatype == 'deltapercent') {
         $('#tt-v').html('&Delta; ' + v.toFixed(3) + '%');
         $('#tt-dv').html('');
     } else {
@@ -545,11 +521,11 @@ GraphCommon.updateTooltip = function(item)
     $('#tt-cset').html(changesetLink).attr('href', changesetUrl);
     $('#tt-t').html($.plot.formatDate(new Date(t), '%b %d, %y %H:%M'));
 
-    this.plot.unhighlight();
-    this.plot.highlight(s, item.datapoint);
-};
+    plot.unhighlight();
+    plot.highlight(s, item.datapoint);
+}
 
-GraphCommon.showTooltip = function(x, y)
+function showTooltip(x, y)
 {
     if (ttLocked) return;
 
@@ -573,46 +549,38 @@ GraphCommon.showTooltip = function(x, y)
     } else {
         tip.css({ opacity: 1, left: left, top: top });
     }
-};
+}
 
-GraphCommon.hideTooltip = function(now)
+function hideTooltip(now)
 {
     if (ttLocked) return;
 
     if (!ttHideTimer) {
         ttHideTimer = setTimeout(function() {
             ttHideTimer = null;
-            GraphCommon.plot.unhighlight();
+            plot.unhighlight();
             $('#tooltip').animate({ opacity: 0, top: '+=10' },
                                     250, 'linear', function() {
                 $(this).css({ visibility: 'hidden' });
             });
         }, now ? 0 : 250);
     }
-};
+}
 
-GraphCommon.lockTooltip = function() {
+function lockTooltip() {
     ttLocked = true;
     $('#tooltip').addClass('locked');
     $('#tt-help').html('');
-};
-
-GraphCommon.unlockTooltip = function() {
+}
+function unlockTooltip() {
     ttLocked = false;
     $('#tooltip').removeClass('locked');
     $('#tt-help').html('Click to lock');
-};
+}
 
-GraphCommon.initData = function(testid, branchid, platformid, data)
-{
-    var uniqueSeries = 'series_' + testid + '_' + branchid + '_' + platformid;
-    this.ajaxSeries = data;
-    this.ajaxSeries.exploded = false;
-    this.ajaxSeries.visible = true;
-    this.allSeries[uniqueSeries] = GraphCommon.ajaxSeries;
-};
+function isTooltipLocked() { return ttLocked; }
 
-GraphCommon.updatePlot = function()
+function updatePlot()
 {
     var plotData = [];
     var overviewData = [];
@@ -621,22 +589,22 @@ GraphCommon.updatePlot = function()
         marginV = 0,
         minV = 0;
     var count = 0;
-    $.each(this.allSeries, function(index, series) {
+    $.each(allSeries, function(index, series) {
         if ($.isEmptyObject(series)) {
             // purposely deleted, keep colors consistent
             count++;
             return true;
         }
-        GraphCommon.allSeries[index].count = count;
+        allSeries[index].count = count;
 
-        var allPlots = GraphCommon.parseSeries(series, count, 3, 1);
+        var allPlots = parseSeries(series, count, 3, 1);
         for (var i = 0; i < allPlots.length; i++) {
             var plot = allPlots[i];
             if (!series.visible) {
                 delete(plot.data);
             }
-            if (GraphCommon.datatype != 'running') {
-                plot = GraphCommon.deltaPlot(plot);
+            if (datatype != 'running') {
+                plot = deltaPlot(plot);
                 maxV = plot.maxV > maxV ? plot.maxV : maxV;
                 minV = plot.minV < minV ? plot.minV : minV;
             } else {
@@ -646,11 +614,11 @@ GraphCommon.updatePlot = function()
             plotData.push(plot);
         }
 
-        var allOverviews = GraphCommon.parseSeries(series, count, 1, .5);
+        var allOverviews = parseSeries(series, count, 1, .5);
         for (var i = 0; i < allOverviews.length; i++) {
             var overview = allOverviews[i];
-            if (GraphCommon.datatype != 'running') {
-                overview = GraphCommon.deltaPlot(overview);
+            if (datatype != 'running') {
+                overview = deltaPlot(overview);
             }
             overviewData.push(overview);
         }
@@ -658,29 +626,26 @@ GraphCommon.updatePlot = function()
         count++;
 
         marginV = 0.1 * (maxV - minV);
-        minT = GraphCommon.zoomFrom ||
-               (minT < series.minT ? minT : series.minT);
-        maxT = GraphCommon.zoomTo || (maxT > series.maxT ? maxT : series.maxT);
+        minT = _zoomFrom || (minT < series.minT ? minT : series.minT);
+        maxT = _zoomTo || (maxT > series.maxT ? maxT : series.maxT);
 
-        var displayDays = GraphCommon.displayDaysInMicroseconds();
         var xaxis = { xaxis: { min: minT, max: maxT } },
             yaxis = { yaxis: { min: minV, max: maxV + marginV } };
-        var overview_xaxis = { xaxis: { min: new Date() - displayDays,
+        var overview_xaxis = { xaxis: { min: new Date() -
+                                             (DAY * displayDays),
                                         max: new Date() } };
         plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
         overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS,
                                    overview_xaxis, yaxis);
     });
-    this.unlockTooltip();
-    this.hideTooltip(true);
-    this.plot = $.plot($('#plot'), plotData, plotOptions);
+    unlockTooltip();
+    hideTooltip(true);
+    plot = $.plot($('#plot'), plotData, plotOptions);
     if ($('#overview').length > 0) {
-        this.overview = $.plot($('#overview'), overviewData, overviewOptions);
+        overview = $.plot($('#overview'), overviewData, overviewOptions);
     }
-};
+}
 
-// FIXME: This function should be moved to graph.html since it's not used
-// elsewhere but methods on GraphCommon call this function.
 function updateLocation() {
     var hash = window.location.hash.split('=');
     var url = hash[0];
@@ -688,7 +653,7 @@ function updateLocation() {
         url += '#tests';
     }
     args = [];
-    $.each(GraphCommon.allSeries, function(index, series) {
+    $.each(allSeries, function(index, series) {
         if ($.isEmptyObject(series)) {
             return true;
         }
@@ -701,9 +666,9 @@ function updateLocation() {
 
     var newLocation = url + '=' + JSON.stringify(args);
 
-    if (GraphCommon.zoomFrom && GraphCommon.zoomTo) {
-        newLocation += '&sel=' + GraphCommon.zoomFrom + ',' +
-        GraphCommon.zoomTo;
+    if (_zoomFrom && _zoomTo) {
+        newLocation += '&sel=' + _zoomFrom +
+                       ',' + _zoomTo;
     } else {
         newLocation += '&sel=none';
     }
@@ -713,10 +678,10 @@ function updateLocation() {
     window.location = newLocation;
 }
 
-GraphCommon.iframeMarkupForEmbeddedChart = function(width, height, hash)
+function iframeMarkupForEmbeddedChart(width, height, hash)
 {
     var href = window.location.href;
     var url = href.substring(0, href.lastIndexOf('/')) + '/embed.html' + hash;
     return '<iframe type="text/html" width="' + width + '" height="' + height +
            '" src="' + url + '&notooltips=true" frameborder="0"</iframe>';
-};
+}

@@ -31,8 +31,8 @@ var Common = {};
 
     commonJs = fs.readFileSync(__dirname + '/../js/common.js', 'utf8');
     eval(commonJs);
-    Common.convertData = GraphCommon.convertData;
-    Common.parseSeries = GraphCommon.parseSeries;
+    Common.convertData = convertData;
+    Common.parseSeries = parseSeries;
 })();
 
 /** attach fake canvas to window */
