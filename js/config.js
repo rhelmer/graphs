@@ -123,7 +123,7 @@ function fetchDashboardManifest(callback)
         'testToId': {
         'Ts': 83,
         'Tp': 139,
-        'SunSpider': 152
+        'SunSpider': 162
         }
     });
 }
