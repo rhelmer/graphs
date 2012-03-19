@@ -2648,3 +2648,31 @@ insert into tests values (NULL,"v8.2_nochrome_paint","V8 2 NoChrome MozAfterPain
 insert into tests values (NULL,"trobopan","Robocop Pan Benchmark",1,1,NULL);
 insert into tests values (NULL,"tcheckerboard","Robocop Checkerboarding Benchmark",1,1,NULL);
 
+
+-- row major testing updates
+insert into tests values (NULL,"tp5row_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint",0,1,15);
+insert into tests values (NULL,"tp5row_paint","Tp5 Row Major MozAfterPaint",1,1,15);
+insert into tests values (NULL,"tp5row_pbytes_paint", "Tp5 Row Major MozAfterPaint (Private Bytes)",1,1,NULL);
+insert into tests values (NULL,"tp5row_pbytes_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint (Private Bytes)",0,1,NULL);
+insert into tests values (NULL,"tp5row_rss_paint","Tp5 Row Major MozAfterPaint (RSS)",1,1,NULL);
+insert into tests values (NULL,"tp5row_rss_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint (RSS)",0,1,NULL);
+insert into tests values (NULL,"tp5row_main_rss_paint","Tp5 Row Major MozAfterPaint (Main RSS)",1,1,NULL);
+insert into tests values (NULL,"tp5row_content_rss_paint","Tp5 Row Major MozAfterPaint (Content RSS)",1,1,NULL);
+insert into tests values (NULL,"tp5row_main_rss_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint (Main RSS)",0,1,NULL);
+insert into tests values (NULL,"tp5row_content_rss_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint (Content RSS)",0,1,NULL);
+insert into tests values (NULL,"tp5row_xres_paint","Tp5 Row Major MozAfterPaint (XRes)",1,1,NULL);
+insert into tests values (NULL,"tp5row_xres_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint (XRes)",0,1,NULL);
+insert into tests values (NULL,"tp5row_%cpu_paint","Tp5 Row Major MozAfterPaint (%CPU)",1,1,NULL);
+insert into tests values (NULL,"tp5row_%cpu_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint (%CPU)",0,1,NULL);
+insert into tests values (NULL,"tp5row_memset_paint","Tp5 Row Major MozAfterPaint (Memset)",1,1,NULL);
+insert into tests values (NULL,"tp5row_memset_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint (Memset)",0,1,NULL);
+insert into tests values (NULL,"tp5row_modlistbytes_paint","Tp5 Row Major MozAfterPaint (Modified Page List Bytes)",1,1,NULL);
+insert into tests values (NULL,"tp5row_modlistbytes_nochrome_paint","Tp5 Row Major NoChrome MozAfterPaint (Modified Page List Bytes)",0,1,NULL);
+insert into tests values (NULL,"tp5row_shutdown_paint","Tp5 Row Major Shutdown MozAfterPaint",1,1,15);
+insert into tests values (NULL,"tp5row_shutdown_nochrome_paint","Tp5 Row Major NoChrome Shutdown MozAfterPaint",0,1,15);
+insert into tests values (NULL,"tp5row_responsiveness_paint","Tp5 Row Major Responsiveness MozAfterPaint",1,1,15);
+insert into tests values (NULL,"tp5row_responsiveness_nochrome_paint","Tp5 Row Major NoChrome Responsiveness MozAfterPaint",0,1,15);
+insert into tests values (NULL,"tp5row_responsiveness_nochrome","Tp5 Row Major NoChrome Responsiveness",0,1,15);
+insert into tests values (NULL,"tp5row_responsiveness","Tp5 Row Major Responsiveness",1,1,15);
+
+
