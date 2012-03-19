@@ -29,22 +29,22 @@ var GraphCommon = (function() {
         ajaxSeries: null,
         prevSeriesIndex: -1,
         prevDataIndex: -1,
-        allSeries: {},
-    }
+        allSeries: {}
+    };
 })();
 
 GraphCommon.daysInMicroseconds = function(days) {
     return 86400000 * days;
-}
+};
 
 GraphCommon.displayDaysInMicroseconds = function() {
     return this.daysInMicroseconds(GraphCommon.displayDays);
-}
+};
 
-GraphCommon.clearZoom = function () {
+GraphCommon.clearZoom = function() {
     this.zoomFrom = null;
     this.zoomTo = null;
-}
+};
 
 function debug(message)
 {
@@ -240,7 +240,7 @@ GraphCommon.convertData = function(testName, branchName, platformName, data,
     }
 
     return gdata;
-}
+};
 
 GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
 {
@@ -293,7 +293,7 @@ GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
         plots.push(plot);
     });
     return plots;
-}
+};
 
 GraphCommon.confirmTooMuchData = function(count, suggested, name)
 {
@@ -306,7 +306,7 @@ GraphCommon.confirmTooMuchData = function(count, suggested, name)
         return window.confirm(msg);
     }
     return true;
-}
+};
 
 GraphCommon.deltaPlot = function(plot)
 {
@@ -335,7 +335,7 @@ GraphCommon.deltaPlot = function(plot)
     });
     plot.data = newPlot;
     return plot;
-}
+};
 
 GraphCommon.getZoomRange = function()
 {
@@ -343,7 +343,7 @@ GraphCommon.getZoomRange = function()
         from: GraphCommon.zoomFrom || GraphCommon.ajaxSeries.minT,
         to: GraphCommon.zoomTo || GraphCommon.ajaxSeries.maxT
     };
-}
+};
 
 GraphCommon.getPlotRange = function()
 {
@@ -362,14 +362,14 @@ GraphCommon.getPlotRange = function()
     }
 
     return range;
-}
+};
 
 GraphCommon.zoomIn = function()
 {
     var range = this.getPlotRange();
     this.zoomToRange(range);
     updateLocation();
-}
+};
 
 GraphCommon.zoomOut = function()
 {
@@ -392,7 +392,7 @@ GraphCommon.zoomOut = function()
 
     this.zoomToRange(range);
     updateLocation();
-}
+};
 
 GraphCommon.zoomToRange = function(range)
 {
@@ -414,7 +414,7 @@ GraphCommon.zoomToRange = function(range)
     }
 
     $('#zoomout').toggleClass('disabled', !canZoomOut);
-}
+};
 
 GraphCommon.onPlotHover = function(e, pos, item)
 {
@@ -434,7 +434,7 @@ GraphCommon.onPlotHover = function(e, pos, item)
         GraphCommon.prevSeriesIndex = -1;
         GraphCommon.prevDataIndex = -1;
     }
-}
+};
 
 GraphCommon.onPlotClick = function(e, pos, item)
 {
@@ -447,44 +447,44 @@ GraphCommon.onPlotClick = function(e, pos, item)
     } else {
         GraphCommon.hideTooltip(true);
     }
-}
+};
 
 GraphCommon.onPlotSelect = function(e, ranges)
 {
     GraphCommon.zoomFrom = ranges.xaxis.from;
     GraphCommon.zoomTo = ranges.xaxis.to;
-}
+};
 
 GraphCommon.onPlotUnSelect = function(e, ranges)
 {
     GraphCommon.clearZoom();
-}
+};
 
 GraphCommon.onOverviewSelect = function(e, ranges)
 {
     GraphCommon.plot.clearSelection(true);
     GraphCommon.zoomToRange(ranges.xaxis);
     updateLocation();
-}
+};
 
 GraphCommon.onOverviewUnselect = function(e)
 {
     GraphCommon.zoomToRange(null);
     GraphCommon.clearZoom();
     updateLocation();
-}
+};
 
 // FIXME: This variable should be defined in a closure.
 var resizeTimer = null;
 
-GraphCommon.onResize = function () {
+GraphCommon.onResize = function() {
     if (!resizeTimer) {
         resizeTimer = setTimeout(function() {
             GraphCommon.updatePlot();
             resizeTimer = null;
         }, 50);
     }
-}
+};
 
 // FIXME: These variables should be defined in a closure.
 var ttHideTimer = null,
@@ -547,7 +547,7 @@ GraphCommon.updateTooltip = function(item)
 
     this.plot.unhighlight();
     this.plot.highlight(s, item.datapoint);
-}
+};
 
 GraphCommon.showTooltip = function(x, y)
 {
@@ -573,7 +573,7 @@ GraphCommon.showTooltip = function(x, y)
     } else {
         tip.css({ opacity: 1, left: left, top: top });
     }
-}
+};
 
 GraphCommon.hideTooltip = function(now)
 {
@@ -589,19 +589,19 @@ GraphCommon.hideTooltip = function(now)
             });
         }, now ? 0 : 250);
     }
-}
+};
 
 GraphCommon.lockTooltip = function() {
     ttLocked = true;
     $('#tooltip').addClass('locked');
     $('#tt-help').html('');
-}
+};
 
 GraphCommon.unlockTooltip = function() {
     ttLocked = false;
     $('#tooltip').removeClass('locked');
     $('#tt-help').html('Click to lock');
-}
+};
 
 GraphCommon.initData = function(testid, branchid, platformid, data)
 {
@@ -610,7 +610,7 @@ GraphCommon.initData = function(testid, branchid, platformid, data)
     this.ajaxSeries.exploded = false;
     this.ajaxSeries.visible = true;
     this.allSeries[uniqueSeries] = GraphCommon.ajaxSeries;
-}
+};
 
 GraphCommon.updatePlot = function()
 {
@@ -677,7 +677,7 @@ GraphCommon.updatePlot = function()
     if ($('#overview').length > 0) {
         this.overview = $.plot($('#overview'), overviewData, overviewOptions);
     }
-}
+};
 
 // FIXME: This function should be moved to graph.html since it's not used
 // elsewhere but methods on GraphCommon call this function.
@@ -702,8 +702,8 @@ function updateLocation() {
     var newLocation = url + '=' + JSON.stringify(args);
 
     if (GraphCommon.zoomFrom && GraphCommon.zoomTo) {
-        newLocation += '&sel=' + GraphCommon.zoomFrom + ','
-                    + GraphCommon.zoomTo;
+        newLocation += '&sel=' + GraphCommon.zoomFrom + ',' +
+                       GraphCommon.zoomTo;
     } else {
         newLocation += '&sel=none';
     }
@@ -719,4 +719,4 @@ GraphCommon.iframeMarkupForEmbeddedChart = function(width, height, hash)
     var url = href.substring(0, href.lastIndexOf('/')) + '/embed.html' + hash;
     return '<iframe type="text/html" width="' + width + '" height="' + height +
            '" src="' + url + '&notooltips=true" frameborder="0"</iframe>';
-}
+};

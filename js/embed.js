@@ -113,8 +113,8 @@
                 var branchName = manifest.branchMap[branchid].name;
                 var platformName = manifest.platformMap[platformid].name;
 
-                data = GraphCommon.convertData(testName, branchName, platformName,
-                                               data, displayDays);
+                data = GraphCommon.convertData(testName, branchName,
+                                               platformName, data, displayDays);
 
                 if (!data) {
                     error('Could not import test run data', false, data);
