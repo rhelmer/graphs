@@ -66,7 +66,7 @@
             var params = { tests: JSON.stringify(tests),
                            sel: 'none',
                            displayrange: displayDays,
-                           datatype: datatype };
+                           datatype: GraphCommon.datatype };
             var html = '<a href="graph.html#' + $.param(params) + '">';
             if (USE_GENERATED_IMAGES_IN_DASHBOARD) {
                 html += '<img src="' + IMAGE_SERVER +
@@ -76,7 +76,8 @@
             } else {
                 params['transparent'] = true;
                 var hash = '#' + $.param(params);
-                html += iframeMarkupForEmbeddedChart(360, 240, hash);
+                html += GraphCommon.iframeMarkupForEmbeddedChart(360, 240,
+                                                                 hash);
             }
             td.html(html + '</a>');
         });

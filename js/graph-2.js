@@ -17,8 +17,6 @@
         var args = getUrlVars();
         var tests = args['tests'];
         sel = args['sel'] ? args['sel'] : 'none';
-        displayDays = args['displayrange'] ? args['displayrange'] : displayDays;
-        datatype = args['datatype'] ? args['datatype'] : 'running';
         if (tests) {
             try {
                 tests = JSON.parse(decodeURIComponent(tests));
@@ -26,7 +24,8 @@
                 error('Could not understand URL', e);
                 return false;
             }
-            if (!confirmTooMuchData(tests.length, MAX_GRAPHS, 'data series')) {
+            if (!GraphCommon.confirmTooMuchData(tests.length, MAX_GRAPHS,
+                                                'data series')) {
                 return false;
             }
             for (var i = 0; i < tests.length; i++) {
@@ -45,28 +44,18 @@
 
     function initPlot()
     {
-        plot = $.plot($('#plot'), [], PLOT_OPTIONS);
-        overview = $.plot($('#overview'), [], OVERVIEW_OPTIONS);
-    }
-
-    function initData(testid, branchid, platformid, data)
-    {
-        var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
-                           platformid;
-        ajaxSeries = data;
-        ajaxSeries.exploded = false;
-        ajaxSeries.visible = true;
-        allSeries[uniqueSeries] = ajaxSeries;
+        GraphCommon.plot = $.plot($('#plot'), [], PLOT_OPTIONS);
+        GraphCommon.overview = $.plot($('#overview'), [], OVERVIEW_OPTIONS);
     }
 
     // FIXME use delegation here instead
     function updateBindings()
     {
-        $('#plot').bind('plothover', onPlotHover);
-        $('#plot').bind('plotclick', onPlotClick);
-        $('#plot').bind('plotselected', onPlotSelect);
-        $('#overview').bind('plotselected', onOverviewSelect);
-        $('#overview').bind('plotunselected', onOverviewUnselect);
+        $('#plot').bind('plothover', GraphCommon.onPlotHover);
+        $('#plot').bind('plotclick', GraphCommon.onPlotClick);
+        $('#plot').bind('plotselected', GraphCommon.onPlotSelect);
+        $('#overview').bind('plotselected', GraphCommon.onOverviewSelect);
+        $('#overview').bind('plotunselected', GraphCommon.onOverviewUnselect);
 
         $('.explode, .implode').unbind();
         $('.explode, .implode').click(onExplode);
@@ -86,94 +75,93 @@
         $('#exportcsv').click(onExportCSV);
 
         $(document).keydown(onPageKeyDown);
-        $(window).resize(onResize);
+        $(window).resize(GraphCommon.onResize);
     }
-
 
     function onPageKeyDown(e)
     {
         switch (e.keyCode) {
         case 107: /* + */
-            zoomIn();
+            GraphCommon.zoomIn();
             return false;
         case 109: /* - */
-            zoomOut();
+            GraphCommon.zoomOut();
             return false;
         }
     }
 
     $('#displayrange').change(function(e) {
         e.preventDefault();
-        displayDays = e.target.value;
-        minT = new Date().getTime() - (DAY * displayDays);
+        GraphCommon.displayDays = e.target.value;
+        minT = new Date().getTime() - GraphCommon.displayDaysInMicroseconds();
         maxT = new Date().getTime();
-        ajaxSeries.minT = minT;
-        ajaxSeries.maxT = maxT;
-        updatePlot();
-        zoomOut();
-        _zoomFrom = null;
-        _zoomTo = null;
-        overview.clearSelection();
+        GraphCommon.ajaxSeries.minT = minT;
+        GraphCommon.ajaxSeries.maxT = maxT;
+        GraphCommon.updatePlot();
+        GraphCommon.zoomOut();
+        GraphCommon.clearZoom();
+        GraphCommon.overview.clearSelection();
         updateLocation();
     });
 
     $('#datatype').change(function(e) {
         e.preventDefault();
-        datatype = e.target.value;
-        _zoomFrom = null;
-        _zoomTo = null;
-        updatePlot();
+        GraphCommon.datatype = e.target.value;
+        GraphCommon.clearZoom();
+        GraphCommon.updatePlot();
         updateLocation();
     });
 
     function onZoomInClick(e)
     {
         e.preventDefault();
-        zoomIn();
+        GraphCommon.zoomIn();
     }
 
     function onZoomOutClick(e)
     {
         e.preventDefault();
-        zoomOut();
+        GraphCommon.zoomOut();
     }
 
     function onExplode(e)
     {
         e.preventDefault();
         var id = e.target.id;
+        var allSeries = GraphCommon.allSeries;
         allSeries[id].exploded = !allSeries[id].exploded;
         $('.explode, .implode, #' + id).toggleClass('exploded',
                                                     allSeries[id].exploded);
 
-        unlockTooltip();
-        hideTooltip();
-        updatePlot();
+        GraphCommon.unlockTooltip();
+        GraphCommon.hideTooltip();
+        GraphCommon.updatePlot();
     }
 
     function onShow(e)
     {
         e.preventDefault();
         var id = e.target.id;
+        var allSeries = GraphCommon.allSeries;
         allSeries[id].visible = !allSeries[id].visible;
         $('.show, .hide, #' + id).toggleClass('hidden', !allSeries[id].visible);
 
-        unlockTooltip();
-        hideTooltip();
-        updatePlot();
+        GraphCommon.unlockTooltip();
+        GraphCommon.hideTooltip();
+        GraphCommon.updatePlot();
     }
 
     function onRemove(e)
     {
         e.preventDefault();
         var id = e.target.id;
-        allSeries[id] = {};
+        GraphCommon.allSeries[id] = {};
         $('#' + id).remove();
 
         // only disabled controls if this is the last series
         var lastSeries = true;
-        $.each(allSeries, function(index) {
-            if (allSeries[index].count != undefined) {
+        $.each(GraphCommon.allSeries, function(index) {
+            if (GraphCommon.allSeries[index].count != undefined) {
                 lastSeries = false;
                 return false;
             }
@@ -190,9 +178,9 @@
 
         updateLocation();
 
-        unlockTooltip();
-        hideTooltip();
-        updatePlot();
+        GraphCommon.unlockTooltip();
+        GraphCommon.hideTooltip();
+        GraphCommon.updatePlot();
     }
 
     function onSelectData(e)
@@ -298,9 +286,9 @@
         var startDate;
         var endDate;
 
-        if ((_zoomFrom) && (_zoomTo)) {
-            startDate = new Date(_zoomFrom);
-            endDate = new Date(_zoomTo);
+        if (GraphCommon.zoomFrom && GraphCommon.zoomTo) {
+            startDate = new Date(GraphCommon.zoomFrom);
+            endDate = new Date(GraphCommon.zoomTo);
         } else {
             startDate = new Date(minT);
             endDate = new Date(maxT);
@@ -319,8 +307,8 @@
     function fetchData(testid, branchid, platformid, sel) {
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
-        if (allSeries.hasOwnProperty(uniqueSeries)) {
-            if (!$.isEmptyObject(allSeries[uniqueSeries])) {
+        if (GraphCommon.allSeries.hasOwnProperty(uniqueSeries)) {
+            if (!$.isEmptyObject(GraphCommon.allSeries[uniqueSeries])) {
                 // already have this loaded, don't bother
                 return false;
             }
@@ -354,20 +342,23 @@
                 var testName = manifest.testMap[testid].name;
                 var branchName = manifest.branchMap[branchid].name;
                 var platformName = manifest.platformMap[platformid].name;
-                data = convertData(testName, branchName, platformName, data,
-                                   displayDays);
+
+                data = GraphCommon.convertData(testName, branchName,
+                                               platformName, data,
+                                               GraphCommon.displayDays);
+
                 if (!data) {
                     error('Could not import test run data', false, data);
                     return false;
                 }
-                initData(testid, branchid, platformid, data);
-                updatePlot();
+                GraphCommon.initData(testid, branchid, platformid, data);
+                GraphCommon.updatePlot();
                 if (sel && sel != 'none') {
                     var range = {
                         from: parseInt(sel.split(',')[0]),
                         to: parseInt(sel.split(',')[1])
                     };
-                    zoomTo(range);
+                    GraphCommon.zoomToRange(range);
                 }
                 addSeries(testid, branchid, platformid, addSeriesNode);
                 updateBindings();
@@ -428,9 +419,9 @@
 
         // find changes which match this range
         var csets = [];
-        var range = getZoomRange();
+        var range = GraphCommon.getZoomRange();
         var branches = [];
-        $.each(allSeries, function(i, series) {
+        $.each(GraphCommon.allSeries, function(i, series) {
             if (series.runs === undefined) {
                 return true;
             }
@@ -454,7 +445,8 @@
             });
         });
 
-        if (!confirmTooMuchData(csets.length, MAX_CSETS, 'changesets')) {
+        if (!GraphCommon.confirmTooMuchData(csets.length, MAX_CSETS,
+                                            'changesets')) {
             return false;
         }
         $.each(branches, function() {
@@ -502,12 +494,13 @@
                 });
             });
         });
-        $.each(allSeries, function(i, series) {
+        $.each(GraphCommon.allSeries, function(i, series) {
             if (!$.isEmptyObject(series)) {
                 count += 1;
             }
         });
-        if (!confirmTooMuchData(count, MAX_GRAPHS, 'data series')) {
+        if (!GraphCommon.confirmTooMuchData(count, MAX_GRAPHS,
+                                            'data series')) {
             addMoreTestData();
             return false;
         }
@@ -569,7 +562,8 @@
               $('#' + uniqueSeries + ' .loader').hide();
               $(node).append('Failed');
             } else {
-              color = COLORS[allSeries[uniqueSeries].count % COLORS.length];
+              color = COLORS[GraphCommon.allSeries[uniqueSeries].count %
+                             COLORS.length];
               $('#' + uniqueSeries + ' .loader').hide();
               $(node).append('<em style="background-color: ' +
                              color + ';"></em>');
@@ -614,7 +608,7 @@
         $('#embed-overlay').showBubble(this);
 
         var hash = window.location.hash;
-        var markup = iframeMarkupForEmbeddedChart(480, 390, hash);
+        var markup = GraphCommon.iframeMarkupForEmbeddedChart(480, 390, hash);
 
         $('#embed-code').html(markup);
         $('#embed-code').focus().select();

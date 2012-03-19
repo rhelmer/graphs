@@ -13,7 +13,7 @@ var document = require('jsdom').jsdom(),
     flot_text = document.createElement('script');
 
 var Configuration = {};
-var Common = {};
+var Common;
 
 // FIXME config.js and common.js should define classes themselves
 (function() {
@@ -31,8 +31,7 @@ var Common = {};
 
     commonJs = fs.readFileSync(__dirname + '/../js/common.js', 'utf8');
     eval(commonJs);
-    Common.convertData = convertData;
-    Common.parseSeries = parseSeries;
+    Common = GraphCommon;
 })();
 
 /** attach fake canvas to window */
