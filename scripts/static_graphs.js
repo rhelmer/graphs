@@ -52,7 +52,6 @@ function run(dashboardManifest) {
 
     var PLOT_OPTIONS = {
         xaxis: { mode: 'time' },
-        yaxis: { min: 0 },
         //selection: { mode: 'x', color: '#97c6e5' },
         /* crosshair: { mode: 'xy', color: '#cdd6df', lineWidth: 1 }, */
         series: { shadowSize: 0 },
@@ -72,21 +71,17 @@ function run(dashboardManifest) {
 
     function updatePlot(series, displayDays)
     {
-        var minV, maxV, marginV, minT, maxT;
+        var minT, maxT;
         series.exploded = false;
         series.visible = true;
         var plotData = Common.parseSeries(series, 0, 3, 1);
 
-        minV = series.minV;
-        maxV = series.maxV;
-        marginV = 0.1 * (maxV - minV);
         minT = series.minT;
         maxT = series.maxT;
 
         var xaxis = { xaxis: { min: minT, max: maxT, labelWidth: 50,
                                labelHeight: 20 } },
-            yaxis = { yaxis: { min: 0, max: maxV + marginV, labelWidth: 50,
-                               labelHeight: 20 } };
+            yaxis = { yaxis: { labelWidth: 50, labelHeight: 20 } };
         var plotOptions = jQuery.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis);
 
         var testid = series['test'];
@@ -126,10 +121,11 @@ function run(dashboardManifest) {
                                 [testId, branchId, platformId, data,
                                  displayDays]);
                     console.log('WARN: status was ' + data['stat']);
+                } else {
+                    data = Common.convertData(testId, branchId, platformId, 
+                                              data, displayDays);
+                    updatePlot(data, displayDays);
                 }
-                data = Common.convertData(testId, branchId, platformId, data,
-                                          displayDays);
-                updatePlot(data, displayDays);
             });
         });
     }
