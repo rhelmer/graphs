@@ -261,7 +261,7 @@ GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
             id: d.id,
             lines: { lineWidth: lineWidth },
             color: color,
-            data: $.map(d.data, function(p) { 
+            data: $.map(d.data, function(p) {
                 if (p.t >= minVisibleT && p.t <= maxVisibleT) {
                     return [[p.t, p.v]];
                 }
