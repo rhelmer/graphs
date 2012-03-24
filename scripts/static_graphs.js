@@ -71,13 +71,13 @@ function run(dashboardManifest) {
 
     function updatePlot(series, displayDays)
     {
-        var minT, maxT;
         series.exploded = false;
         series.visible = true;
         var plotData = Common.parseSeries(series, 0, 3, 1);
 
-        minT = series.minT;
-        maxT = series.maxT;
+        Common.displayDays = displayDays;
+        var minT = new Date().getTime() - Common.displayDaysInMicroseconds();
+        var maxT = new Date().getTime();
 
         var xaxis = { xaxis: { min: minT, max: maxT, labelWidth: 50,
                                labelHeight: 20 } },
