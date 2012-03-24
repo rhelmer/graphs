@@ -24,7 +24,6 @@ if ($.color) {
 
 var PLOT_OPTIONS = {
     xaxis: { mode: 'time' },
-    yaxis: { min: 0 },
     selection: { mode: 'x', color: '#97c6e5' },
     /* crosshair: { mode: 'xy', color: '#cdd6df', lineWidth: 1 }, */
     series: { shadowSize: 0 },
@@ -42,7 +41,6 @@ var PLOT_OPTIONS = {
 
 var OVERVIEW_OPTIONS = {
     xaxis: { mode: 'time' },
-    yaxis: { min: 0 },
     selection: { mode: 'x', color: '#97c6e5' },
     series: {
         lines: { show: true, lineWidth: 1 },

@@ -164,8 +164,6 @@ GraphCommon.convertData = function(testName, branchName, platformName, data,
         'branch': branchName,
         'maxT': undefined,
         'minT': undefined,
-        'maxV': undefined,
-        'minV': undefined,
         'platform': platformName,
         'runs': [],
         'test': testName,
@@ -183,8 +181,6 @@ GraphCommon.convertData = function(testName, branchName, platformName, data,
                                     this.displayDaysInMicroseconds();
     gdata.minT = new Date().getTime() - displayDaysInMicroseconds;
     gdata.maxT = new Date().getTime();
-    gdata.minV = data['min'];
-    gdata.maxV = data['max'];
 
     minT = gdata.minT;
     maxT = gdata.maxT;
@@ -257,11 +253,19 @@ GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
     var plots = [];
     $.each(datasets, function(index) {
         d = datasets[index];
+        var displayDays = GraphCommon.displayDaysInMicroseconds();
+        var minVisibleT = new Date().getTime() - displayDays;
+        var maxVisibleT = new Date().getTime();
+
         var plot = {
             id: d.id,
             lines: { lineWidth: lineWidth },
             color: color,
-            data: $.map(d.data, function(p) { return [[p.t, p.v]]; }),
+            data: $.map(d.data, function(p) { 
+                if (p.t >= minVisibleT && p.t <= maxVisibleT) {
+                    return [[p.t, p.v]];
+                }
+            }),
             etc: {
                 branch: seriesIn.branch,
                 test: seriesIn.test,
@@ -312,8 +316,6 @@ GraphCommon.deltaPlot = function(plot)
 {
     var newPlot = [];
     var previous;
-    plot.maxV = 0;
-    plot.minV = 0;
     $.each(plot.data, function() {
        var datetime = $(this)[0];
        var elapsed = $(this)[1];
@@ -328,8 +330,6 @@ GraphCommon.deltaPlot = function(plot)
                return false;
            }
            newPlot.push([datetime, newV]);
-           plot.maxV = plot.maxV > newV ? plot.maxV : newV;
-           plot.minV = plot.minV < newV ? plot.minV : newV;
        }
        previous = elapsed;
     });
@@ -617,10 +617,9 @@ GraphCommon.updatePlot = function()
     var plotData = [];
     var overviewData = [];
     var plotOptions, overviewOptions;
-    var maxV = 0,
-        marginV = 0,
-        minV = 0;
     var count = 0;
+    var displayDays = GraphCommon.displayDaysInMicroseconds();
+
     $.each(this.allSeries, function(index, series) {
         if ($.isEmptyObject(series)) {
             // purposely deleted, keep colors consistent
@@ -637,11 +636,6 @@ GraphCommon.updatePlot = function()
             }
             if (GraphCommon.datatype != 'running') {
                 plot = GraphCommon.deltaPlot(plot);
-                maxV = plot.maxV > maxV ? plot.maxV : maxV;
-                minV = plot.minV < minV ? plot.minV : minV;
-            } else {
-                maxV = maxV > series.maxV ? maxV : series.maxV;
-                minV = minV < series.minV ? minV : series.minV;
             }
             plotData.push(plot);
         }
@@ -657,14 +651,12 @@ GraphCommon.updatePlot = function()
 
         count++;
 
-        marginV = 0.1 * (maxV - minV);
         minT = GraphCommon.zoomFrom ||
                (minT < series.minT ? minT : series.minT);
         maxT = GraphCommon.zoomTo || (maxT > series.maxT ? maxT : series.maxT);
 
-        var displayDays = GraphCommon.displayDaysInMicroseconds();
         var xaxis = { xaxis: { min: minT, max: maxT } },
-            yaxis = { yaxis: { min: minV, max: maxV + marginV } };
+            yaxis = { yaxis: {} };
         var overview_xaxis = { xaxis: { min: new Date() - displayDays,
                                         max: new Date() } };
         plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
