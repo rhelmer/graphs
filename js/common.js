@@ -666,7 +666,9 @@ GraphCommon.updatePlot = function()
         var allOverviews = GraphCommon.parseSeries(series, count, 1, .5);
         for (var i = 0; i < allOverviews.length; i++) {
             var overview = allOverviews[i];
-            if (GraphCommon.datatype != 'running') {
+            if (!series.visible) {
+                delete(overview.data);
+            } else if (GraphCommon.datatype != 'running') {
                 overview = GraphCommon.deltaPlot(overview);
             }
             overview.yaxis = yaxisIndex;
