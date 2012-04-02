@@ -639,7 +639,7 @@ GraphCommon.updatePlot = function()
 
         var yaxisIndex = 1;
         var unit = GraphCommon.datatype == 'deltapercent' ? '%' : series.unit;
-        if (units.indexOf(unit) < 0) {
+        if (units.indexOf(unit) < 0 && series.visible) {
             if (unit) {
                 yaxes.push({tickFormatter: (function (unit) {
                     return function (value, axis) { return value + ' ' + unit; }
@@ -655,8 +655,8 @@ GraphCommon.updatePlot = function()
         for (var i = 0; i < allPlots.length; i++) {
             var plot = allPlots[i];
             if (!series.visible) {
-                delete(plot.data);
-            } else if (GraphCommon.datatype != 'running') {
+                continue;
+            if (GraphCommon.datatype != 'running') {
                 plot = GraphCommon.deltaPlot(plot);
             }
             plot.yaxis = yaxisIndex;
@@ -667,8 +667,8 @@ GraphCommon.updatePlot = function()
         for (var i = 0; i < allOverviews.length; i++) {
             var overview = allOverviews[i];
             if (!series.visible) {
-                delete(overview.data);
-            } else if (GraphCommon.datatype != 'running') {
+                continue;
+            if (GraphCommon.datatype != 'running') {
                 overview = GraphCommon.deltaPlot(overview);
             }
             overview.yaxis = yaxisIndex;
