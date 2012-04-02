@@ -506,7 +506,7 @@ def getRevisionValues(req):
                 """
 
         cursor.execute(sql, (rev,))
-        for row in cursor:
+        for row in cursor.fetchall():
             testData = testRuns.setdefault(row['test_name'],
                     {'name': row['pretty_name'], 'id': row['test_id'], 'test_runs': {}})
             platformRuns = testData['test_runs'].setdefault(row['os_name'], []).append(
