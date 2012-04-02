@@ -181,6 +181,7 @@ GraphCommon.convertData = function(testName, branchName, platformName, data,
                                     this.displayDaysInMicroseconds();
     gdata.minT = new Date().getTime() - displayDaysInMicroseconds;
     gdata.maxT = new Date().getTime();
+    gdata.unit = data['unit'];
 
     minT = gdata.minT;
     maxT = gdata.maxT;
@@ -620,6 +621,9 @@ GraphCommon.updatePlot = function()
     var count = 0;
     var displayDays = GraphCommon.displayDaysInMicroseconds();
 
+    var minT, maxT;
+    var yaxes = [], units = [];
+
     $.each(this.allSeries, function(index, series) {
         if ($.isEmptyObject(series)) {
             // purposely deleted, keep colors consistent
@@ -628,15 +632,34 @@ GraphCommon.updatePlot = function()
         }
         GraphCommon.allSeries[index].count = count;
 
+        minT = GraphCommon.zoomFrom ||
+               (minT != null && minT < series.minT ? minT : series.minT);
+        maxT = GraphCommon.zoomTo ||
+               (maxT != null && maxT > series.maxT ? maxT : series.maxT);
+
+        var yaxisIndex = 1;
+        var unit = GraphCommon.datatype == 'deltapercent' ? '%' : series.unit;
+        if (units.indexOf(unit) < 0) {
+            if (unit) {
+                yaxes.push({tickFormatter: (function (unit) {
+                    return function (value, axis) { return value + ' ' + unit; }
+                })(unit)});
+            } else {
+                yaxes.push({});
+            }
+            units.push(unit);
+            yaxisIndex = yaxes.length;
+        }
+
         var allPlots = GraphCommon.parseSeries(series, count, 3, 1);
         for (var i = 0; i < allPlots.length; i++) {
             var plot = allPlots[i];
             if (!series.visible) {
                 delete(plot.data);
-            }
-            if (GraphCommon.datatype != 'running') {
+            } else if (GraphCommon.datatype != 'running') {
                 plot = GraphCommon.deltaPlot(plot);
             }
+            plot.yaxis = yaxisIndex;
             plotData.push(plot);
         }
 
@@ -646,23 +669,20 @@ GraphCommon.updatePlot = function()
             if (GraphCommon.datatype != 'running') {
                 overview = GraphCommon.deltaPlot(overview);
             }
+            overview.yaxis = yaxisIndex;
             overviewData.push(overview);
         }
 
         count++;
-
-        minT = GraphCommon.zoomFrom ||
-               (minT < series.minT ? minT : series.minT);
-        maxT = GraphCommon.zoomTo || (maxT > series.maxT ? maxT : series.maxT);
-
-        var xaxis = { xaxis: { min: minT, max: maxT } },
-            yaxis = { yaxis: {} };
-        var overview_xaxis = { xaxis: { min: new Date() - displayDays,
-                                        max: new Date() } };
-        plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, yaxis),
-        overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS,
-                                   overview_xaxis, yaxis);
     });
+
+    var xaxis = { xaxis: { min: minT, max: maxT } };
+    var overview_xaxis = { xaxis: { min: new Date() - displayDays,
+                                    max: new Date() } };
+    plotOptions = $.extend(true, { }, PLOT_OPTIONS, xaxis, {yaxes: yaxes});
+    overviewOptions = $.extend(true, { }, OVERVIEW_OPTIONS,
+                               overview_xaxis, {yaxes: yaxes});
+
     this.unlockTooltip();
     this.hideTooltip(true);
     this.plot = $.plot($('#plot'), plotData, plotOptions);
