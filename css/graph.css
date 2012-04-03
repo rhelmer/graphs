@@ -34,7 +34,10 @@ html {
 	margin-right: 42px;
 	white-space: nowrap;
 	overflow: hidden;
-}		
+}
+#legend span.unit {
+    display: inline;
+}
 #legend strong {
 	font-size: 12px;
 	font-weight: bold;

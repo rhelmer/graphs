@@ -656,6 +656,7 @@ GraphCommon.updatePlot = function()
             var plot = allPlots[i];
             if (!series.visible) {
                 continue;
+            }
             if (GraphCommon.datatype != 'running') {
                 plot = GraphCommon.deltaPlot(plot);
             }
@@ -668,6 +669,7 @@ GraphCommon.updatePlot = function()
             var overview = allOverviews[i];
             if (!series.visible) {
                 continue;
+            }
             if (GraphCommon.datatype != 'running') {
                 overview = GraphCommon.deltaPlot(overview);
             }
