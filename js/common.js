@@ -479,15 +479,10 @@ GraphCommon.onPlotClick = function(e, pos, item)
 
 GraphCommon.onPlotSelect = function(e, ranges)
 {
-    GraphCommon.zoomXFrom = ranges.xaxis.from;
-    GraphCommon.zoomXTo = ranges.xaxis.to;
-    GraphCommon.zoomYFrom = ranges.yaxis.from;
-    GraphCommon.zoomYTo = ranges.yaxis.to;
 };
 
 GraphCommon.onPlotUnSelect = function(e, ranges)
 {
-    GraphCommon.clearZoom();
 };
 
 GraphCommon.onOverviewSelect = function(e, ranges)
@@ -655,14 +650,6 @@ GraphCommon.updatePlot = function()
     var overviewYAxes = [];
     var yaxisIndex = 0;
 
-    function minIgnoringNull(valueOrNull, value) {
-        return valueOrNull != null ? Math.min(valueOrNull, value) : value;
-    }
-
-    function maxIgnoringNull(valueOrNull, value) {
-        return valueOrNull != null ? Math.max(valueOrNull, value) : value;
-    }
-
     $.each(this.allSeries, function(index, series) {
         if ($.isEmptyObject(series)) {
             // purposely deleted, keep colors consistent
@@ -695,8 +682,10 @@ GraphCommon.updatePlot = function()
             yaxisIndex++;
         }
 
-        minT = GraphCommon.zoomXFrom || minIgnoringNull(minT, series.minT);
-        maxT = GraphCommon.zoomXTo || maxIgnoringNull(maxT, series.maxT);
+        minT = GraphCommon.zoomXFrom ||
+               (minT != null && minT < series.minT ? minT : series.minT);
+        maxT = GraphCommon.zoomXTo ||
+               (maxT != null && maxT > series.maxT ? maxT : series.maxT);
 
         var allPlots = GraphCommon.parseSeries(series, count, 3, 1);
         for (var i = 0; i < allPlots.length; i++) {
