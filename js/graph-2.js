@@ -136,6 +136,7 @@
         GraphCommon.unlockTooltip();
         GraphCommon.hideTooltip();
         GraphCommon.updatePlot();
+        GraphCommon.clearYZoom();
     }
 
     function onShow(e)
@@ -145,10 +146,10 @@
         var allSeries = GraphCommon.allSeries;
         allSeries[id].visible = !allSeries[id].visible;
         $('.show, .hide, #' + id).toggleClass('hidden', !allSeries[id].visible);
-
         GraphCommon.unlockTooltip();
         GraphCommon.hideTooltip();
         GraphCommon.updatePlot();
+        GraphCommon.clearYZoom();
     }
 
     function onRemove(e)
@@ -181,6 +182,7 @@
         GraphCommon.unlockTooltip();
         GraphCommon.hideTooltip();
         GraphCommon.updatePlot();
+        GraphCommon.clearYZoom();
     }
 
     function onSelectData(e)
@@ -307,7 +309,7 @@
         e.preventDefault();
     }
 
-    function fetchData(testid, branchid, platformid, zoomRanges) {
+    function fetchData(testid, branchid, platformid, zoomRanges, clearYZoom) {
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
         if (GraphCommon.allSeries.hasOwnProperty(uniqueSeries)) {
@@ -321,16 +323,19 @@
                 return false;
         }
         if (manifest) {
-            downloadSeries(testid, branchid, platformid);
+            downloadSeries(testid, branchid, platformid, zoomRanges,
+                           clearYZoom);
         } else {
-            loadSeries.push([testid, branchid, platformid, zoomRanges]);
+            loadSeries.push([testid, branchid, platformid, zoomRanges,
+                             clearYZoom]);
             if (!downloadingManifest) {
                 downloadManifest();
             }
         }
     }
 
-    function downloadSeries(testid, branchid, platformid, zoomRanges) {
+    function downloadSeries(testid, branchid, platformid, zoomRanges,
+                            clearYZoom) {
         var addSeriesNode = addSeries(testid, branchid, platformid, false);
         $.ajaxSetup({
             'error': function(xhr, e, message) {
@@ -358,6 +363,9 @@
                 GraphCommon.updatePlot();
                 if (zoomRanges) {
                     GraphCommon.zoomToRange(zoomRanges);
+                }
+                if (clearYZoom) {
+                    GraphCommon.clearYZoom();
                 }
                 addSeries(testid, branchid, platformid, addSeriesNode, false, data.unit);
                 updateBindings();
@@ -505,7 +513,7 @@
         $.each($(branches), function(i, branch) {
             $.each($(tests), function(j, test) {
                 $.each($(platforms), function(k, platform) {
-                    fetchData(test, branch, platform);
+                    fetchData(test, branch, platform, null, true);
                 });
             });
         });
@@ -578,7 +586,6 @@
             }
 
             if (unit) {
-                console.log(unit);
                 $(node).find('.testName').append(' <span class="unit">(' + unit + ')</span>');
             }
 

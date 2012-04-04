@@ -431,6 +431,11 @@ GraphCommon.zoomToRange = function(ranges)
     this.hideTooltip(true);
     this.updatePlot();
 
+    if (this.zoomY.length == 0) {
+        ranges = this.getZoomYRanges();
+        ranges.xaxis = xRange;
+    }
+
     var xaxis = this.overview.getXAxes()[0]; // Assume exactly one x-axis.
 
     if (ranges && (this.ajaxSeries.minT < this.zoomXFrom || this.zoomXTo < this.ajaxSeries.maxT)) {
@@ -443,6 +448,12 @@ GraphCommon.zoomToRange = function(ranges)
 
     $('#zoomout').toggleClass('disabled', !canZoomOut);
 };
+
+GraphCommon.clearYZoom = function()
+{
+    this.zoomToRange({ xaxis: GraphCommon.getZoomXRange() });
+    updateLocation();
+}
 
 GraphCommon.onPlotHover = function(e, pos, item)
 {
@@ -648,7 +659,6 @@ GraphCommon.updatePlot = function()
     var minT, maxT;
     var yaxes = [], units = [];
     var overviewYAxes = [];
-    var yaxisIndex = 0;
 
     $.each(this.allSeries, function(index, series) {
         if ($.isEmptyObject(series)) {
@@ -659,7 +669,9 @@ GraphCommon.updatePlot = function()
         GraphCommon.allSeries[index].count = count;
 
         var unit = GraphCommon.datatype == 'deltapercent' ? '%' : series.unit;
-        if (units.indexOf(unit) < 0 && series.visible) {
+        var yaxisIndex = units.indexOf(unit) + 1;
+
+        if (yaxisIndex <= 0 && series.visible) {
             if (unit) {
                 yaxes.push({tickFormatter: (function (unit) {
                     return function (value, axis) { return value + ' ' + unit; }
@@ -667,6 +679,8 @@ GraphCommon.updatePlot = function()
             } else {
                 yaxes.push({});
             }
+
+            yaxisIndex = yaxes.length - 1;
 
             overviewYAxes.push($.extend(true, { }, yaxes[yaxisIndex]));
             if (GraphCommon.datatype == 'running') {
@@ -715,6 +729,8 @@ GraphCommon.updatePlot = function()
 
         count++;
     });
+
+    GraphCommon.units = units;
 
     var xaxis = { xaxis: { min: minT, max: maxT } };
     var overview_xaxis = { xaxis: { min: new Date() - displayDays,
@@ -781,7 +797,7 @@ function selToZoomRanges(sel) {
     }
 
     sel = sel.split(',');
-    if (sel.length < 4)
+    if (sel.length < 2)
         return null;
     var ranges = { xaxis: { from: parseFloat(sel[0]),
                             to: parseFloat(sel[1]) } };
