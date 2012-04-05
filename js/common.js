@@ -354,7 +354,7 @@ GraphCommon.getZoomYRanges = function()
 {
     var yaxes = GraphCommon.zoomY;
     if (!yaxes.length) {
-        yaxes = this.plot.getYAxes().map(function (yaxis) {
+        yaxes = this.plot.getYAxes().map(function(yaxis) {
             return { from: yaxis.min, to: yaxis.max };
         });
     }
@@ -364,7 +364,7 @@ GraphCommon.getZoomYRanges = function()
         ranges['y' + (i ? i + 1 : '') + 'axis'] = $.extend({ }, yaxes[i]);
     }
     return ranges;
-}
+};
 
 GraphCommon.zoomIn = function()
 {
@@ -418,7 +418,7 @@ GraphCommon.zoomToRange = function(ranges)
 
     this.zoomY = [];
     if (ranges) {
-        for (var i = 0; ; i++) {
+        for (var i = 0;; i++) {
             var range = ranges['y' + (i ? i + 1 : '') + 'axis'];
             if (!range) {
                 break;
@@ -438,7 +438,8 @@ GraphCommon.zoomToRange = function(ranges)
 
     var xaxis = this.overview.getXAxes()[0]; // Assume exactly one x-axis.
 
-    if (ranges && (this.ajaxSeries.minT < this.zoomXFrom || this.zoomXTo < this.ajaxSeries.maxT)) {
+    if (ranges && (this.ajaxSeries.minT < this.zoomXFrom ||
+        this.zoomXTo < this.ajaxSeries.maxT)) {
         this.overview.setSelection(ranges, true);
         var canZoomOut = true;
     } else {
@@ -453,7 +454,7 @@ GraphCommon.clearYZoom = function()
 {
     this.zoomToRange({ xaxis: GraphCommon.getZoomXRange() });
     updateLocation();
-}
+};
 
 GraphCommon.onPlotHover = function(e, pos, item)
 {
@@ -673,8 +674,8 @@ GraphCommon.updatePlot = function()
 
         if (yaxisIndex <= 0 && series.visible) {
             if (unit) {
-                yaxes.push({tickFormatter: (function (unit) {
-                    return function (value, axis) { return value + ' ' + unit; }
+                yaxes.push({tickFormatter: (function(unit) {
+                    return function(value, axis) { return value + ' ' + unit; }
                 })(unit)});
             } else {
                 yaxes.push({});
@@ -779,7 +780,7 @@ function updateLocation() {
     if (GraphCommon.zoomXFrom && GraphCommon.zoomXTo) {
         newLocation += '&sel=' +
                        [GraphCommon.zoomXFrom, GraphCommon.zoomXTo].concat(
-                           GraphCommon.zoomY.reduce(function (result, zoom) {
+                           GraphCommon.zoomY.reduce(function(result, zoom) {
                                return result.concat([zoom.from, zoom.to]);
                            }, [])).join(',');
     } else {

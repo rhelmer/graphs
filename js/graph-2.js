@@ -367,7 +367,8 @@
                 if (clearYZoom) {
                     GraphCommon.clearYZoom();
                 }
-                addSeries(testid, branchid, platformid, addSeriesNode, false, data.unit);
+                addSeries(testid, branchid, platformid, addSeriesNode, false,
+                          data.unit);
                 updateBindings();
             } catch (e) {
                 error('Could not load data series', e);
@@ -553,7 +554,8 @@
             if (!node) {
               $('#legend').append('<li id="' + uniqueSeries + '">');
               node = $('#' + uniqueSeries + '');
-              $(node).append('<strong class="testName">' + testName + '</strong>');
+              $(node).append('<strong class="testName">' + testName +
+                             '</strong>');
               $(node).append('<span>' + branchName + '</span>');
               $(node).append('<span>' + platformName + '</span>');
               $(node).append('<small class="loader"' +
@@ -586,7 +588,8 @@
             }
 
             if (unit) {
-                $(node).find('.testName').append(' <span class="unit">(' + unit + ')</span>');
+                $(node).find('.testName').append(' <span class="unit">(' +
+                                                 unit + ')</span>');
             }
 
             $('#displayrange').toggleClass('disabled', false);
