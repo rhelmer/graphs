@@ -16,7 +16,7 @@
         updateBindings();
         var args = getUrlVars();
         var tests = args['tests'];
-        sel = args['sel'] ? args['sel'] : 'none';
+        var zoomRanges = selToZoomRanges(args['sel']);
         if (tests) {
             try {
                 tests = JSON.parse(decodeURIComponent(tests));
@@ -34,7 +34,7 @@
                 var branchid = run[1];
                 var platformid = run[2];
 
-                fetchData(testid, branchid, platformid, sel);
+                fetchData(testid, branchid, platformid, zoomRanges);
             }
         } else {
             addMoreTestData();
@@ -136,6 +136,7 @@
         GraphCommon.unlockTooltip();
         GraphCommon.hideTooltip();
         GraphCommon.updatePlot();
+        GraphCommon.clearYZoom();
     }
 
     function onShow(e)
@@ -145,10 +146,10 @@
         var allSeries = GraphCommon.allSeries;
         allSeries[id].visible = !allSeries[id].visible;
         $('.show, .hide, #' + id).toggleClass('hidden', !allSeries[id].visible);
-
         GraphCommon.unlockTooltip();
         GraphCommon.hideTooltip();
         GraphCommon.updatePlot();
+        GraphCommon.clearYZoom();
     }
 
     function onRemove(e)
@@ -181,6 +182,7 @@
         GraphCommon.unlockTooltip();
         GraphCommon.hideTooltip();
         GraphCommon.updatePlot();
+        GraphCommon.clearYZoom();
     }
 
     function onSelectData(e)
@@ -260,7 +262,6 @@
         $('#add-series-done').html('Add ' + count + ' Data Series');
     }
 
-
     // http://stackoverflow.com/questions/1359761/sorting-a-json-object-in-javascript
     function sortObject(o) {
         var sorted = {},
@@ -282,9 +283,8 @@
 
     function onExportCSV(e)
     {
+        // FIXME: update
         e.preventDefault();
-        var startDate;
-        var endDate;
 
         if (GraphCommon.zoomFrom && GraphCommon.zoomTo) {
             startDate = new Date(GraphCommon.zoomFrom);
@@ -293,8 +293,13 @@
             startDate = new Date(minT);
             endDate = new Date(maxT);
         }
-        var url = 'http://graphs.mozilla.org/server/dumpdata.cgi?' +
-                  'show=' + startDate.getTime() + ',' + endDate.getTime();
+
+        var range = GraphCommon.getZoomXRange();
+        var start = (new Date(range.from)).getDate();
+        var end = (new Date(range.to)).getDate();
+
+        var url = 'http://graphs.mozilla.org/server/dumpdata.cgi?show=' +
+                  start + ',' + end;
         window.open(url);
     }
 
@@ -304,7 +309,7 @@
         e.preventDefault();
     }
 
-    function fetchData(testid, branchid, platformid, sel) {
+    function fetchData(testid, branchid, platformid, zoomRanges, clearYZoom) {
         var uniqueSeries = 'series_' + testid + '_' + branchid + '_' +
                            platformid;
         if (GraphCommon.allSeries.hasOwnProperty(uniqueSeries)) {
@@ -318,16 +323,19 @@
                 return false;
         }
         if (manifest) {
-            downloadSeries(testid, branchid, platformid);
+            downloadSeries(testid, branchid, platformid, zoomRanges,
+                           clearYZoom);
         } else {
-            loadSeries.push([testid, branchid, platformid, sel]);
+            loadSeries.push([testid, branchid, platformid, zoomRanges,
+                             clearYZoom]);
             if (!downloadingManifest) {
                 downloadManifest();
             }
         }
     }
 
-    function downloadSeries(testid, branchid, platformid, sel) {
+    function downloadSeries(testid, branchid, platformid, zoomRanges,
+                            clearYZoom) {
         var addSeriesNode = addSeries(testid, branchid, platformid, false);
         $.ajaxSetup({
             'error': function(xhr, e, message) {
@@ -353,12 +361,11 @@
                 }
                 GraphCommon.initData(testid, branchid, platformid, data);
                 GraphCommon.updatePlot();
-                if (sel && sel != 'none') {
-                    var range = {
-                        from: parseInt(sel.split(',')[0]),
-                        to: parseInt(sel.split(',')[1])
-                    };
-                    GraphCommon.zoomToRange(range);
+                if (zoomRanges) {
+                    GraphCommon.zoomToRange(zoomRanges);
+                }
+                if (clearYZoom) {
+                    GraphCommon.clearYZoom();
                 }
                 addSeries(testid, branchid, platformid, addSeriesNode, false, data.unit);
                 updateBindings();
@@ -386,8 +393,8 @@
                 var testid = loadSeries[i][0];
                 var branchid = loadSeries[i][1];
                 var platformid = loadSeries[i][2];
-                var sel = loadSeries[i][3];
-                downloadSeries(testid, branchid, platformid, sel);
+                var zoomRanges = loadSeries[i][3];
+                downloadSeries(testid, branchid, platformid, zoomRanges);
             }
         });
     }
@@ -419,7 +426,7 @@
 
         // find changes which match this range
         var csets = [];
-        var range = GraphCommon.getZoomRange();
+        var range = GraphCommon.getZoomXRange();
         var branches = [];
         $.each(GraphCommon.allSeries, function(i, series) {
             if (series.runs === undefined) {
@@ -429,9 +436,7 @@
             $.each(series.runs, function(j, run) {
                 $.each(run.data, function(k, data) {
                     var time = parseInt(data.t);
-                    var from = parseInt(range.from);
-                    var to = parseInt(range.to);
-                    if (time >= from && time <= to) {
+                    if (time >= range.from && time <= range.to) {
                         if (repository &&
                             repository != window.DEFAULT_REPOSITORY) {
                             var sets = data.additionalChangesets;
@@ -508,7 +513,7 @@
         $.each($(branches), function(i, branch) {
             $.each($(tests), function(j, test) {
                 $.each($(platforms), function(k, platform) {
-                    fetchData(test, branch, platform);
+                    fetchData(test, branch, platform, null, true);
                 });
             });
         });
@@ -581,7 +586,6 @@
             }
 
             if (unit) {
-                console.log(unit);
                 $(node).find('.testName').append(' <span class="unit">(' + unit + ')</span>');
             }
 

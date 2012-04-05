@@ -274,7 +274,7 @@ The plugin allso adds the following methods to the plot object:
         }
 
         function selectionIsSane() {
-            var minSize = 5;
+            var minSize = 1;
             return Math.abs(selection.second.x - selection.first.x) >= minSize &&
                 Math.abs(selection.second.y - selection.first.y) >= minSize;
         }
