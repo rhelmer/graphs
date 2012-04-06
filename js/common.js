@@ -262,22 +262,24 @@ GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
         var minVisibleT = new Date().getTime() - displayDays;
         var maxVisibleT = new Date().getTime();
 
+        var visibleData = d.data.filter(function(p) {
+            return p.t >= minVisibleT && p.t <= maxVisibleT;
+        });
+
         var plot = {
             id: d.id,
             lines: { lineWidth: lineWidth },
             color: color,
-            data: $.map(d.data, function(p) {
-                if (p.t >= minVisibleT && p.t <= maxVisibleT) {
-                    return [[p.t, p.v]];
-                }
-            }),
+            data: $.map(visibleData,
+                        function (p) { return [[p.t, p.v]]; }),
             etc: {
                 branch: seriesIn.branch,
                 test: seriesIn.test,
                 platform: seriesIn.platform,
                 machine: d.machine,
-                changesets: $.map(d.data, function(p) {return p.changeset;}),
-                additionalChangesets: $.map(d.data, function(p) {
+                changesets: $.map(visibleData,
+                                  function(p) { return p.changeset; }),
+                additionalChangesets: $.map(visibleData, function(p) {
                     return p['additionalChangesets']; })
             }
         };
@@ -341,6 +343,12 @@ GraphCommon.deltaPlot = function(plot)
     plot.data = newPlot;
     return plot;
 };
+
+GraphCommon.getSelectedXRange = function()
+{
+    var selection = this.plot.getSelection();
+    return selection.xaxis ? selection.xaxis : this.getZoomXRange();
+}
 
 GraphCommon.getZoomXRange = function()
 {
@@ -675,7 +683,10 @@ GraphCommon.updatePlot = function()
         if (yaxisIndex <= 0 && series.visible) {
             if (unit) {
                 yaxes.push({tickFormatter: (function(unit) {
-                    return function(value, axis) { return value + ' ' + unit; }
+                    // FIXME This won't work for values less than 0.0001.
+                    return function(value, axis) {
+                        return Math.round(value * 10000) / 10000 + ' ' + unit;
+                    }
                 })(unit)});
             } else {
                 yaxes.push({});

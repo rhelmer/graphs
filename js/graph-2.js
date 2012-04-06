@@ -294,7 +294,7 @@
             endDate = new Date(maxT);
         }
 
-        var range = GraphCommon.getZoomXRange();
+        var range = GraphCommon.getSelectedXRange();
         var start = (new Date(range.from)).getDate();
         var end = (new Date(range.to)).getDate();
 
@@ -427,7 +427,7 @@
 
         // find changes which match this range
         var csets = [];
-        var range = GraphCommon.getZoomXRange();
+        var range = GraphCommon.getSelectedXRange();
         var branches = [];
         $.each(GraphCommon.allSeries, function(i, series) {
             if (series.runs === undefined) {
