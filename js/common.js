@@ -344,6 +344,12 @@ GraphCommon.deltaPlot = function(plot)
     return plot;
 };
 
+GraphCommon.getSelectedXRange = function()
+{
+    var selection = this.plot.getSelection();
+    return selection.xaxis ? selection.xaxis : this.getZoomXRange();
+}
+
 GraphCommon.getZoomXRange = function()
 {
     return {
