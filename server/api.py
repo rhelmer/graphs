@@ -189,7 +189,6 @@ def update_valid_test_combinations(reporter=None):
           AND machines.is_active
           AND test_runs.date_run >= %s
     ORDER BY test_runs.date_run
-    LIMIT 100000
     """
     cursor = db.cursor(cursorclass=MySQLdb.cursors.DictCursor)
     cursor.execute(sql, (last_updated,))
