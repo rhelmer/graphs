@@ -270,8 +270,7 @@ GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
             id: d.id,
             lines: { lineWidth: lineWidth },
             color: color,
-            data: $.map(visibleData,
-                        function (p) { return [[p.t, p.v]]; }),
+            data: $.map(visibleData, function(p) { return [[p.t, p.v]]; }),
             etc: {
                 branch: seriesIn.branch,
                 test: seriesIn.test,
@@ -350,7 +349,7 @@ GraphCommon.getSelectedXRange = function()
 {
     var selection = this.plot.getSelection();
     return selection.xaxis ? selection.xaxis : this.getZoomXRange();
-}
+};
 
 GraphCommon.getZoomXRange = function()
 {
