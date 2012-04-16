@@ -293,7 +293,9 @@ GraphCommon.parseSeries = function(seriesIn, i, weight, explodedWeight)
                     fillBetween: plot.id,
                     points: {show: false},
                     lines: {show: seriesIn.visible, fill: weight,
-                        lineWidth: 0}});
+                        lineWidth: 0},
+                    hoverable: false,
+                    clickable: false});
             }
 
             addPlot(function(p) { return [[p.t, p.l]]; }, '_min', 0.1);
