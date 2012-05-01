@@ -6,6 +6,9 @@
 export PATH=$PATH:$HOME/node/bin
 export NODE_PATH=$HOME/node_modules/
 
+# some installs call it "nodejs"
+alias node=nodejs
+
 if [ -z "$DOCROOT" ]
 then
   export DOCROOT=/var/www/html/graphs
