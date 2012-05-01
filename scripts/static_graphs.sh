@@ -5,9 +5,19 @@
 
 export PATH=$PATH:$HOME/node/bin
 export NODE_PATH=$HOME/node_modules/
+export NODE=$(which node)
 
 # some installs call it "nodejs"
-alias node=nodejs
+if [ -z "$NODE" ]
+then
+  NODE=$(which nodejs)
+fi
+
+if [ -z "$NODE" ]
+then
+  echo "node not found"
+  exit 1
+fi
 
 if [ -z "$DOCROOT" ]
 then
