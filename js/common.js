@@ -491,7 +491,7 @@ function updateTooltip(item)
     $('#tt-series2').html(platform + ' (' + machine + ')');
     if (datatype == 'running') {
         // FIXME should support unit names
-        $('#tt-v').html(parseInt(v));
+        $('#tt-v').html(Math.round(v*1000)/1000);
         $('#tt-dv').html('&Delta; ' + dv.toFixed(0) +
                          ' (' + (100 * dvp).toFixed(1) + '%)');
     } else if (datatype == 'delta') {
