@@ -26,4 +26,4 @@ fi
 
 cd $DOCROOT
 mkdir -p images/dashboard
-node ./scripts/static_graphs.js
+$NODE ./scripts/static_graphs.js
