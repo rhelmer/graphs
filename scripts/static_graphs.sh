@@ -5,12 +5,12 @@
 
 export PATH=$PATH:$HOME/node/bin
 export NODE_PATH=$HOME/node_modules/
-export NODE=$(which node)
+export NODE=$(which node) 2> /dev/null
 
 # some installs call it "nodejs"
 if [ -z "$NODE" ]
 then
-  NODE=$(which nodejs)
+  NODE=$(which nodejs) 2> /dev/null
 fi
 
 if [ -z "$NODE" ]
