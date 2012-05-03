@@ -69,7 +69,8 @@ function repoMap(branch)
         'thunderbird': 'comm-central',
         'mozilla-inbound': 'integration/mozilla-inbound',
         'try': 'try',
-        'mobile': 'mozilla-central'
+        'mobile': 'mozilla-central',
+        'fx-team': 'integration/fx-team'
     };
 
     if (branch.indexOf('-non-pgo') != -1) {
