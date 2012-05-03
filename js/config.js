@@ -11,10 +11,10 @@ var COLORS = ['#e7454c', '#6dba4b', '#4986cf', '#f5983d', '#884e9f',
               '#bf5c41'];
 
 // server for JSON performance data
-var SERVER = 'http://graphs-new.mozilla.org';
+var SERVER = 'http://graphs.mozilla.org';
 // server for static dashboard images
 var IMAGE_SERVER = SERVER;
-var VHOST = 'graphs-new.mozilla.org';
+var VHOST = 'graphs.mozilla.org';
 
 if ($.color) {
     var LIGHT_COLORS = $.map(COLORS, function(color) {
